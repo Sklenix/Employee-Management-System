@@ -133,6 +133,9 @@
         <div class="collapse navbar-collapse" id="dropdownMenu">
             <ul class="navbar-nav navbar-collapse">
                 <li class="nav-item"><a href="#aboutSystem" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >O Systému</a> </li>
+                <li class="nav-item"><a href="#formular" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Formulář</a> </li>
+                <li class="nav-item"><a href="#kontakty" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Kontakty</a> </li>
+
             </ul>
         <ul class="navbar-nav navbar-collapse justify-content-end">
             @if (Route::has('login'))
@@ -151,7 +154,7 @@
 
     <div class="container col-12 pozadi" style="margin-top:6px;"></div>
 
-    <section class="page-section"  id="aboutSystem" style="padding-top:40px;padding-bottom: 40px;background-color: #F5F5F5" >
+    <section class="page-section"  id="aboutSystem" style="padding-top:40px;padding-bottom: 60px;background-color: #F5F5F5" >
         <div class="container">
             <h2 class="text-center mt-0">O systému</h2>
             <hr />
@@ -207,6 +210,99 @@
             </div>
         </div>
     </section>
+                <section class="formular" id="formular">
+                    <div class="col-md-12 col-sm-12 col-xs-12 text-center" style="background-color: #17a2b8;padding-top:60px;padding-bottom: 50px;">
+                        <center>
+                        <div class="col-md-6 col-sm-12 col-xs-12" style="background-color: #F5F5F5;border-radius: 10px;padding:40px;">
+                            <h3 class="h4 mb-2 ">Kontaktujte nás.</h3>
+                            <hr class="divider my-4">
+                            @if(count($errors) > 0 )
+                                <div class="alert alert-danger">
+                                    <button type="button" class="close" data-dismiss="alert">x</button>
+                                    <ul class="text-left">
+                                        @foreach($errors->all() as $error)
+                                            <li>{{$error}}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+                    @if($message = Session::get('success'))
+                            <div class="alert alert-success alert-block">
+                                <button type="button" class="close" data-dismiss="alert">x</button>
+                                <strong>{{$message}}</strong>
+                            </div>
+                    @endif
+                    <form method="post" action="{{url('welcome/send')}}#formular">
+                        @csrf
+                        <div class="form-group">
+                            <div class="alert alert-warning" role="alert">
+                                Položky označené (<span style="color:red;">*</span>) jsou povinné.
+                            </div>
+                            <label><i class="fa fa-user " aria-hidden="true"></i> Vaše celé jméno (<span style="color:red;">*</span>)</label>
+                            <input type="text" name="name" class="form-control" placeholder="Vložte své celé jméno ...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa fa-envelope" aria-hidden="true"></i> Váš e-mail (<span style="color:red;">*</span>)</label>
+                            <input type="email" name="email" class="form-control" placeholder="Vložte svůj e-mail ...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa fa-phone " aria-hidden="true"></i> Vaše číslo (<span style="color:red;">*</span>)</label>
+                            <input type="text" name="phone" class="form-control" placeholder="Vložte své číslo ve tvaru +420 123 456 789 ...">
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa fa-comment " aria-hidden="true"></i> Zpráva (<span style="color:red;">*</span>)</label>
+                            <textarea rows="3" name="message" class="form-control" placeholder="Vložte text zprávy ..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" name="send" value="Odeslat" class="btn btn-danger"/>
+                        </div>
+                    </form>
+                        </div>
+                        </center>
+                </div>
+                </section>
+
+    <!-- Kontakty-->
+    <section class="page-section" id="kontakty" style="background-color: #F5F5F5;color:black;padding-top:60px;padding-bottom:30px;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h2 class="mt-0">Kontakty</h2>
+                    <hr class="divider my-4">
+                    <p class="text-black" style="font-size: 20px;">Pavel Sklenář</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-4 ml-auto text-center mb-5 mb-lg-0">
+                    <i class="fa fa-phone fa-3x"></i>
+                    <div class="">+420 123 456 789
+                    </div>
+                </div>
+                <div class="col-lg-4 mr-auto text-center">
+                    <i class="fa fa-envelope fa-3x"></i>
+                    <a class="d-block " href="mailto:sklenar@aksklenar.com">tozondoservice@gmail.com</a>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+        <center>
+            <p class="">Informační systém pro správu zaměstnanců ve firmě 2020
+                <br>
+                <br></p>
+            <br>
+
+        </center>
+
+    </section>
+    <center>
+        <!-- Patička-->
+        <footer class="bg-light ">
+            <div class="container"><br>
+                <div class="small text-center text-muted">Copyright&copy 2020 - sklenix</div>
+            </div>
+            <br>
+        </footer>
 
     </body>
 </html>
