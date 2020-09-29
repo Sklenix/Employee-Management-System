@@ -7,17 +7,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable
+class Company extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    protected $primaryKey = 'company_id';
+    protected $table = 'table_companies';
+    protected $guard = 'companies';
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'company_name', 'company_first_name', 'company_surname','company_email','company_phone','company_login','company_password'
     ];
 
     /**
@@ -26,7 +29,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'company_password', 'remember_token',
     ];
 
     /**
@@ -37,4 +40,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function getAuthPassword()
+    {
+        return $this->company_password;
+    }
+
 }

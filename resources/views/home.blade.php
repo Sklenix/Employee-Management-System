@@ -14,7 +14,7 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+                    Jsi firma.
                 </div>
             </div>
         </div>
