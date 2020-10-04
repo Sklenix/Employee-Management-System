@@ -16,11 +16,11 @@ class CreateCompaniesTable extends Migration
         Schema::create('table_companies', function (Blueprint $table) {
             $table->id('company_id');
             $table->string('company_name');
-            $table->string('company_first_name')->nullable();;
-            $table->string('company_surname')->nullable();;
+            $table->string('company_first_name');
+            $table->string('company_surname');
             $table->string('company_email')->unique();
-            $table->string('company_phone');
-            $table->string('company_login');
+            $table->string('company_phone')->nullable();
+            $table->string('company_login')->unique();
             $table->timestamp('company_email_verified_at')->nullable();
             $table->string('company_password');
             $table->rememberToken();

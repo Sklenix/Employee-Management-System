@@ -61,7 +61,7 @@
 
     </style>
 </head>
-<body data-spy="scroll" data-target="#myScrollspy" data-offset="20">
+<body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
 
 <!-- Menu-->
 <nav class="fill navbar sticky-top navbar-light navbar-expand-sm " style="background-color: #F5F5F5" id="myScrollspy">
@@ -72,7 +72,7 @@
     </button>
     <div class="collapse navbar-collapse" id="dropdownMenu">
         <ul class="navbar-nav navbar-collapse justify-content-end">
-            <li class="nav-item"><a href="{{ route('login') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 15px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Přihlásit se</a> </li>
+            <li class="nav-item"><a href="{{ route('company') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 15px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Přihlásit se</a> </li>
         </ul>
     </div>
 </nav>
@@ -81,9 +81,9 @@
     <div class="row justify-content-center">
         <div class="col-12">
             <div class="card">
-                <div class="card-header text-center" style="font-size: 23px;">Registrace</div>
+                <div class="card-header text-center" style="font-size: 20px;background-color: #0275d8;color:white;">Registrace</div>
 
-                <div class="card-body">
+                <div class="card-body" style="background-color:#F8F8FF">
                     <div class="row justify-content-center">
 
                     </div>
@@ -96,8 +96,13 @@
                                 @csrf
 
                                 <div class="form-group">
-                                    <label class="col-form-label text-md-right"><i class="fa fa-address-book " aria-hidden="true"></i> Společnost(<span style="color:red;">*</span>)</label>
-                                    <input id="company" placeholder="Zadejte název Vaší společnosti..." type="text" class="form-control @error('company') is-invalid @enderror" name="company" value="{{ old('company') }}" required autocomplete="company" autofocus>
+                                    <label class="col-form-label text-md-right"> Společnost (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-address-book " aria-hidden="true"></i></div>
+                                        </div>
+
+                                    <input id="company" placeholder="Zadejte název Vaší společnosti..." type="text" class="form-control @error('company') is-invalid @enderror" name="company" value="{{ old('company') }}"  autocomplete="company" autofocus>
 
                                     @error('company')
                                     <span class="invalid-feedback" role="alert">
@@ -106,84 +111,115 @@
                                     @enderror
 
                                 </div>
+                                </div>
 
                                 <div class="form-group">
-                                    <label for="first_name" class="col-form-label text-md-right"><i class="fa fa-user " aria-hidden="true"></i> Jméno(<span style="color:red;">*</span>)</label>
-                                    <input id="first_name" placeholder="Zadejte Vaše křestní jméno..." type="text" class="form-control @error('first_name') is-invalid @enderror" name="first_name" value="{{ old('first_name') }}" required autocomplete="first_name">
+                                    <label for="first_name" class="col-form-label text-md-right"> Jméno zástupce (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        </div>
+                                    <input id="first_name" placeholder="Zadejte Vaše křestní jméno..." type="text" class="form-control @error('first_name') is-invalid @enderror" name="first_name" value="{{ old('first_name') }}"  autocomplete="first_name">
 
                                     @error('first_name')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
-
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="surname" class="col-form-label text-md-right"><i class="fa fa-user " aria-hidden="true"></i> Příjmení(<span style="color:red;">*</span>)</label>
-                                    <input id="surname" placeholder="Zadejte Vaše příjmení..." type="text" class="form-control @error('surname') is-invalid @enderror" name="surname" required autocomplete="surname">
+                                    <label for="surname" class="col-form-label text-md-right">Příjmení zástupce (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        </div>
+                                    <input id="surname" placeholder="Zadejte Vaše příjmení..." type="text" class="form-control @error('surname') is-invalid @enderror" name="surname"  value="{{ old('surname') }}" autocomplete="surname">
 
                                     @error('surname')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
-
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="email" class="col-form-label text-md-right"><i class="fa fa-envelope " aria-hidden="true"></i> E-mail(<span style="color:red;">*</span>)</label>
-                                    <input id="email" placeholder="Zadejte Vaši e-mailovou adresu..." type="email" class="form-control  @error('email') is-invalid @enderror" name="email" required autocomplete="email">
+                                    <label for="email" class="col-form-label text-md-right"> E-mail (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-envelope " aria-hidden="true"></i></div>
+                                        </div>
+                                    <input id="company_email" placeholder="Zadejte Vaši e-mailovou adresu..." type="email" class="form-control  @error('company_email') is-invalid @enderror" name="company_email" value="{{ old('company_email') }}"  autocomplete="email">
 
-                                    @error('email')
+                                    @error('company_email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
-
+                                    </div>
                                 </div>
 
-
                                 <div class="form-group">
-                                    <label for="phone" class="col-form-label text-md-right"><i class="fa fa-phone " aria-hidden="true"></i> Telefon</label>
-                                    <input id="phone" placeholder="Zadejte Váš telefon..." type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" required autocomplete="phone">
+                                    <label for="phone" class="col-form-label text-md-right">Telefon</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-phone " aria-hidden="true"></i></div>
+                                        </div>
+                                    <input id="phone" placeholder="Zadejte Váš telefon..." type="text" class="form-control" name="phone" value="{{ old('phone') }}" autocomplete="phone">
 
                                     @error('phone')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="login" class="col-form-label text-md-right"><i class="fa fa-user " aria-hidden="true"></i> Uživatelské jméno(<span style="color:red;">*</span>)</label>
-                                    <input id="login" placeholder="Zadejte Vaše uživatelské jméno k systému..." type="text" class="form-control @error('login') is-invalid @enderror" name="login" required autocomplete="login">
+                                    <label for="login" class="col-form-label text-md-right">Uživatelské jméno (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        </div>
+                                    <input id="company_login" placeholder="Zadejte Vaše uživatelské jméno k systému..." type="text" value="{{ old('company_login') }}" class="form-control @error('company_login') is-invalid @enderror" name="company_login"  autocomplete="company_login">
 
-                                    @error('login')
+                                    @error('company_login')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    <label for="password" class="col-form-label text-md-right"><i class="fa fa-lock" aria-hidden="true"></i> Heslo</label>
-                                    <input id="password" placeholder="Zadejte Vaše heslo ..." type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+                                    <label for="password" class="col-form-label text-md-right">Heslo (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
+                                        </div>
+                                    <input id="password" placeholder="Zadejte Vaše heslo ..." type="password" class="form-control @error('password') is-invalid @enderror" name="password"  autocomplete="new-password">
 
                                     @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
-
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="password-confirm" class="col-form-label text-md-right"><i class="fa fa-lock" aria-hidden="true"></i> Heslo znovu</label>
-                                    <input id="password-confirm" placeholder="Znovu zadejte Vaše heslo ..." type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                                    <label for="password-confirm" class="col-form-label text-md-right">Heslo znovu (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
+                                        </div>
+                                    <input id="password-confirm" placeholder="Znovu zadejte Vaše heslo ..." type="password" class="form-control" name="password_confirmation"  autocomplete="new-password">
+                                </div>
                                 </div>
 
                                 <div class="form-group text-center">
-                                    <button type="submit" class="btn btn-primary">
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg">
                                         Registrovat
                                     </button>
                                 </div>

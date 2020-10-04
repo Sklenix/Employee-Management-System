@@ -27,7 +27,7 @@ class CompanyFactory extends Factory
             'company_name' => 'Google',
             'company_first_name' => 'Josef',
             'company_surname' => 'Malý',
-            'company_email' => 'google@gmail.com',
+            'company_email' => 'Fload158@gmail.com',
             'company_phone' => '123456789',
             'company_login' => 'sklenix',
             'company_email_verified_at' => now(),

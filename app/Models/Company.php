@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class Company extends Authenticatable
 {
@@ -13,7 +13,7 @@ class Company extends Authenticatable
 
     protected $primaryKey = 'company_id';
     protected $table = 'table_companies';
-    protected $guard = 'companies';
+    protected $guard = 'users';
     /**
      * The attributes that are mass assignable.
      *
@@ -41,6 +41,26 @@ class Company extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function getEmailForPasswordReset()
+    {
+        return $this->company_email;
+    }
+
+    public function routeNotificationFor($driver)
+    {
+        if (method_exists($this, $method = 'routeNotificationFor'.Str::studly($driver))) {
+            return $this->{$method}();
+        }
+
+        switch ($driver) {
+            case 'database':
+                return $this->notifications();
+            case 'mail':
+                return $this->company_email;
+            case 'nexmo':
+                return $this->company_phone;
+        }
+    }
 
     public function getAuthPassword()
     {

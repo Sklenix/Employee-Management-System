@@ -22,12 +22,14 @@ Auth::routes();
 
 
 Route::get('/login/admin', [App\Http\Controllers\Auth\LoginController::class, 'showAdminLoginForm']);
+Route::get('/login/company', [App\Http\Controllers\Auth\LoginController::class, 'showCompanyLoginForm'])->name('company');
 Route::get('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'showEmployeeLoginForm'])->name('employee');
 
 Route::post('/login/admin', [App\Http\Controllers\Auth\LoginController::class,'adminLogin']);
+Route::post('/login/company', [App\Http\Controllers\Auth\LoginController::class,'companyLogin']);
 Route::post('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'employeeLogin']);
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/company/profile/', [App\Http\Controllers\UserCompanyController::class, 'index'])->name('home');
 
 
 Route::group(['middleware' => 'auth:employee'], function () {

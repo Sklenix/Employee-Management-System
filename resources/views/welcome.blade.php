@@ -31,7 +31,9 @@
         body { font-family: 'Roboto', sans-serif; }
         .navbar-brand{ font-family: 'Pacifico', cursive; }
         nav { width: 100%; box-shadow: 0px 6px 0px #dedede;}
-
+        html {
+            scroll-behavior: smooth
+        }
         nav ul li a { text-decoration: none; font-weight: 800; text-transform: uppercase; }
         nav.fill ul li a { position: relative; }
 
@@ -62,7 +64,6 @@
     </style>
 </head>
 <body data-spy="scroll" data-target="#myScrollspy" data-offset="20">
-
 <!-- Menu-->
 <nav class="fill navbar sticky-top navbar-light navbar-expand-sm " style="background-color: #F5F5F5" id="myScrollspy">
     <!-- Sekce logo -->
@@ -72,16 +73,17 @@
     </button>
     <div class="collapse navbar-collapse" id="dropdownMenu">
         <ul class="navbar-nav navbar-collapse">
-            <li class="nav-item"><a href="#osystemu" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >O Systému</a> </li>
+            <li class="nav-item"><a href="#funkce" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Jak to funguje</a> </li>
+            <li class="nav-item"><a href="#vlastnosti" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Vlastnosti systému</a> </li>
             <li class="nav-item"><a href="#formular" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Napište nám</a> </li>
             <li class="nav-item"><a href="#kontakty" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Kontakty</a> </li>
         </ul>
         <ul class="navbar-nav navbar-collapse justify-content-end">
             @if (Route::has('login'))
                 @auth
-                    <li class="nav-item"><a href="{{ url('/home') }}" class="nav-link p-3" style="font-family: 'Amatic SC', cursive;" >Vstup do systému</a> </li>
+                    <li class="nav-item"><a href="{{ url('/company/profile') }}" class="nav-link p-3" style="font-family: 'Amatic SC', cursive;" >Vstup do systému</a> </li>
                 @else
-                    <li class="nav-item"><a href="{{ route('login') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 16px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Přihlásit se</a> </li>
+                    <li class="nav-item"><a href="{{ route('company') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 16px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Přihlásit se</a> </li>
                     @if (Route::has('register'))
                         <li class="nav-item"> <a href="{{ route('register') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 16px;margin-right: 20px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Registrace</a> </li>
                     @endif
@@ -94,17 +96,39 @@
 <!-- Pozadí (obrázek)-->
 <div class="container col-12 pozadi" style="margin-top:6px;"></div>
 
-<!-- O systému-->
-<section class="page-section"  id="osystemu" style="padding-top:40px;padding-bottom: 60px;background-color: #F5F5F5" >
+<!-- Jak to funguje-->
+<section class="page-section"  id="funkce" style="padding-top:40px;padding-bottom: 60px;background-color: #17a2b8;" >
     <div class="container">
-        <h2 class="text-center">O systému</h2>
+        <h2 class="text-center text-white">Jak to funguje</h2>
+        <hr style="background-color: white;padding-top:2px;">
+        <div class="row">
+            <div class="col-lg-1 col-md-1 text-center">
+            </div>
+            <div class="col-lg-10 col-md-10 text-center">
+                <p class="text-white-50 mb-0 text-justify" style="font-size: 16px;">Zaregistrujete se jako firma pomocí tlačítka registrace, po založení účtu budete přesměrováni na domovskou stránku Vašeho profilu,
+                    po registraci se Vám také vytvoří složka v Google Drive ve formátu [Jméno][Příjmení][E-mail]. Na domovské stránce máte menu, v kterém jsou vypsané možnosti, co vše lze se systémem dělat. V horním pravém rohu máte
+                    možnost upravit Váš profil, nebo se odhlásit. Po vytvoření zaměstnance, sekce "Vytvořit zaměstnance" se ve Vaší firemní složce vytvoří nová složka se jménem zaměstnance
+                    ve formátu [Příjmení][Jméno][ID_zaměstnance]. Do systému se lze přihlásit Vaším e-mailem, nebo přihlašovacím jménem(loginem), který jste zadal v registraci účtu.
+                </p>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+
+<!-- Vlastnosti systému-->
+<section class="page-section"  id="vlastnosti" style="padding-top:40px;padding-bottom: 60px;background-color: #F5F5F5" >
+    <div class="container">
+        <h2 class="text-center">Funkce systému</h2>
         <hr style="background-color: #FF7F50;padding-top:2px;">
         <div class="row">
             <div class="col-lg-3 col-md-6 text-center">
                 <div class="mt-5">
                     <img src="{{asset("images/googleDrive.png")}}" alt="Google Drive ikonka" height="100" width="100" title="Google Drive"/>
                     <h3 class="h4 mb-2">Google Drive</h3>
-                    <p class="text-muted mb-0 text-justify">Můžete spravovat své zaměstnance i vzdáleně na Google Drive, kde se jim automaticky vytvoří složka, do které můžete ukládat!</p>
+                    <p class="text-muted mb-0 text-justify">Můžete spravovat soubory zaměstnance na Google Drive, kde se po registraci zaměstnance automaticky vytvoří složka, do které můžete ukládat!</p>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6 text-center">
@@ -121,16 +145,14 @@
                     <p class="text-muted mb-0">Můžete vytvářet zaměstnance, které potom v systému můžete jednotlivě spravovat.</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 text-center">
+           <!-- <div class="col-lg-3 col-md-6 text-center">
                 <div class="mt-5">
                     <img src="{{asset("images/penizeImage.png")}}" alt="Výplata ikonka" height="90" width="90" title="Výplata" style="margin-bottom: 10px;"/>
                     <h3 class="h4 mb-2">Vyplácení zaměstnanců</h3>
                     <p class="text-muted mb-0">Můžete vyplácet konkrétní zaměstnance v jejich profilu.</p>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6 text-center">
+            </div> !-->
 
-            </div>
             <div class="col-lg-3 col-md-6 text-center">
                 <div class="mt-5">
                     <img src="{{asset("images/pdfImage.png")}}" alt="Generování ikonka" height="90" width="90" title="Generování PDF, Excel" style="margin-bottom: 10px;"/>
@@ -138,7 +160,8 @@
                     <p class="text-muted mb-0">Můžete generovat například přehled zaměstnanců, směny, ... .</p>
                 </div>
             </div>
-            <div class="col-lg-3 col-md-6 text-center">
+
+            <div class="col-lg-12 col-md-6 text-center">
                 <div class="mt-5">
                     <img src="{{asset("images/dochazkaImage.png")}}" alt="Docházky ikonka" height="90" width="90" title="Evidování docházky" style="margin-bottom: 10px;"/>
                     <h3 class="h4 mb-2">Docházka</h3>
@@ -150,6 +173,7 @@
         </div>
     </div>
 </section>
+
 
 <!-- Formulář-->
 <section class="formular" id="formular">

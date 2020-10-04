@@ -26,8 +26,6 @@
     <title>Tozondo - Přihlašování</title>
 
     <style>
-
-
         body { font-family: 'Roboto', sans-serif; }
         .navbar-brand{ font-family: 'Pacifico', cursive; }
         nav { width: 100%; box-shadow: 0px 6px 0px #dedede;}
@@ -45,7 +43,7 @@
 
         label{font-size: 17px;}
 
-
+        .field-icon {z-index: 2;position: relative;margin-right: 8px;margin-top: -28px;float: right;}
         .card{
             margin-top: 30px;
         }
@@ -66,7 +64,7 @@
 
     </style>
 </head>
-<body data-spy="scroll" data-target="#myScrollspy" data-offset="20">
+<body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
 
 <!-- Menu-->
 <nav class="fill navbar sticky-top navbar-light navbar-expand-sm " style="background-color: #F5F5F5" id="myScrollspy">
@@ -81,109 +79,142 @@
         </ul>
     </div>
 </nav>
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
+<div class="container" >
+    <div class="row justify-content-center" >
+        <div class="col-md-10">
             <div class="card">
-                <div class="card-header text-center" style="font-size: 22px;">Přihlašování pro
+                <div class="card-header text-center" style="background-color: #0275d8;color:white;font-size: 20px;">Přihlašování pro
                     @isset($url)
                         @if($url == "employee")
                            zaměstnance
                         @elseif($url == "admin")
                             adminy
+                        @elseif($url == "company")
+                            firmy
                         @endif
                             @else
-                        firmy
                     @endisset
                 </div>
 
-                <div class="card-body">
+                <div class="card-body" style="background-color:#F8F8FF;">
                     @if(Session::has('message'))
                         <div class="alert alert-danger">
                             <button type="button" class="close" data-dismiss="alert">x</button>
                             {{ Session::get('message') }}
                         </div>
                     @endif
+                        @if(Session::has('successRegister'))
+                            <div class="alert alert-success">
+                                <button type="button" class="close" data-dismiss="alert">x</button>
+                                {{ Session::get('successRegister') }}
+                            </div>
+                        @endif
                     @isset($url)
                         <form method="POST" action='{{ url("login/$url") }}' aria-label="{{ __('Login') }}">
                             @else
                                 <form method="POST" action="{{ route('login') }}" aria-label="{{ __('Login') }}">
                                     @endisset
                         @csrf
+                        <center>
+                        <div class="form-group">
+                            <label for="email" class="col-md-4 col-form-label text-md-right"></label>
 
-                        <div class="form-group row">
-                            <label for="email" class="col-md-4 col-form-label text-md-right">E-mail</label>
-
-                            <div class="col-md-6">
-                                <input id="email" class="form-control @error('email') is-invalid @enderror" name="email" placeholder="Zadejte Váš E-mail ..." value="{{ old('email') }}" autocomplete="email" autofocus>
-
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-envelope " aria-hidden="true"></i></div>
+                                    </div>
+                                <input id="email" class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" placeholder="Email | Login" value="{{ old('email') }}" autocomplete="email" autofocus>
                                 @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group row">
-                            <label for="password" class="col-md-4 col-form-label text-md-right">Heslo</label>
+                        <div class="form-group">
+                            <label for="password" class="col-md-4 col-form-label text-md-right"></label>
+                            <div class="col-md-8">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-lock" style="padding-right: 5px;" aria-hidden="true"></i></div>
+                                    </div>
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" placeholder="Zadejte Vaše heslo ..." name="password"  autocomplete="current-password">
+                                <input id="password"  type="password" class="form-control form-control-lg @error('password') is-invalid @enderror" placeholder="Heslo" name="password"  autocomplete="current-password">
 
                                 @error('password')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
-                            </div>
-                        </div>
 
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-4">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                            </div>
+                                <span toggle="#password" style="z-index: 3" class="fa fa-fw fa-eye field-icon showpassword"></span>
+                        </div>
+                        </div>
+                        </center>
+
+                        <script>
+                            $(".showpassword").click(function() {
+                                $(this).toggleClass("fa-eye fa-eye-slash");
+                                var input = $($(this).attr("toggle"));
+                                if (input.attr("type") == "password") {
+                                    input.attr("type", "text");
+                                } else {
+                                    input.attr("type", "password");
+                                }
+                            });
+                        </script>
+                        <div class="form-group">
+                            <div class="col-md-8 offset-md-2 col-sm-6">
+                                <span class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="remember" id="remember" {{ old('remember') !== null ? 'checked' : '' }}>
                                     <label class="form-check-label" for="remember" style="font-size: 14px;">
                                         Zapamatovat
                                     </label>
-                                </div>
+                                      @if (Route::has('password.request'))
+                                        <a class="btn btn-link" style="float:right;position:relative;margin-top:-7px;" href="{{ route('password.request') }}">
+                                        Zapomněl jste heslo?
+                                    </a>
+                                    @endif
+                                </span>
                             </div>
                         </div>
-
-                        <div class="form-group row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                        <div class="form-group">
+                            <div class="col-md-8 offset-md-2">
+                                <button type="submit" class="btn btn-primary btn-lg btn-block">
                                     Přihlásit se
                                 </button>
                                 <br>
-                            </div>
-                        </div>
-                        <center>
-                            @if (Route::has('employee'))
-                                <a class="btn btn-link" href="{{ route('login') }}">
-                                    Jste firma?
-                                </a>
-                            @endif
-
-                            @if (Route::has('login'))
-                                <a class="btn btn-link" href="{{ route('employee') }}">
-                                    Jste zaměstnanec?
-                                </a>
-                            @endif
-
-                            @if (Route::has('password.request'))
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    Zapomněl jste své heslo?
-                                </a>
-                            @endif
-                        </center>
-                    </form>
-                        </form>
-                </div>
-            </div>
-            </div>
+                                <center>
+                                @isset($url)
+                                    @if($url == "employee")
+                                        @if (Route::has('employee'))
+                                            <a id="firma_current" class="btn btn-link" style="font-size: 16px;" href="{{ route('company') }}">
+                                                Jste firma?
+                                            </a>
+                                        @endif
+                                    @elseif($url == "admin")
+                                        adminy
+                                    @elseif($url == "company")
+                                        @if (Route::has('login'))
+                                            <a id="zamestnanec_current" class="btn btn-link" style="font-size: 16px;" href="{{ route('employee') }}">
+                                                Jste zaměstnanec?</a>
+                                        @endif
+                                    @endif
+                                @else
+                                @endisset
+                                </center>
+                                 </div>
+                             </div>
+                            </form>
+                         </form>
+                     </div>
+                 </div>
+             </div>
         </div>
     </div>
-
 </body>
 </html>

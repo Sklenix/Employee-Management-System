@@ -56,6 +56,11 @@ return [
             'provider' => 'employees',
         ],
 
+        'user' => [
+            'driver' => 'session',
+            'provider' => 'companies',
+        ],
+
 
     ],
 
@@ -120,6 +125,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+
     ],
 
     /*

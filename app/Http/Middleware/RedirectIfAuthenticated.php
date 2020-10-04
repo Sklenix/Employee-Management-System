@@ -24,8 +24,13 @@ class RedirectIfAuthenticated
         if ($guard == "employee" && Auth::guard($guard)->check()) {
             return redirect('/employee');
         }
+
+        if ($guard == "user" && Auth::guard($guard)->check()) {
+            return redirect('/company');
+        }
+
         if (Auth::guard($guard)->check()) {
-            return redirect('/home');
+            return redirect('/company/profile/');
         }
 
         return $next($request);

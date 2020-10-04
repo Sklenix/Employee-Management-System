@@ -77,6 +77,8 @@ class LoginController extends Controller
       //  return back()->withInput($request->only('email', 'remember'));
     }
 
+
+
     public function showEmployeeLoginForm()
     {
         return view('auth.login', ['url' => 'employee']);
@@ -103,12 +105,23 @@ class LoginController extends Controller
         }else{
             session()->flash('message', 'Špatně zadané přihlašovací údaje!');
             session()->flash('alert-class', 'alert-danger');
-            return redirect()->route('login');
+            return redirect()->route('employee');
         }
     }
 
+    public function showCompanyLoginForm()
+    {
+        return view('auth.login', ['url' => 'company']);
+    }
 
-    public function login(Request $request)
+
+    public function username()
+    {
+        return 'company_email';
+    }
+
+
+    public function companyLogin(Request $request)
    {
 
        $pravidla = [
@@ -128,11 +141,11 @@ class LoginController extends Controller
        if (Auth::attempt(['company_email' => $request->email, 'password' => $request->password]) || Auth::attempt(['company_login' => $request->email, 'password' => $request->password])  )
        {
           // return redirect()->intended('userhome');
-           return redirect()->intended('home');
+           return redirect()->intended('/company/profile/');
        }else{
            session()->flash('message', 'Špatně zadané přihlašovací údaje!');
            session()->flash('alert-class', 'alert-danger');
-           return redirect()->route('login');
+           return redirect()->route('company');
        }
    }
 
