@@ -96,17 +96,17 @@
                     <form method="POST" action="{{ route('password.email') }}">
                         @csrf
                         <div class="form-group" style="margin-top: -20px;">
-                            <label for="company_email" class="col-md-4 col-form-label text-md-right"></label>
+                            <label for="email" class="col-md-4 col-form-label text-md-right"></label>
                             <div class="col-md-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-envelope " aria-hidden="true"></i></div>
                                     </div>
-                                <input id="company_email" type="email" placeholder="Zadejte Váš email ..." class="form-control form-control-lg @error('company_email') is-invalid @enderror" name="company_email" value="{{ old('company_email') }}"  autocomplete="email" autofocus>
+                                <input id="email" type="email" placeholder="Zadejte Váš email ..." class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ old('company_email') }}"  autocomplete="email" autofocus>
 
-                                @error('company_email')
+                                @error('email')
                                     <span class="invalid-feedback" role="alert">
-                                        <strong>Zadaná emailová adresa v našem systému není registrována.</strong>
+                                        {{$message}}
                                     </span>
                                 @enderror
                                 </div>

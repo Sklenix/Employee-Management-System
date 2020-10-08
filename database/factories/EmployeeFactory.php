@@ -26,9 +26,9 @@ class EmployeeFactory extends Factory
         return [
             'employee_name' => 'Jan',
             'employee_surname' => 'Malý',
-            'employee_email' => 'maly@gmail.com',
+            'email' => 'fuurin555@gmail.com',
             'employee_login' => 'maly123',
-            'employee_password' => Hash::make('maly1234'),
+            'password' => Hash::make('maly1234'),
             'remember_token' => Str::random(10),
         ];
     }

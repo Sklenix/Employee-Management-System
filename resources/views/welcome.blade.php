@@ -105,10 +105,23 @@
             <div class="col-lg-1 col-md-1 text-center">
             </div>
             <div class="col-lg-10 col-md-10 text-center">
-                <p class="text-white-50 mb-0 text-justify" style="font-size: 16px;">Zaregistrujete se jako firma pomocí tlačítka registrace, po založení účtu budete přesměrováni na domovskou stránku Vašeho profilu,
-                    po registraci se Vám také vytvoří složka v Google Drive ve formátu [Jméno][Příjmení][E-mail]. Na domovské stránce máte menu, v kterém jsou vypsané možnosti, co vše lze se systémem dělat. V horním pravém rohu máte
-                    možnost upravit Váš profil, nebo se odhlásit. Po vytvoření zaměstnance, sekce "Vytvořit zaměstnance" se ve Vaší firemní složce vytvoří nová složka se jménem zaměstnance
-                    ve formátu [Příjmení][Jméno][ID_zaměstnance]. Do systému se lze přihlásit Vaším e-mailem, nebo přihlašovacím jménem(loginem), který jste zadal v registraci účtu.
+
+                <ol class="text-white-50 mb-0 text-justify" style="font-size: 16px;">
+                    <li>Zaregistrujete se jako firma pomocí tlačítka registrace, po založení účtu budete přesměrováni na domovskou stránku Vašeho profilu.</li>
+                    <li>Po registraci obdržíte pozvánku do Vašeho prostoru v Google Drive na Vámi uvedený email.</li>
+                    <li>Na domovské stránce máte menu, v kterém jsou vypsané možnosti, co vše lze se systémem dělat.</li>
+                    <li>V horním pravém rohu máte možnost upravit Váš profil, nebo se odhlásit.</li>
+                    <li>Po vytvoření zaměstnance se ve Vaší Google Drive složce vytvoří nová složka se jménem zaměstnance.</li>
+                    <li>Formát složky zaměstnance je následující [Příjmení][Jméno][ID_zaměstnance].</li>
+                    <li>Do systému se lze přihlásit Vaším e-mailem, nebo přihlašovacím  (loginem), který jste zadal v registraci účtu.</li>
+                    <li>Po vytvoření směn je můžete přiřazovat jednotlivým zaměstnancům.</li>
+                </ol>
+
+
+
+                <p class="text-white-50 mb-0 text-justify" style="font-size: 16px;">
+
+
                 </p>
 
             </div>

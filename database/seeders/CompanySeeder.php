@@ -20,11 +20,11 @@ class CompanySeeder extends Seeder
             'company_name' => 'Google',
             'company_first_name' => 'Josef',
             'company_surname' => 'Malý',
-            'company_email' => 'google@gmail.com',
+            'email' => 'google@gmail.com',
             'company_phone' => '123456789',
             'company_login' => 'sklenix',
             'company_email_verified_at' => now(),
-            'company_password' => Hash::make('ahoj1234'),
+            'password' => Hash::make('ahoj1234'),
             'remember_token' => Str::random(10),
         ]);
     }

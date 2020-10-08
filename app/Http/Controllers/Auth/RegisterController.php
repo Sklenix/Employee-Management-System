@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Providers\RouteServiceProvider;
+use Google_Service_Drive_Permission;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Foundation\Auth\User;
@@ -68,7 +69,7 @@ class RegisterController extends Controller
             'company' => ['required', 'string', 'max:255'],
             'first_name' =>  ['required', 'string', 'max:255'],
             'surname' =>  ['required', 'string', 'max:255'],
-            'company_email' => ['required','unique:table_companies,company_email','string','email','max:255'],
+            'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
             'phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
             'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
@@ -103,7 +104,7 @@ class RegisterController extends Controller
     protected function create(array $data)
     {
         /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
-        $cele_jmeno = $data['first_name'] . " " . $data['surname'];
+        $cele_jmeno = $data['company'];
         $id_brigadnik = $data['company_email'];
         $soubor = $cele_jmeno . " " . $id_brigadnik;
         /*Service účet pro pripojeni ke Google Drive*/
@@ -143,6 +144,23 @@ class RegisterController extends Controller
                 'uploadType' => "multipart"
             ));
 
+
+            $role = 'writer';
+            $userEmail = $data['company_email'];
+            $fileId = $createdFile->id;
+
+            $userPermission = new Google_Service_Drive_Permission(array(
+                'type' => 'user',
+                'role' => $role,
+                'emailAddress' => $userEmail
+            ));
+
+            $request = $service->permissions->create(
+                $fileId, $userPermission, array('fields' => 'id')
+            );
+
+
+
         } catch (Exception $e) {
             file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
             die();
@@ -151,11 +169,14 @@ class RegisterController extends Controller
             'company_name' => $data['company'],
             'company_first_name' => $data['first_name'],
             'company_surname' => $data['surname'],
-            'company_email' => $data['company_email'],
+            'email' => $data['company_email'],
             'company_phone' => $data['phone'],
             'company_login' => $data['company_login'],
-            'company_password' => Hash::make($data['password']),
+            'company_url' => $fileId,
+            'password' => Hash::make($data['password']),
         ]);
+
+
     }
 
     public function register(Request $request)
@@ -169,7 +190,7 @@ class RegisterController extends Controller
         event(new Registered($user = $this->create($request->all())));
 
         return $this->registered($request, $user)
-            ?: redirect($this->redirectPath())->with('successRegister', 'Registrace proběhla úspěšně, nyní se můžete přihlásit.');
+            ?: redirect($this->redirectPath())->with('successRegister', 'Registrace proběhla úspěšně, byl vám zaslán e-mail pro ověření e-mailové adresy, před přihlášením ověřte svou e-mailovou adresu.');
     }
 
 }

@@ -19,9 +19,9 @@ class EmployeeSeeder extends Seeder
         DB::table('table_employees')->insert([
             'employee_name' => 'Martin',
             'employee_surname' => 'Holý',
-            'employee_email' => 'holy@gmail.com',
+            'email' => 'holy@gmail.com',
             'employee_login' => 'holy12',
-            'employee_password' => Hash::make('lolec1234'),
+            'password' => Hash::make('lolec1234'),
             'remember_token' => Str::random(10),
         ]);
     }

@@ -18,11 +18,12 @@ class CreateCompaniesTable extends Migration
             $table->string('company_name');
             $table->string('company_first_name');
             $table->string('company_surname');
-            $table->string('company_email')->unique();
+            $table->string('email')->unique();
             $table->string('company_phone')->nullable();
             $table->string('company_login')->unique();
-            $table->timestamp('company_email_verified_at')->nullable();
-            $table->string('company_password');
+            $table->string('company_url')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
         });

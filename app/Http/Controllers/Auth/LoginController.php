@@ -99,7 +99,7 @@ class LoginController extends Controller
 
         $this->validate($request, $pravidla, $vlastniHlasky);
 
-        if (Auth::guard('employee')->attempt(['employee_email' => $request->email, 'password' => $request->password]) || Auth::guard('employee')->attempt(['employee_login' => $request->email, 'password' => $request->password])) {
+        if (Auth::guard('employee')->attempt(['email' => $request->email, 'password' => $request->password]) || Auth::guard('employee')->attempt(['employee_login' => $request->email, 'password' => $request->password])) {
 
             return redirect()->intended('employee');
         }else{
@@ -114,11 +114,6 @@ class LoginController extends Controller
         return view('auth.login', ['url' => 'company']);
     }
 
-
-    public function username()
-    {
-        return 'company_email';
-    }
 
 
     public function companyLogin(Request $request)
@@ -138,7 +133,7 @@ class LoginController extends Controller
        $this->validate($request, $pravidla, $vlastniHlasky);
 
 
-       if (Auth::attempt(['company_email' => $request->email, 'password' => $request->password]) || Auth::attempt(['company_login' => $request->email, 'password' => $request->password])  )
+       if (Auth::attempt(['email' => $request->email, 'password' => $request->password]) || Auth::attempt(['company_login' => $request->email, 'password' => $request->password])  )
        {
           // return redirect()->intended('userhome');
            return redirect()->intended('/company/profile/');

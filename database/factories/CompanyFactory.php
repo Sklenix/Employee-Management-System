@@ -27,11 +27,12 @@ class CompanyFactory extends Factory
             'company_name' => 'Google',
             'company_first_name' => 'Josef',
             'company_surname' => 'Malý',
-            'company_email' => 'Fload158@gmail.com',
+            'email' => 'Fload158@gmail.com',
             'company_phone' => '123456789',
             'company_login' => 'sklenix',
-            'company_email_verified_at' => now(),
-            'company_password' => Hash::make('ahoj1234'),
+            'email_verified_at' => now(),
+            'company_url' => '',
+            'password' => Hash::make('ahoj1234'),
             'remember_token' => Str::random(10),
         ];
     }

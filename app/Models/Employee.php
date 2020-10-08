@@ -20,7 +20,7 @@ class Employee extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'employee_name', 'employee_surname', 'employee_email','employee_login','employee_password'
+        'employee_name', 'employee_surname', 'email','employee_login','password'
     ];
 
     /**
@@ -29,12 +29,9 @@ class Employee extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'employee_password', 'remember_token',
+        'password', 'remember_token',
     ];
 
-    public function getAuthPassword()
-    {
-        return $this->employee_password;
-    }
+
 
 }

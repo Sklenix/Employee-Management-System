@@ -83,20 +83,28 @@
     <div class="row justify-content-center" >
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header text-center" style="background-color: #0275d8;color:white;font-size: 20px;">Přihlašování pro
+                <div class="card-header text-center" style="background-color: #0275d8;color:white;font-size: 20px;">Přihlašování
                     @isset($url)
                         @if($url == "employee")
-                           zaměstnance
+                           pro zaměstnance
                         @elseif($url == "admin")
-                            adminy
+                           pro adminy
                         @elseif($url == "company")
-                            firmy
+                            pro firmy
                         @endif
                             @else
                     @endisset
                 </div>
 
                 <div class="card-body" style="background-color:#F8F8FF;">
+                    @if(Session::has('status'))
+                        <div class="alert alert-success">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
+                            Heslo změněno, nyní se můžete přihlásit.
+                        </div>
+                    @endif
+
+
                     @if(Session::has('message'))
                         <div class="alert alert-danger">
                             <button type="button" class="close" data-dismiss="alert">x</button>

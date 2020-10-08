@@ -80,7 +80,7 @@
 <div class="container" style="margin-top:30px;">
     <div class="row justify-content-center">
         <div class="col-12">
-            <div class="card">
+            <div class="card" style="margin-bottom: 40px">
                 <div class="card-header text-center" style="font-size: 20px;background-color: #0275d8;color:white;">Registrace</div>
 
                 <div class="card-body" style="background-color:#F8F8FF">

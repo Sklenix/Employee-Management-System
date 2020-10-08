@@ -23,13 +23,22 @@ class UserCompanyController extends Controller
      */
     public function index()
     {
-        if(Auth::user()){
+
 
             return view('home', [
 
             ]);
-        }
 
+
+
+    }
+
+    public function showVerifySuccess()
+    {
+
+        return view('email_verified_login', [
+
+        ]);
 
     }
 }

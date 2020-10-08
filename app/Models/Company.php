@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Models;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\VerifyEmail;
 use Illuminate\Support\Str;
 
-class Company extends Authenticatable
+class Company extends Authenticatable implements  MustVerifyEmail
 {
     use HasFactory, Notifiable;
 
@@ -20,7 +22,7 @@ class Company extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'company_name', 'company_first_name', 'company_surname','company_email','company_phone','company_login','company_password'
+        'company_name', 'company_first_name', 'company_surname','email','company_phone','company_login','password','company_url'
     ];
 
     /**
@@ -41,30 +43,10 @@ class Company extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function getEmailForPasswordReset()
+    public function sendEmailVerificationNotification()
     {
-        return $this->company_email;
+        $this->notify(new VerifyEmailNotification());
     }
 
-    public function routeNotificationFor($driver)
-    {
-        if (method_exists($this, $method = 'routeNotificationFor'.Str::studly($driver))) {
-            return $this->{$method}();
-        }
-
-        switch ($driver) {
-            case 'database':
-                return $this->notifications();
-            case 'mail':
-                return $this->company_email;
-            case 'nexmo':
-                return $this->company_phone;
-        }
-    }
-
-    public function getAuthPassword()
-    {
-        return $this->company_password;
-    }
 
 }
