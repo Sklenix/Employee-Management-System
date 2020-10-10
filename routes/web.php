@@ -19,6 +19,10 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 Route::post('/welcome/send',[App\Http\Controllers\WelcomeController::class, 'send'])->name('sendEmail');
 
+Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
+Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');
+Route::post('/company/profile/deleteFile', [App\Http\Controllers\UserCompanyController::class, 'deleteFileGoogleDrive'])->name('deleteFile');
+
 Auth::routes(['verify'=>true]);
 
 Route::get('/company/profile/', [App\Http\Controllers\UserCompanyController::class, 'index'])->name('home')->middleware('verified');
@@ -32,6 +36,8 @@ Route::post('/login/company', [App\Http\Controllers\Auth\LoginController::class,
 Route::post('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'employeeLogin']);
 
 Route::get('/login/company/verifySuccess', [App\Http\Controllers\UserCompanyController::class, 'showVerifySuccess'])->name('OvereniHotovo');
+
+
 
 Route::group(['middleware' => 'auth:employee'], function () {
     Route::view('/employee', '/home_user');
