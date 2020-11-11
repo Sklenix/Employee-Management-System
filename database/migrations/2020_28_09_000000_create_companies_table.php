@@ -24,6 +24,7 @@ class CreateCompaniesTable extends Migration
             $table->string('company_url')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('profilovka')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

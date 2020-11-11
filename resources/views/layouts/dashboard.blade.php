@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
     <style>
 
         body { font-family: 'Roboto', sans-serif; }
@@ -101,6 +102,39 @@
             }
         }
 
+        .modal-content {
+            background-color: #1a202c !important;
+            text-align: center;
+        }
+
+        .modal-header h5{
+            color:rgba(255, 255, 255, 0.95);
+        }
+
+        .btn-modalClose{
+            background-color: #4aa0e6 !important;
+        }
+
+        .btn-modalClose:hover{
+            background-color: #c51f1a !important;
+        }
+
+        .btn-modalSuccess{
+            background-color: #4aa0e6 !important;
+        }
+
+       .btn-modalSuccess:hover{
+           background-color: green !important;
+       }
+
+        .nahratTlacitko label:hover{
+            transform: scale(1.03);
+        }
+
+
+        .nahratTlacitko label span{
+            font-weight: normal;
+        }
 
     </style>
     <meta charset="utf-8">
@@ -135,13 +169,17 @@
             <hr class="caraPodNazvem">
         </div>
         <div class="list-group list-group-flush">
-            <a href="#" class="border-bottom active" style="padding-left:60px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 20px;padding-top: 20px;font-size:17px;"><i class="fa fa-cube" aria-hidden="true"></i> Dashboard</a>
+            <a href="{{route('home')}}" class="border-bottom active" style="padding-left:60px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 20px;padding-top: 20px;font-size:17px;"><i class="fa fa-cube" aria-hidden="true"></i> Dashboard</a>
             <a href="#" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-user-o" aria-hidden="true"></i> Přidat zaměstnance</a>
             <a href="#" class="border-bottom" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-list-ol" aria-hidden="true"></i> Seznam zaměstnanců</a>
             <a href="#" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Přidat směnu</a>
             <a href="#" class="border-bottom" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-list-alt" aria-hidden="true"></i> Seznam směn</a>
             <a href="https://drive.google.com/drive/u/1/folders/{{ Auth::user()->company_url }}" target="_blank" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-server" aria-hidden="true"></i> Google Drive</a>
-            <a href="#" class="border-bottom" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-upload" aria-hidden="true"></i> Nahrání na Google Drive</a>
+            <a data-toggle="modal" data-target="#formAddFolder" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-upload" aria-hidden="true"></i> Přidat složku</a>
+            <a data-toggle="modal" data-target="#formDeleteFile" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-upload" aria-hidden="true"></i> Smazat soubor</a>
+            <a data-toggle="modal"  data-target="#formUpload" class="border-bottom" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-upload" aria-hidden="true"></i> Nahrání souboru</a>
+
+
             <a href="#" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-rocket" aria-hidden="true"></i> Generátor souborů</a>
             <a href="#" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-address-card-o" aria-hidden="true"></i> Docházka</a>
             <a href="#" class="border-bottom" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-pie-chart" aria-hidden="true"></i> Statistiky</a>
@@ -164,11 +202,18 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto mt-2 mt-lg-0" >
                     <li class="nav-item dropdown">
+
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" style="color:rgba(255, 255, 255, 0.95);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if($profilovka === NULL)
+                                <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" style="margin-right: 5px;" width="45" class="rounded-circle" alt="profilovka">
+                            @else
+                                <img src =" {{ asset('/storage/company_images/'.Auth::user()->profilovka) }}" width="45" class="rounded-circle" style="margin-right: 5px;"  alt="profilovka" />
+                            @endif
                             {{ Auth::user()->company_name }}
+
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Profil firmy</a>
+                            <a class="dropdown-item" href="{{route('showProfileData')}}">Profil firmy</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
