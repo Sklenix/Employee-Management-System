@@ -101,9 +101,7 @@
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-address-book " aria-hidden="true"></i></div>
                                         </div>
-
                                     <input id="company" placeholder="Zadejte název Vaší společnosti..." type="text" class="form-control @error('company') is-invalid @enderror" name="company" value="{{ old('company') }}"  autocomplete="company" autofocus>
-
                                     @error('company')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -162,12 +160,12 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="phone" class="col-form-label text-md-right">Telefon</label>
+                                    <label for="phone" class="col-form-label text-md-right">Telefon (<span style="color:red;">*</span>)</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-phone " aria-hidden="true"></i></div>
                                         </div>
-                                    <input id="phone" placeholder="Zadejte Váš telefon..." type="text" class="form-control" name="phone" value="{{ old('phone') }}" autocomplete="phone">
+                                    <input id="phone" placeholder="Zadejte Váš telefon..." type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}" autocomplete="phone">
 
                                     @error('phone')
                                     <span class="invalid-feedback" role="alert">

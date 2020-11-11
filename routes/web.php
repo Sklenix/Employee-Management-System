@@ -22,6 +22,9 @@ Route::post('/welcome/send',[App\Http\Controllers\WelcomeController::class, 'sen
 Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
 Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');
 Route::post('/company/profile/deleteFile', [App\Http\Controllers\UserCompanyController::class, 'deleteFileGoogleDrive'])->name('deleteFile');
+Route::get('/company/profile/data', [App\Http\Controllers\UserCompanyController::class, 'showProfileData'])->name('showProfileData');
+Route::post('/company/profile/data/update/password',[App\Http\Controllers\UserCompanyController::class, 'updateProfilePassword'])->name('updateProfilePassword');
+Route::post('/company/profile/data/update',[App\Http\Controllers\UserCompanyController::class, 'updateProfileData'])->name('updateProfileData');
 
 Auth::routes(['verify'=>true]);
 
@@ -37,7 +40,9 @@ Route::post('/login/employee', [App\Http\Controllers\Auth\LoginController::class
 
 Route::get('/login/company/verifySuccess', [App\Http\Controllers\UserCompanyController::class, 'showVerifySuccess'])->name('OvereniHotovo');
 
+Route::post('/company/profile/uploadImage',[App\Http\Controllers\UserCompanyController::class, 'uploadImage'])->name('uploadImage');
 
+Route::post('/company/profile/deleteOldImage',[App\Http\Controllers\UserCompanyController::class, 'deleteOldImage'])->name('deleteOldImage');
 
 Route::group(['middleware' => 'auth:employee'], function () {
     Route::view('/employee', '/home_user');

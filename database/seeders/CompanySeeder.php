@@ -22,9 +22,10 @@ class CompanySeeder extends Seeder
             'company_surname' => 'Malý',
             'email' => 'google@gmail.com',
             'company_phone' => '123456789',
-            'company_login' => 'sklenix',
+            'company_login' => 'sklenixa',
             'company_email_verified_at' => now(),
             'password' => Hash::make('ahoj1234'),
+            'profilovka' =>'',
             'remember_token' => Str::random(10),
         ]);
     }

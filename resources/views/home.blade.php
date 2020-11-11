@@ -28,16 +28,8 @@
                     @endif
 
                 </div>
-                <div class="col-lg-2 col-md-2 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
 
-                </div>
-                <div class="col-lg-8 col-md-8 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
-                    <div class="alert alert-danger" role="alert">
-                        Sekce Zaměstnanci
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-2 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
-                </div>
+
                 <div class="col-lg-2 col-md-2 text-center">
                 </div>
                 <div class="col-lg-2 col-md-2 text-center ramecek">
@@ -67,16 +59,7 @@
                         <h4>Docházka</h4>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-2 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
 
-                </div>
-                <div class="col-lg-8 col-md-8 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
-                    <div class="alert alert-danger" role="alert">
-                        Sekce Směny
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-2 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
-                </div>
                 <div class="col-lg-2 col-md-2 text-center">
                 </div>
                 <div class="col-lg-2 col-md-2 text-center ramecek">
@@ -97,16 +80,8 @@
 
                 <div class="col-lg-4 col-md-4 text-center">
                 </div>
-                <div class="col-lg-2 col-md-2 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
 
-                </div>
-                <div class="col-lg-8 col-md-8 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
-                    <div class="alert alert-danger" role="alert">
-                    Sekce Google Drive
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-2 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
-                </div>
+
                 <div class="col-lg-2 col-md-2 text-center">
                 </div>
                 <div class="col-lg-2 col-md-2 text-center ramecek" style="">
@@ -152,7 +127,7 @@
                 </div>
                 <div class="col-lg-8 col-md-8 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
                     <div class="alert alert-danger" role="alert">
-                        Sekce Ostatní
+                        Ostatní
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-2 text-center" style="font-size: 30px;padding-bottom: 5px;padding-top:10px;">
@@ -215,7 +190,7 @@
                         <div class="modal-body">
                             @csrf
                             <div class="form-group">
-                                <select name="slozky" id="slozky" style="color:black" class="form-control input-lg dynamic" data-dependent="state">
+                                <select name="slozky" required id="slozky" style="color:black" class="form-control input-lg dynamic" data-dependent="state">
                                     <option value="">Vyber složku</option>
                                     <option value="{{ Auth::user()->company_url}}">/</option>
                                     @foreach($slozky as $slozka)
@@ -225,7 +200,7 @@
                                 </select>
                             </div>
                             <div class="form-group nahratTlacitko">
-                               <input type="file" name="fileInput" id="file" hidden />
+                               <input type="file" name="fileInput" required id="file" hidden />
                                 <label for="file" style="padding: 12px 35px;border:3px solid #4aa0e6;border-radius: 48px;text-transform: uppercase;letter-spacing: 2px;font-weight: bold;color:#4aa0e6;" id="selector">Vyberte soubor</label>
                             <script>
                                 var loader = function(e){
@@ -289,7 +264,7 @@
                         <div class="modal-body">
                             @csrf
                             <div class="form-group">
-                                <select name="slozkyDelete" id="slozkyDelete" style="color:black" class="form-control input-lg dynamic" data-dependent="state">
+                                <select name="slozkyDelete" required id="slozkyDelete" style="color:black" class="form-control input-lg dynamic" data-dependent="state">
                                     <option value="">Vyber soubor pro smazání</option>
                                     @foreach($slozkyDelete as $slozka)
                                         <option value="{{$slozka->id}}">{{$slozka->name}}</option>
@@ -341,7 +316,7 @@
                             @csrf
                             <div class="form-group">
                                 <label style="color:rgba(255, 255, 255, 0.90);font-size: 15px;" for="nazev">Jméno složky:</label>
-                                <input type="text" class="form-control" name="nazev" id="nazev" />
+                                <input type="text" class="form-control" name="nazev" id="nazev" required />
                             </div>
                         </div>
 

@@ -70,7 +70,7 @@ class RegisterController extends Controller
             'first_name' =>  ['required', 'string', 'max:255'],
             'surname' =>  ['required', 'string', 'max:255'],
             'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
-            'phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+            'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
             'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ];
@@ -78,6 +78,7 @@ class RegisterController extends Controller
         $vlastniHlasky = [
             'required' => 'Položka :attribute je povinná.',
             'email' => 'U položky :attribute nebyl dodržen formát emailu.',
+            'regex' => 'Formát :attribute není validní.',
             'max:255' => 'U položky :attribute je povoleno maximálně 255 znaků.',
             'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.'
         ];
@@ -165,6 +166,9 @@ class RegisterController extends Controller
             file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
             die();
         }
+
+        redirect($this->redirectPath())->with('successRegister', 'Registrace proběhla úspěšně, byl vám zaslán e-mail pro ověření e-mailové adresy, před přihlášením ověřte svou e-mailovou adresu.');
+
         return \App\Models\Company::create([
             'company_name' => $data['company'],
             'company_first_name' => $data['first_name'],
@@ -179,18 +183,6 @@ class RegisterController extends Controller
 
     }
 
-    public function register(Request $request)
-    {
 
-        try {
-            $this->validator($request->all())->validate();
-        } catch (ValidationException $e) {
-        }
-
-        event(new Registered($user = $this->create($request->all())));
-
-        return $this->registered($request, $user)
-            ?: redirect($this->redirectPath())->with('successRegister', 'Registrace proběhla úspěšně, byl vám zaslán e-mail pro ověření e-mailové adresy, před přihlášením ověřte svou e-mailovou adresu.');
-    }
 
 }
