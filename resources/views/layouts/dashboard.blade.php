@@ -193,7 +193,7 @@
     <div id="page-content-wrapper" >
 
         <nav class="navbar navbar-expand-lg navbar-dark border-bottom" style="background:rgba(0,0,0,0.85);">
-            <button class="btn btn-danger" id="menu-toggle">Schovat menu</button>
+            <button class="btn btn-danger btn-lg" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></button>
 
             <button class="navbar-toggler" style="color:rgba(255, 255, 255, 0.95);" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -207,7 +207,7 @@
                             @if($profilovka === NULL)
                                 <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" style="margin-right: 5px;" width="45" class="rounded-circle" alt="profilovka">
                             @else
-                                <img src =" {{ asset('/storage/company_images/'.Auth::user()->profilovka) }}" width="45" class="rounded-circle" style="margin-right: 5px;"  alt="profilovka" />
+                                <img src =" {{ asset('/storage/company_images/'.Auth::user()->profilovka) }}" width="45" class="rounded-circle" style="margin-right: 5px;max-height: 45px;"  alt="profilovka" />
                             @endif
                             {{ Auth::user()->company_name }}
 

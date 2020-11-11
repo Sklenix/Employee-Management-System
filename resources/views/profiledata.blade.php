@@ -87,12 +87,23 @@
                  @else
                         <img src =" {{ asset('/storage/company_images/'.Auth::user()->profilovka) }}" width="250" style="margin-right: 5px;"  alt="profilovka" />
                 @endif
-
+                 @if(Session::has('obrazekZpravaFail'))
+                     <div class="alert alert-danger">
+                         <button type="button" class="close" data-dismiss="alert">x</button>
+                         {{ Session::get('obrazekZpravaFail') }}
+                     </div>
+                 @endif
+                 @if(Session::has('obrazekZpravaSuccess'))
+                     <div class="alert alert-success">
+                         <button type="button" class="close" data-dismiss="alert">x</button>
+                         {{ Session::get('obrazekZpravaSuccess') }}
+                     </div>
+                 @endif
                 <form method="post" style="margin-top: 15px;" action="{{route('uploadImage')}}" id="zamestnanec_form" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group nahratTlacitko">
                     <input type="file" name="obrazek" required id="file" hidden />
-                    <label for="file" style="padding: 12px 15px;border:3px solid #4aa0e6;font-size:14px;background-color:#4aa0e6;border-radius: 48px;text-transform: uppercase;letter-spacing: 2px;font-weight: bold;color:white;" id="selector">Vyberte soubor</label>
+                    <label for="file" style="max-width: 250px;padding: 12px 15px;border:3px solid #4aa0e6;font-size:14px;background-color:#4aa0e6;border-radius: 48px;text-transform: uppercase;letter-spacing: 2px;font-weight: bold;color:white;" id="selector">Vyberte soubor</label>
 
                     <script>
                         var loader = function(e){

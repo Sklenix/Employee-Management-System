@@ -21,6 +21,7 @@ use Guzzle\Http\Exception\ClientErrorResponseException;
 use GuzzleHttp\Exception\ServerException;
 use GuzzleHttp\Exception\BadResponseException;
 use Google_Client;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
@@ -168,6 +169,38 @@ class UserCompanyController extends Controller
         }
 
         $this->validator($request->all(),$emailDuplicate,$loginDuplicate);
+
+        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
+        $firma = $request->company_name;
+        $email = $request->company_email;
+        $souborZmena = $firma . " " . $email;
+        /*Cesta k autorizačnímu klíči*/
+        $keyFileLocation =storage_path('app/credentials.json');
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+        try {
+            /*Inicializace klienta*/
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $service = new \Google_Service_Drive($client);
+            $zmena_jmena = new Google_Service_Drive_DriveFile();
+            $zmena_jmena->setName($souborZmena);
+            $service->files->update($user->company_url, $zmena_jmena, array(
+                'mimeType' => 'text/csv',
+                'uploadType' => 'multipart'
+            ));
+        } catch (Exception $e) {
+            print "Nastala chyba: " . $e->getMessage();
+        }
+
         $user->company_name=$request->company_name;
         $user->company_first_name = $request->company_firstname;
         $user->company_surname = $request->company_surname;
@@ -216,12 +249,19 @@ class UserCompanyController extends Controller
     public function uploadImage(Request $request){
         if($request->hasFile('obrazek')){
            $nazev = $request->obrazek->getClientOriginalName();
-           $user = Auth::user();
-            if($user->profilovka){
-                Storage::delete('/public/company_images/'.$user->profilovka);
-            }
-           $request->obrazek->storeAs('company_images',$nazev,'public');
-           $user->update(['profilovka' => $nazev]);
+           $pripona = explode(".",$nazev);
+           if($pripona[1] == "jpg" || $pripona[1] == "png" || $pripona[1] == "jpeg"){
+               $user = Auth::user();
+               if($user->profilovka){
+                   Storage::delete('/public/company_images/'.$user->profilovka);
+               }
+               $tokenUnique = Str::random(20);
+               $request->obrazek->storeAs('company_images',$tokenUnique.$nazev,'public');
+               $user->update(['profilovka' => $tokenUnique.$nazev]);
+               session()->flash('obrazekZpravaSuccess', 'Profilová fotka úspěšně nahrána.');
+           }else{
+               session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg]');
+           }
         }
         return redirect()->back();
     }
