@@ -73,6 +73,9 @@ class RegisterController extends Controller
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
             'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'company_ico' => ['nullable','digits:8'],
+            'company_city' => ['nullable','string', 'max:255'],
+            'company_street' => ['nullable','max:255']
         ];
 
         $vlastniHlasky = [
@@ -80,7 +83,8 @@ class RegisterController extends Controller
             'email' => 'U položky :attribute nebyl dodržen formát emailu.',
             'regex' => 'Formát :attribute není validní.',
             'max:255' => 'U položky :attribute je povoleno maximálně 255 znaků.',
-            'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.'
+            'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.',
+            'digits' => 'Číslo musí mít 8 cifer'
         ];
 
         Validator::validate($data, $pravidla, $vlastniHlasky);
@@ -93,6 +97,9 @@ class RegisterController extends Controller
             'phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
             'company_login' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'company_ico' => ['nullable','digits:8'],
+            'company_city' => ['nullable','string', 'max:255'],
+            'company_street' => ['nullable','max:255']
         ]);
     }
 
@@ -106,8 +113,8 @@ class RegisterController extends Controller
     {
         /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
         $cele_jmeno = $data['company'];
-        $id_brigadnik = $data['company_email'];
-        $soubor = $cele_jmeno . " " . $id_brigadnik;
+        $email = $data['company_email'];
+        $soubor = $cele_jmeno . " " . $email;
         /*Service účet pro pripojeni ke Google Drive*/
         $emailAddress = 'tozondoservices@tozondo-drive.iam.gserviceaccount.com';
         /*Cesta k autorizačnímu klíči*/
@@ -160,8 +167,6 @@ class RegisterController extends Controller
                 $fileId, $userPermission, array('fields' => 'id')
             );
 
-
-
         } catch (Exception $e) {
             file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
             die();
@@ -171,13 +176,16 @@ class RegisterController extends Controller
 
         return \App\Models\Company::create([
             'company_name' => $data['company'],
-            'company_first_name' => $data['first_name'],
-            'company_surname' => $data['surname'],
+            'company_user_name' => $data['first_name'],
+            'company_user_surname' => $data['surname'],
             'email' => $data['company_email'],
             'company_phone' => $data['phone'],
             'company_login' => $data['company_login'],
             'company_url' => $fileId,
             'password' => Hash::make($data['password']),
+            'company_ico' => $data['company_ico'],
+            'company_city' => $data['company_city'],
+            'company_street' => $data['company_street']
         ]);
 
 

@@ -27,6 +27,13 @@
                         </div>
                     @endif
 
+                        @if($message = Session::get('success'))
+                            <div class="alert alert-success alert-block">
+                                <button type="button" class="close" data-dismiss="alert">x</button>
+                                <strong>{{$message}}</strong>
+                            </div>
+                        @endif
+
                 </div>
 
 
@@ -240,8 +247,6 @@
     </div>
 
 
-
-
     <!-- Modul pro google smazani souboru !-->
     <div>
         <div class="modal fade" id="formDeleteFile" role="dialog">
@@ -339,72 +344,243 @@
     </div>
 <!-- Modul pro zamestnance !-->
     <div>
-        <div class="modal" id="formAddEmployee">
-            <div class="modal-dialog">
-                <form method="post" id="zamestnanec_form" enctype="multipart/form-data">
+
+        <div class="modal fade" id="formAddEmployee" style="color:white;">
+            <div class="modal-dialog  modal-lg">
+                <form method="post" action="{{route('addEmployee')}}" enctype="multipart/form-data">
+                    @csrf
                     <div class="modal-content">
 
                         <!-- Modal Header -->
                         <div class="modal-header">
-                            <h5 class="modal-title" id="modal_title">Přidat nového zaměstnance</h5>
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                             <span class="col-md-12 text-center">
+                          <h4 class="modal-title" id="modal_title" style="color:#4aa0e6;">Přidat nového zaměstnance</h4>
+                             </span>
                         </div>
 
                         <!-- Modal body -->
                         <div class="modal-body">
+                            <div class="alert alert-danger" role="alert" style="font-size: 16px;">
+                                Položky označené (<span style="color:red;">*</span>) jsou povinné.
+                            </div>
                             <div class="form-group">
                                 <div class="row">
-                                    <label class="col-md-4 text-right">Jméno(<span class="text-danger">*</span>)</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="zamestnanec_jmeno" id="zamestnanec_jmeno" class="form-control" />
-                                        <span id="error_zamestnanec_jmeno" class="text-danger"></span>
+                                    <label class="col-md-2 text-left">Jméno(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        </div>
+                                        <input id="employee_name" placeholder="Zadejte křestní jméno zaměstnance..." type="text" class="form-control @error('employee_name') is-invalid @enderror" name="employee_name" value="{{ old('employee_name') }}"  autocomplete="employee_name" autofocus>
+                                        @error('employee_name')
+                                        <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                        @enderror
+                                    </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="row">
-                                    <label class="col-md-4 text-right">Příjmení(<span class="text-danger">*</span>)</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="zamestnanec_prijmeni" id="zamestnanec_prijmeni" class="form-control"></input>
-                                        <span id="error_zamestnanec_prijmeni" class="text-danger"></span>
+                                    <label class="col-md-2 text-left">Příjmení(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_surname" placeholder="Zadejte příjmení zaměstnance..." type="text" class="form-control @error('employee_surname') is-invalid @enderror" name="employee_surname" value="{{ old('employee_surname') }}"  autocomplete="employee_surname">
+                                            @error('employee_surname')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="row">
-                                    <label class="col-md-4 text-right">E-mail(<span class="text-danger">*</span>)</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="zamestnanec_email" id="zamestnanec_email" class="form-control" />
-                                        <span id="error_zamestnanec_email" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <label class="col-md-4 text-right">Telefon(<span class="text-danger">*</span>)</label>
-                                    <div class="col-md-8">
-                                        <input type="text" name="zamestnanec_telefon" id="zamestnanec_telefon" class="form-control" />
-                                        <span id="error_zamestnanec_telefon" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="row">
-                                    <label class="col-md-4 text-right">Poznámka</label>
-                                    <div class="col-md-8">
-                                        <textarea name="zamestnanec_poznamka" id="zamestnanec_poznamka" class="form-control"></textarea>
-                                        <span id="error_zamestnanec_poznamka" class="text-danger"></span>
+                                    <label class="col-md-2 text-left">Email(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-envelope " aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_email" placeholder="Zadejte email zaměstnance..." type="text" class="form-control @error('employee_email') is-invalid @enderror" name="employee_email" value="{{ old('employee_email') }}"  autocomplete="employee_email">
+                                            @error('employee_email')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Telefon(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-phone " aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_phone" placeholder="Zadejte telefon zaměstnance..." type="text" class="form-control @error('employee_phone') is-invalid @enderror" name="employee_phone" value="{{ old('employee_phone') }}"  autocomplete="employee_phone">
+                                            @error('employee_phone')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Pozice(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-child" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_position" placeholder="Zadejte pozici zaměstnance..." type="text" class="form-control @error('employee_position') is-invalid @enderror" name="employee_position" value="{{ old('employee_position') }}"  autocomplete="employee_position">
+                                            @error('employee_position')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Město bydliště(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_city" placeholder="Zadejte město bydliště zaměstnance..." type="text" class="form-control @error('employee_city') is-invalid @enderror" name="employee_city" value="{{ old('employee_city') }}"  autocomplete="employee_city">
+                                            @error('employee_city')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Ulice bydliště</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_street" placeholder="Zadejte město bydliště zaměstnance..." type="text" class="form-control @error('employee_street') is-invalid @enderror" name="employee_street" value="{{ old('employee_street') }}"  autocomplete="employee_street">
+                                            @error('employee_street')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Login</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_login" placeholder="Zadejte login zaměstnance..." type="text" class="form-control @error('employee_login') is-invalid @enderror" name="employee_login" value="{{ old('employee_login') }}"  autocomplete="employee_login">
+                                            @error('employee_login')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Heslo(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_password" placeholder="Zadejte heslo zaměstnance..." type="password" class="form-control @error('employee_password') is-invalid @enderror" name="employee_password" value="{{ old('employee_password') }}"  autocomplete="employee_password">
+                                            @error('employee_password')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Heslo znovu(<span class="text-danger">*</span>)</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
+                                            </div>
+                                            <input id="employee_password_confirm" placeholder="Zadejte heslo zaměstnance..." type="password" class="form-control @error('employee_password_confirm') is-invalid @enderror" name="employee_password_confirm" value="{{ old('employee_password_confirm') }}"  autocomplete="employee_password_confirm">
+                                            @error('employee_password_confirm')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="row">
+                                    <label class="col-md-2 text-left">Poznámka</label>
+                                    <div class="col-md-10">
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <div class="input-group-text"><i class="fa fa-sticky-note-o" aria-hidden="true"></i></div>
+                                            </div>
+                                            <textarea name="employee_note" placeholder="Zadejte poznámku k zaměstnanci..." id="employee_note" class="form-control @error('employee_note') is-invalid @enderror" value="{{ old('employee_note') }}"  autocomplete="employee_note"></textarea>
+
+                                            @error('employee_note')
+                                            <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
                         </div>
                             <!-- Modal footer -->
                             <div class="modal-footer">
-                                <input type="hidden" name="id_zamestnance" id="id_zamestnance" />
-                                <input type="hidden" name="action" id="action" value="Add" />
-                                <input type="submit" name="button_action" id="button_action" class="btn btn-success btn-sm" value="Add" />
-                                <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Close</button>
+                                <div class="col-md-12 text-center">
+                                    <input type="submit" name="button_action" id="button_action" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalSuccess" value="Přidat zaměstnance" />
+                                    <button type="button" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalClose" data-dismiss="modal">Zavřít</button>
+                                </div>
                             </div>
 
                         </div>

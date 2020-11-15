@@ -61,7 +61,9 @@
             .pozadi {background-image: url({{ asset('images/pozadi.png') }});height: 95vh;width: auto;
                 background-size: cover;background-position: center center;}
         }
-
+        .card, .card-header, .card-body, .card-footer{
+            border-radius:35px !important;
+        }
     </style>
 </head>
 <body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
@@ -83,7 +85,7 @@
     <div class="row justify-content-center" >
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header text-center" style="background-color: #0275d8;color:white;font-size: 20px;">Přihlašování
+                <div class="card-header text-center" style="background-color: #0275d8;color:white;font-size: 28px;font-family: 'Pacifico', cursive;">Přihlašování
                     @isset($url)
                         @if($url == "employee")
                            pro zaměstnance

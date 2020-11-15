@@ -58,7 +58,9 @@
             .pozadi {background-image: url({{ asset('images/pozadi.png') }});height: 95vh;width: auto;
                 background-size: cover;background-position: center center;}
         }
-
+        .card, .card-header, .card-body, .card-footer{
+            border-radius:35px !important;
+        }
     </style>
 </head>
 <body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
@@ -81,7 +83,7 @@
     <div class="row justify-content-center">
         <div class="col-12">
             <div class="card" style="margin-bottom: 40px">
-                <div class="card-header text-center" style="font-size: 20px;background-color: #0275d8;color:white;">Registrace</div>
+                <div class="card-header text-center" style="font-size: 30px;background-color: #0275d8;color:white;font-family: 'Pacifico', cursive;">Registrace</div>
 
                 <div class="card-body" style="background-color:#F8F8FF">
                     <div class="row justify-content-center">
@@ -109,6 +111,55 @@
                                     @enderror
 
                                 </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="company_city" class="col-form-label text-md-right"> Město (<span style="color:red;">*</span>)</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                        </div>
+                                        <input id="company_city" placeholder="Zadejte město, kde se Vaše firma nachází..." type="text" class="form-control @error('company_city') is-invalid @enderror" name="company_city" value="{{ old('company_city') }}"  autocomplete="company_city">
+
+                                        @error('company_city')
+                                        <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="company_street" class="col-form-label text-md-right"> Ulice </label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                        </div>
+                                        <input id="company_street" placeholder="Zadejte ulici, kde se Vaše firma nachází (včetně čísla popisného)..." type="text" class="form-control @error('company_street') is-invalid @enderror" name="company_street" value="{{ old('company_street') }}"  autocomplete="company_street">
+
+                                        @error('company_street')
+                                        <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group">
+                                    <label for="company_ico" class="col-form-label text-md-right"> IČO</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <div class="input-group-text"><i class="fa fa-info-circle" aria-hidden="true"></i></div>
+                                        </div>
+                                        <input id="company_ico" placeholder="Zadejte IČO Vaší firmy..." type="text" class="form-control @error('company_ico') is-invalid @enderror" name="company_ico" value="{{ old('company_ico') }}"  autocomplete="company_ico">
+
+                                        @error('company_ico')
+                                        <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                        @enderror
+                                    </div>
                                 </div>
 
                                 <div class="form-group">
@@ -196,7 +247,7 @@
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
                                         </div>
-                                    <input id="password" placeholder="Zadejte Vaše heslo ..." type="password" class="form-control @error('password') is-invalid @enderror" name="password"  autocomplete="new-password">
+                                    <input id="password" placeholder="Zadejte Vaše heslo ..." type="password" class="form-control @error('password') is-invalid @enderror" name="password"  autocomplete="password">
 
                                     @error('password')
                                     <span class="invalid-feedback" role="alert">
@@ -212,7 +263,7 @@
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
                                         </div>
-                                    <input id="password-confirm" placeholder="Znovu zadejte Vaše heslo ..." type="password" class="form-control" name="password_confirmation"  autocomplete="new-password">
+                                    <input id="password-confirm" placeholder="Znovu zadejte Vaše heslo ..." type="password" class="form-control" name="password_confirmation"  autocomplete="password_confirmation">
                                 </div>
                                 </div>
 

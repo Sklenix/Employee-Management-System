@@ -145,8 +145,6 @@
 
     <title>Tozondo - Dashboard</title>
 
-    <!-- Scripts -->
-    <script src="{{ asset('js/dashboard.js') }}" defer></script>
 
     <!-- Fonts -->
 
@@ -170,7 +168,7 @@
         </div>
         <div class="list-group list-group-flush">
             <a href="{{route('home')}}" class="border-bottom active" style="padding-left:60px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 20px;padding-top: 20px;font-size:17px;"><i class="fa fa-cube" aria-hidden="true"></i> Dashboard</a>
-            <a href="#" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-user-o" aria-hidden="true"></i> Přidat zaměstnance</a>
+            <a data-toggle="modal" data-target="#formAddEmployee" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-user-o" aria-hidden="true"></i> Přidat zaměstnance</a>
             <a href="#" class="border-bottom" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-list-ol" aria-hidden="true"></i> Seznam zaměstnanců</a>
             <a href="#" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Přidat směnu</a>
             <a href="#" class="border-bottom" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-list-alt" aria-hidden="true"></i> Seznam směn</a>
@@ -207,7 +205,7 @@
                             @if($profilovka === NULL)
                                 <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" style="margin-right: 5px;" width="45" class="rounded-circle" alt="profilovka">
                             @else
-                                <img src =" {{ asset('/storage/company_images/'.Auth::user()->profilovka) }}" width="45" class="rounded-circle" style="margin-right: 5px;max-height: 45px;"  alt="profilovka" />
+                                <img src =" {{ asset('/storage/company_images/'.Auth::user()->company_picture) }}" width="45" class="rounded-circle" style="margin-right: 5px;max-height: 45px;"  alt="profilovka" />
                             @endif
                             {{ Auth::user()->company_name }}
 
@@ -243,6 +241,14 @@
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
+
+@if(Session::has('errors'))
+    <script>
+        $(document).ready(function(){
+            $('#formAddEmployee').modal({show: true});
+        });
+    </script>
+@endif
 
 <!-- Menu Toggle Script -->
 <script>

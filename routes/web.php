@@ -25,7 +25,7 @@ Route::post('/company/profile/deleteFile', [App\Http\Controllers\UserCompanyCont
 Route::get('/company/profile/data', [App\Http\Controllers\UserCompanyController::class, 'showProfileData'])->name('showProfileData');
 Route::post('/company/profile/data/update/password',[App\Http\Controllers\UserCompanyController::class, 'updateProfilePassword'])->name('updateProfilePassword');
 Route::post('/company/profile/data/update',[App\Http\Controllers\UserCompanyController::class, 'updateProfileData'])->name('updateProfileData');
-
+Route::post('/company/profile/addEmployee',[App\Http\Controllers\UserCompanyController::class, 'addEmployee'])->name('addEmployee');
 Auth::routes(['verify'=>true]);
 
 Route::get('/company/profile/', [App\Http\Controllers\UserCompanyController::class, 'index'])->name('home')->middleware('verified');

@@ -85,7 +85,7 @@
                  @if($profilovka == NULL)
                         <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" alt="profilovka">
                  @else
-                        <img src =" {{ asset('/storage/company_images/'.Auth::user()->profilovka) }}" width="250" style="margin-right: 5px;"  alt="profilovka" />
+                        <img src =" {{ asset('/storage/company_images/'.Auth::user()->company_picture) }}" width="250" style="margin-right: 5px;"  alt="profilovka" />
                 @endif
                  @if(Session::has('obrazekZpravaFail'))
                      <div class="alert alert-danger">
@@ -192,6 +192,59 @@
 
                         <div class="form-group">
                             <div class="col-xs-6">
+                                <label for="company_ico"><h4>IČO</h4></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-info-circle" aria-hidden="true"></i></div>
+                                    </div>
+                                    <input type="text" class="form-control @error('company_ico') is-invalid @enderror" name="company_ico" value="{{ Auth::user()->company_ico }}" id="company_ico" placeholder="IČO společnosti...">
+                                    @error('company_ico')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="company_city"><h4>Město</h4></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                    </div>
+                                    <input type="text" class="form-control @error('company_city') is-invalid @enderror" name="company_city" value="{{ Auth::user()->company_city }}" id="company_city" placeholder="Sídlo společnosti...">
+                                    @error('company_city')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="company_street"><h4>Ulice</h4></label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                    </div>
+                                    <input type="text" class="form-control @error('company_street') is-invalid @enderror" name="company_street" value="{{ Auth::user()->company_street }}" id="company_street" placeholder="Ulice sídla společnosti...">
+                                    @error('company_street')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <div class="col-xs-6">
                                 <label for="company_email"><h4>Email</h4></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
@@ -215,7 +268,7 @@
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
                                     </div>
-                                <input type="text" class="form-control @error('company_firstname') is-invalid @enderror" name="company_firstname" id="company_firstname" value="{{ Auth::user()->company_first_name }}" placeholder="Křestní jméno zástupce..." >
+                                <input type="text" class="form-control @error('company_firstname') is-invalid @enderror" name="company_firstname" id="company_firstname" value="{{ Auth::user()->company_user_name }}" placeholder="Křestní jméno zástupce..." >
                                 @error('company_firstname')
                                 <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
@@ -232,7 +285,7 @@
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
                                     </div>
-                                <input type="text" class="form-control @error('company_surname') is-invalid @enderror" name="company_surname" id="company_surname" value="{{ Auth::user()->company_surname }}" placeholder="Příjmení zástupce...">
+                                <input type="text" class="form-control @error('company_surname') is-invalid @enderror" name="company_surname" id="company_surname" value="{{ Auth::user()->company_user_surname }}" placeholder="Příjmení zástupce...">
                                 @error('company_surname')
                                 <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>

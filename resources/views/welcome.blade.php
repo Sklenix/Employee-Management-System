@@ -47,6 +47,18 @@
 
         label{font-size: 17px;}
 
+        .seznam{
+            padding-top:10px;
+            padding-bottom:10px;
+            padding-right:25px;
+            padding-left:30px;
+            margin-bottom:15px;
+            color:#f8f9fa;
+            background-color: #d9534f;
+            border-radius: 25px;
+            font-size: 17px;
+        }
+
         @-webkit-keyframes fill {
             0% { width: 0%; height: 1px; }
             50% { width: 100%; height: 1px; }
@@ -107,14 +119,30 @@
             <div class="col-lg-10 col-md-10 text-center">
 
                 <ol class="text-white-50 mb-0 text-justify" style="font-size: 16px;">
+                    <div class="seznam">
                     <li>Zaregistrujete se jako firma pomocí tlačítka registrace, po založení účtu budete přesměrováni na domovskou stránku Vašeho profilu.</li>
+                    </div>
+                    <div class="seznam">
                     <li>Po registraci obdržíte pozvánku do Vašeho prostoru v Google Drive na Vámi uvedený email.</li>
+                    </div>
+                    <div class="seznam">
                     <li>Na domovské stránce máte menu, v kterém jsou vypsané možnosti, co vše lze se systémem dělat.</li>
+                    </div>
+                    <div class="seznam">
                     <li>V horním pravém rohu máte možnost upravit Váš profil, nebo se odhlásit.</li>
+                    </div>
+                    <div class="seznam">
                     <li>Po vytvoření zaměstnance se ve Vaší Google Drive složce vytvoří nová složka se jménem zaměstnance.</li>
+                    </div>
+                    <div class="seznam">
                     <li>Formát složky zaměstnance je následující [Příjmení][Jméno][ID_zaměstnance].</li>
+                    </div>
+                    <div class="seznam">
                     <li>Do systému se lze přihlásit Vaším e-mailem, nebo přihlašovacím  (loginem), který jste zadal v registraci účtu.</li>
+                    </div>
+                    <div class="seznam">
                     <li>Po vytvoření směn je můžete přiřazovat jednotlivým zaměstnancům.</li>
+                    </div>
                 </ol>
 
 

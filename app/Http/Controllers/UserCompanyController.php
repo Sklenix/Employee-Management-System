@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Employee;
 use App\Providers\RouteServiceProvider;
 use Google_Service_Drive_Permission;
 use Illuminate\Auth\Events\Registered;
@@ -84,7 +85,7 @@ class UserCompanyController extends Controller
         }catch (Exception $e){
 
         }
-        return view('home')->with('slozky',$slozky)->with('slozkyDelete',$slozkyDelete)->with('profilovka',$user->profilovka);;
+        return view('home')->with('slozky',$slozky)->with('slozkyDelete',$slozkyDelete)->with('profilovka',$user->company_picture);;
 
     }
 
@@ -96,63 +97,93 @@ class UserCompanyController extends Controller
     }
 
 
-    protected function validator(array $data,$emailDuplicate,$loginDuplicate){
-        if($emailDuplicate == 1 && $loginDuplicate == 0){
-            $pravidla = [
-                'company_name' => ['required', 'string', 'max:255'],
-                'company_firstname' =>  ['required', 'string', 'max:255'],
-                'company_surname' =>  ['required', 'string', 'max:255'],
-                'company_email' => ['required','string','email','max:255'],
-                'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255']
-            ];
-        }else if($loginDuplicate == 1 && $emailDuplicate == 0){
-            $pravidla = [
-                'company_name' => ['required', 'string', 'max:255'],
-                'company_firstname' =>  ['required', 'string', 'max:255'],
-                'company_surname' =>  ['required', 'string', 'max:255'],
-                'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
-                'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                'company_login' => ['required', 'string', 'max:255']
-            ];
-        }else if($loginDuplicate == 1 && $emailDuplicate == 1){
-            $pravidla = [
-                'company_name' => ['required', 'string', 'max:255'],
-                'company_firstname' =>  ['required', 'string', 'max:255'],
-                'company_surname' =>  ['required', 'string', 'max:255'],
-                'company_email' => ['required','string','email','max:255'],
-                'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                'company_login' => ['required', 'string', 'max:255']
-            ];
-        }else if($loginDuplicate == 0 && $emailDuplicate == 0){
-            $pravidla = [
-                'company_name' => ['required', 'string', 'max:255'],
-                'company_firstname' =>  ['required', 'string', 'max:255'],
-                'company_surname' =>  ['required', 'string', 'max:255'],
-                'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
-                'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255']
-            ];
-        }
+    protected function validator(array $data,$emailDuplicate,$loginDuplicate,$verze){
+        if($verze == 1){
+            if($emailDuplicate == 1 && $loginDuplicate == 0){
+                $pravidla = [
+                    'company_name' => ['required', 'string', 'max:255'],
+                    'company_firstname' =>  ['required', 'string', 'max:255'],
+                    'company_surname' =>  ['required', 'string', 'max:255'],
+                    'company_email' => ['required','string','email','max:255'],
+                    'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                    'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
+                    'company_ico' => ['digits:8'],
+                    'company_city' => ['string', 'max:255'],
+                    'company_street' => ['max:255']
+                ];
+            }else if($loginDuplicate == 1 && $emailDuplicate == 0){
+                $pravidla = [
+                    'company_name' => ['required', 'string', 'max:255'],
+                    'company_firstname' =>  ['required', 'string', 'max:255'],
+                    'company_surname' =>  ['required', 'string', 'max:255'],
+                    'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
+                    'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                    'company_login' => ['required', 'string', 'max:255'],
+                    'company_ico' => ['digits:8'],
+                    'company_city' => ['string', 'max:255'],
+                    'company_street' => ['max:255']
+                ];
+            }else if($loginDuplicate == 1 && $emailDuplicate == 1){
+                $pravidla = [
+                    'company_name' => ['required', 'string', 'max:255'],
+                    'company_firstname' =>  ['required', 'string', 'max:255'],
+                    'company_surname' =>  ['required', 'string', 'max:255'],
+                    'company_email' => ['required','string','email','max:255'],
+                    'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                    'company_login' => ['required', 'string', 'max:255'],
+                    'company_ico' => ['digits:8'],
+                    'company_city' => ['string', 'max:255'],
+                    'company_street' => ['max:255']
+                ];
+            }else if($loginDuplicate == 0 && $emailDuplicate == 0){
+                $pravidla = [
+                    'company_name' => ['required', 'string', 'max:255'],
+                    'company_firstname' =>  ['required', 'string', 'max:255'],
+                    'company_surname' =>  ['required', 'string', 'max:255'],
+                    'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
+                    'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                    'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
+                    'company_ico' => ['digits:8'],
+                    'company_city' => ['string', 'max:255'],
+                    'company_street' => ['max:255']
+                ];
+            }
 
+            Validator::make($data, [
+                'company_name' => ['required', 'string', 'max:255'],
+                'company_firstname' =>  ['required', 'string', 'max:255'],
+                'company_surname' =>  ['required', 'string', 'max:255'],
+                'company_email' => ['required','string','email','max:255'],
+                'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                'company_login' => ['required', 'string', 'max:255'],
+                'company_ico' => ['digits:8'],
+                'company_city' => ['string', 'max:255'],
+                'company_street' => ['max:255']
+            ]);
+        }else if($verze == 2){
+            $pravidla = [
+                'employee_name' => ['required', 'string', 'max:255'],
+                'employee_surname' =>  ['required', 'string', 'max:255'],
+                'employee_position' =>  ['required', 'string', 'max:255'],
+                'employee_email' => ['required','unique:table_employees,email','string','email','max:255'],
+                'employee_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                'employee_login' => ['required','unique:table_employees,employee_login', 'string', 'max:255'],
+                'employee_note' => ['nullable','max:500'],
+                'employee_city' => ['required','string', 'max:255'],
+                'employee_street' => ['nullable','max:255'],
+                'employee_password' => ['required', 'string', 'min:8','required_with:employee_password_confirm','same:employee_password_confirm']
+            ];
+
+        }
 
     $vlastniHlasky = [
         'required' => 'Položka :attribute je povinná.',
         'email' => 'U položky :attribute nebyl dodržen formát emailu.',
         'regex' => 'Formát :attribute není validní.',
         'max:255' => 'U položky :attribute je povoleno maximálně 255 znaků.',
-        'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.'
+        'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.',
+        'digits' => 'Číslo musí mít 8 cifer'
     ];
-
-    Validator::make($data, [
-        'company_name' => ['required', 'string', 'max:255'],
-        'company_firstname' =>  ['required', 'string', 'max:255'],
-        'company_surname' =>  ['required', 'string', 'max:255'],
-        'company_email' => ['required','string','email','max:255'],
-        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-        'company_login' => ['required', 'string', 'max:255']
-    ]);
-
     Validator::validate($data, $pravidla, $vlastniHlasky);
     }
 
@@ -168,7 +199,7 @@ class UserCompanyController extends Controller
             $loginDuplicate = 1;
         }
 
-        $this->validator($request->all(),$emailDuplicate,$loginDuplicate);
+        $this->validator($request->all(),$emailDuplicate,$loginDuplicate,1);
 
         /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
         $firma = $request->company_name;
@@ -202,9 +233,12 @@ class UserCompanyController extends Controller
         }
 
         $user->company_name=$request->company_name;
-        $user->company_first_name = $request->company_firstname;
-        $user->company_surname = $request->company_surname;
+        $user->company_user_name = $request->company_firstname;
+        $user->company_user_surname = $request->company_surname;
         $user->email = $request->company_email;
+        $user->company_city = $request->company_city;
+        $user->company_street = $request->company_street;
+        $user->company_ico = $request->company_ico;
         $user->company_phone = $request->company_phone;
         $user->company_login = $request->company_login;
         $user->save();
@@ -239,9 +273,9 @@ class UserCompanyController extends Controller
 
     public function deleteOldImage(){
         $user = Auth::user();
-        if($user->profilovka){
-            Storage::delete('/public/company_images/'.$user->profilovka);
-            $user->update(['profilovka' => NULL]);
+        if($user->company_picture){
+            Storage::delete('/public/company_images/'.$user->company_picture);
+            $user->update(['company_picture' => NULL]);
         }
         return redirect()->back();
     }
@@ -252,12 +286,12 @@ class UserCompanyController extends Controller
            $pripona = explode(".",$nazev);
            if($pripona[1] == "jpg" || $pripona[1] == "png" || $pripona[1] == "jpeg"){
                $user = Auth::user();
-               if($user->profilovka){
-                   Storage::delete('/public/company_images/'.$user->profilovka);
+               if($user->company_picture){
+                   Storage::delete('/public/company_images/'.$user->company_picture);
                }
                $tokenUnique = Str::random(20);
                $request->obrazek->storeAs('company_images',$tokenUnique.$nazev,'public');
-               $user->update(['profilovka' => $tokenUnique.$nazev]);
+               $user->update(['company_picture' => $tokenUnique.$nazev]);
                session()->flash('obrazekZpravaSuccess', 'Profilová fotka úspěšně nahrána.');
            }else{
                session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg]');
@@ -270,7 +304,7 @@ class UserCompanyController extends Controller
 
     public function showProfileData(){
         $user = Auth::user();
-        return view('profiledata')->with('profilovka',$user->profilovka);
+        return view('profiledata')->with('profilovka',$user->company_picture);
     }
 
     public function createFolderGoogleDrive(Request $request){
@@ -413,6 +447,87 @@ class UserCompanyController extends Controller
 
     }
 
+    public function addEmployee(Request $request){
+        $user = Auth::user();
+        $this->validator($request->all(),-1,-1,2);
+        $uzivatel = $request->employee_login;
 
+        \App\Models\Employee::create([
+            'employee_name' => $request->employee_name,
+            'employee_surname' => $request->employee_surname,
+            'employee_phone' => $request->employee_phone,
+            'email' => $request->employee_email,
+            'employee_note' => $request->employee_note,
+            'employee_position' => $request->employee_position,
+            'employee_city' => $request->employee_city,
+            'employee_street' => $request->employee_street,
+            'employee_login' => $request->employee_login,
+            'password' => Hash::make($request->employee_password),
+            'employee_company' => $user->company_id
+        ]);
+
+
+        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
+        $soubor = $request->employee_name.' '.$request->employee_surname;
+
+        /*Cesta k autorizačnímu klíči*/
+        $keyFileLocation =storage_path('app/credentials.json');
+        /*ID složky, do které chceme soubory nahrávat*/
+        $folderId = $user->company_url;
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+        try {
+            /*Inicializace klienta*/
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $service = new \Google_Service_Drive($client);
+            /*Vytvoření složky*/
+            $file = new Google_Service_Drive_DriveFile();
+            $file->setName($soubor);
+            $mimeType = 'application/vnd.google-apps.folder';
+            $file->setMimeType($mimeType);
+            /*Nasměrování do zvolené složky*/
+
+            $file->setParents(array($folderId));
+
+            /*Odeslání dat*/
+            $createdFile = $service->files->create($file, array(
+                'mimeType' => $mimeType,
+                'uploadType' => "multipart"
+            ));
+
+            $fileId = $createdFile->id;
+          /*  $role = 'writer';
+            $userEmail = $request->employee_email;
+
+
+            $userPermission = new Google_Service_Drive_Permission(array(
+                'type' => 'user',
+                'role' => $role,
+                'emailAddress' => $userEmail
+            ));
+
+            $request = $service->permissions->create(
+                $fileId, $userPermission, array('fields' => 'id')
+            );*/
+
+        } catch (Exception $e) {
+            file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
+            die();
+        }
+
+        $employeeSearch = Employee::where('employee_login', '=',$uzivatel )->first();
+        $employeeSearch->update(['employee_drive_url' => $fileId]);
+        session()->flash('success', 'Zaměstnanec '.$request->employee_name.' '.$request->employee_surname.' byl úspešně vytvořen!');
+        return redirect()->back();
+    }
 
 }

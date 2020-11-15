@@ -24,9 +24,9 @@ class CompanyFactory extends Factory
     public function definition()
     {
         return [
-            'company_name' => 'Google',
-            'company_first_name' => 'Josef',
-            'company_surname' => 'Malý',
+            'company_name' => 'Sklenářství',
+            'company_user_name' => 'Pavel',
+            'company_user_surname' => 'Sklenář',
             'email' => 'Fload158@gmail.com',
             'company_phone' => '123456789',
             'company_login' => 'sklenix',
@@ -34,6 +34,10 @@ class CompanyFactory extends Factory
             'company_url' => '',
             'password' => Hash::make('ahoj1234'),
             'remember_token' => Str::random(10),
+            'company_ico' => '12345678',
+            'company_city' => 'Velké Meziříčí',
+            'company_street' =>'Třebíčská 10'
         ];
     }
 }
+
