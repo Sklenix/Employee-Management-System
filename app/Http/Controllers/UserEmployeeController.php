@@ -41,7 +41,7 @@ class UserEmployeeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return view('home_user')->with('profilovka',$user->employee_picture);
+        return view('homes.employee_home')->with('profilovka',$user->employee_picture);
     }
 
     public function showEmployeeProfileData(){

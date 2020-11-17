@@ -1,4 +1,4 @@
-@extends('layouts.dashboard_admin')
+@extends('layouts.admin_dashboard')
 
 @section('content')
     <!-- Vlastnosti systému-->

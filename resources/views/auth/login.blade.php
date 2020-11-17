@@ -207,7 +207,7 @@
                                             </a>
                                         @endif
                                     @elseif($url == "admin")
-                                        adminy
+
                                     @elseif($url == "company")
                                         @if (Route::has('login'))
                                             <a id="zamestnanec_current" class="btn btn-link" style="font-size: 16px;" href="{{ route('employee') }}">

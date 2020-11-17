@@ -1,4 +1,4 @@
-@extends('layouts.dashboard_zamestnanec')
+@extends('layouts.employee_dashboard')
 
 @section('content')
     <!-- Vlastnosti systému-->

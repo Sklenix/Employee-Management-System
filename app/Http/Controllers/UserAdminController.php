@@ -17,13 +17,12 @@ class UserAdminController
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function index(){
-        return view('admin_home');
+        return view('homes.admin_home');
     }
 
     public function showAdminProfileData(){
         return view('profiles.admin_profile');
     }
-
 
     protected function validator(array $data,$emailDuplicate,$loginDuplicate,$verze){
         if($verze == 1){

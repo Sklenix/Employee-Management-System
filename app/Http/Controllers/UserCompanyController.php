@@ -85,7 +85,7 @@ class UserCompanyController extends Controller
         }catch (Exception $e){
 
         }
-        return view('home')->with('slozky',$slozky)->with('slozkyDelete',$slozkyDelete)->with('profilovka',$user->company_picture);;
+        return view('homes.company_home')->with('slozky',$slozky)->with('slozkyDelete',$slozkyDelete)->with('profilovka',$user->company_picture);;
 
     }
 
@@ -244,7 +244,7 @@ class UserCompanyController extends Controller
         $user->company_login = $request->company_login;
         $user->save();
         session()->flash('message', 'Vaše údaje byly úspěšně změněny!');
-        return redirect()->route('showProfileData');
+        return redirect()->route('showCompanyProfileData');
     }
 
     public function updateProfilePassword(Request $request){

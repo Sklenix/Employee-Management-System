@@ -91,13 +91,22 @@
             <li class="nav-item"><a href="#kontakty" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Kontakty</a> </li>
         </ul>
         <ul class="navbar-nav navbar-collapse justify-content-end">
-            @if (Route::has('login'))
+            @if (Route::has('login') )
                 @auth
+
                     <li class="nav-item"><a href="{{ url('/company/profile') }}" class="nav-link p-3" style="font-family: 'Amatic SC', cursive;" >Vstup do systému</a> </li>
                 @else
-                    <li class="nav-item"><a href="{{ route('company') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 16px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Přihlásit se</a> </li>
+                    @auth('employee')
+                        <li class="nav-item"><a href="{{ url('/employee/profile') }}" class="nav-link p-3" style="font-family: 'Amatic SC', cursive;" >Vstup do systému</a> </li>
+                    @else
+                        @auth('admin')
+                            <li class="nav-item"><a href="{{ url('/admin/profile') }}" class="nav-link p-3" style="font-family: 'Amatic SC', cursive;" >Vstup do systému</a> </li>
+                        @else
+                            <li class="nav-item"><a href="{{ route('company') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 16px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Přihlásit se</a> </li>
                     @if (Route::has('register'))
                         <li class="nav-item"> <a href="{{ route('register') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 16px;margin-right: 20px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Registrace</a> </li>
+                          @endif
+                        @endif
                     @endif
                 @endif
             @endif
