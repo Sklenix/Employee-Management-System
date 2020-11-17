@@ -572,7 +572,24 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="form-group nahratTlacitko">
+                                <input type="file" name="employee_picture" id="fileEmployee" hidden />
+                                <label for="fileEmployee" style="padding: 12px 35px;border:3px solid #4aa0e6;border-radius: 48px;text-transform: uppercase;letter-spacing: 2px;font-weight: bold;color:#4aa0e6;" id="selector2">Vyberte Fotku</label>
+                                <script>
+                                    var loaderEmployee = function(e){
+                                        let file = e.target.files;
+                                        let show="<span> Vybrán soubor: </span>" + file[0].name;
 
+                                        let output = document.getElementById("selector2");
+                                        output.innerHTML = show;
+                                        output.classList.add("active");
+                                    };
+
+                                    let fileInputEmployee = document.getElementById("fileEmployee");
+                                    fileInputEmployee.addEventListener("change",loaderEmployee);
+
+                                </script>
+                            </div>
 
                         </div>
                             <!-- Modal footer -->

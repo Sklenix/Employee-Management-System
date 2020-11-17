@@ -31,7 +31,7 @@ class CompanyFactory extends Factory
             'company_phone' => '123456789',
             'company_login' => 'sklenix',
             'email_verified_at' => now(),
-            'company_url' => '',
+            'company_url' => '1FsQa0y8jHnCNkZw9g9SSECRkfgvuUbWy',
             'password' => Hash::make('ahoj1234'),
             'remember_token' => Str::random(10),
             'company_ico' => '12345678',

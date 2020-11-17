@@ -211,7 +211,7 @@
 
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{route('showProfileData')}}">Profil firmy</a>
+                            <a class="dropdown-item" href="{{route('showCompanyProfileData')}}">Profil firmy</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

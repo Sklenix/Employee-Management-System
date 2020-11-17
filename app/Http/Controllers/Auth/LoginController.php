@@ -66,18 +66,15 @@ class LoginController extends Controller
 
         $this->validate($request, $pravidla, $vlastniHlasky);
 
-        if (Auth::guard('admin')->attempt(['admin_email' => $request->email, 'password' => $request->password], $request->get('remember'))) {
-
-            return redirect()->intended('/admin');
+        if (Auth::guard('admin')->attempt(['admin_email' => $request->email, 'password' => $request->password], $request->get('remember')) ||  Auth::guard('admin')->attempt(['admin_login' => $request->email, 'password' => $request->password])) {
+            return redirect()->intended('/admin/profile');
         }else{
             session()->flash('message', 'Špatně zadané přihlašovací údaje!');
             session()->flash('alert-class', 'alert-danger');
-            return redirect()->route('login');
+            return redirect()->route('showAdminLoginForm');
         }
       //  return back()->withInput($request->only('email', 'remember'));
     }
-
-
 
     public function showEmployeeLoginForm()
     {
@@ -101,7 +98,7 @@ class LoginController extends Controller
 
         if (Auth::guard('employee')->attempt(['email' => $request->email, 'password' => $request->password]) || Auth::guard('employee')->attempt(['employee_login' => $request->email, 'password' => $request->password])) {
 
-            return redirect()->intended('employee');
+            return redirect()->intended('/employee/profile/');
         }else{
             session()->flash('message', 'Špatně zadané přihlašovací údaje!');
             session()->flash('alert-class', 'alert-danger');
@@ -133,7 +130,7 @@ class LoginController extends Controller
        $this->validate($request, $pravidla, $vlastniHlasky);
 
 
-       if (Auth::attempt(['email' => $request->email, 'password' => $request->password]) || Auth::attempt(['company_login' => $request->email, 'password' => $request->password])  )
+       if (Auth::attempt(['email' => $request->email, 'password' => $request->password]) || Auth::attempt(['company_login' => $request->email, 'password' => $request->password]))
        {
           // return redirect()->intended('userhome');
            return redirect()->intended('/company/profile/');

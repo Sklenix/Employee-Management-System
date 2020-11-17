@@ -153,7 +153,7 @@
     <div id="page-content-wrapper" >
 
         <nav class="navbar navbar-expand-lg navbar-dark border-bottom" style="background:rgba(0,0,0,0.85);">
-            <button class="btn btn-danger" id="menu-toggle">Schovat menu</button>
+            <button class="btn btn-danger btn-lg" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></button>
 
             <button class="navbar-toggler" style="color:rgba(255, 255, 255, 0.95);" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -163,10 +163,15 @@
                 <ul class="navbar-nav ml-auto mt-2 mt-lg-0" >
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" style="color:rgba(255, 255, 255, 0.95);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if($profilovka === NULL)
+                                <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" style="margin-right: 5px;" width="45" class="rounded-circle" alt="profilovka">
+                            @else
+                                <img src =" {{ asset('/storage/employee_images/'.Auth::user()->employee_picture) }}" width="45" class="rounded-circle" style="margin-right: 5px;max-height: 45px;"  alt="profilovka" />
+                            @endif
                             {{ Auth::user()->employee_name }} {{ Auth::user()->employee_surname }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Profil zaměstnance</a>
+                            <a class="dropdown-item" href="{{route('showEmployeeProfileData')}}">Profil zaměstnance</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

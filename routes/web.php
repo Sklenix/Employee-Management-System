@@ -22,7 +22,7 @@ Route::post('/welcome/send',[App\Http\Controllers\WelcomeController::class, 'sen
 Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
 Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');
 Route::post('/company/profile/deleteFile', [App\Http\Controllers\UserCompanyController::class, 'deleteFileGoogleDrive'])->name('deleteFile');
-Route::get('/company/profile/data', [App\Http\Controllers\UserCompanyController::class, 'showProfileData'])->name('showProfileData');
+Route::get('/company/profile/data', [App\Http\Controllers\UserCompanyController::class, 'showCompanyProfileData'])->name('showCompanyProfileData');
 Route::post('/company/profile/data/update/password',[App\Http\Controllers\UserCompanyController::class, 'updateProfilePassword'])->name('updateProfilePassword');
 Route::post('/company/profile/data/update',[App\Http\Controllers\UserCompanyController::class, 'updateProfileData'])->name('updateProfileData');
 Route::post('/company/profile/addEmployee',[App\Http\Controllers\UserCompanyController::class, 'addEmployee'])->name('addEmployee');
@@ -30,7 +30,7 @@ Auth::routes(['verify'=>true]);
 
 Route::get('/company/profile/', [App\Http\Controllers\UserCompanyController::class, 'index'])->name('home')->middleware('verified');
 
-Route::get('/login/admin', [App\Http\Controllers\Auth\LoginController::class, 'showAdminLoginForm']);
+Route::get('/login/admin', [App\Http\Controllers\Auth\LoginController::class, 'showAdminLoginForm'])->name('showAdminLoginForm');
 Route::get('/login/company', [App\Http\Controllers\Auth\LoginController::class, 'showCompanyLoginForm'])->name('company');
 Route::get('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'showEmployeeLoginForm'])->name('employee');
 
@@ -39,17 +39,25 @@ Route::post('/login/company', [App\Http\Controllers\Auth\LoginController::class,
 Route::post('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'employeeLogin']);
 
 Route::get('/login/company/verifySuccess', [App\Http\Controllers\UserCompanyController::class, 'showVerifySuccess'])->name('OvereniHotovo');
-
 Route::post('/company/profile/uploadImage',[App\Http\Controllers\UserCompanyController::class, 'uploadImage'])->name('uploadImage');
-
 Route::post('/company/profile/deleteOldImage',[App\Http\Controllers\UserCompanyController::class, 'deleteOldImage'])->name('deleteOldImage');
 
 Route::group(['middleware' => 'auth:employee'], function () {
-    Route::view('/employee', '/home_user');
+   // Route::view('/employee', '/home_user');
+    Route::get('/employee/profile/', [App\Http\Controllers\UserEmployeeController::class, 'index'])->name('homeEmployee');
+    Route::get('/employee/profile/data', [App\Http\Controllers\UserEmployeeController::class, 'showEmployeeProfileData'])->name('showEmployeeProfileData');
+    Route::post('/employee/profile/data/update',[App\Http\Controllers\UserEmployeeController::class, 'updateEmployeeProfileData'])->name('updateEmployeeProfileData');
+    Route::post('/employee/profile/data/update/password',[App\Http\Controllers\UserEmployeeController::class, 'updateEmployeeProfilePassword'])->name('updateEmployeeProfilePassword');
+    Route::post('/company/profile/uploadEmployeeImage',[App\Http\Controllers\UserEmployeeController::class, 'uploadEmployeeImage'])->name('uploadEmployeeImage');
+    Route::post('/company/profile/deleteEmployeeOldImage',[App\Http\Controllers\UserEmployeeController::class, 'deleteEmployeeOldImage'])->name('deleteEmployeeOldImage');
 });
 
 Route::group(['middleware' => 'auth:admin'], function () {
-    Route::view('/admin', 'admin');
+    //Route::view('/admin', 'admin');
+    Route::get('/admin/profile/', [App\Http\Controllers\UserAdminController::class, 'index'])->name('homeAdmin');
+    Route::get('/admin/profile/data', [App\Http\Controllers\UserAdminController::class, 'showAdminProfileData'])->name('showAdminProfileData');
+    Route::post('/admin/profile/data/update',[App\Http\Controllers\UserAdminController::class, 'updateAdminProfileData'])->name('updateAdminProfileData');
+    Route::post('/admin/profile/data/update/password',[App\Http\Controllers\UserAdminController::class, 'updateAdminProfilePassword'])->name('updateAdminProfilePassword');
 });
 
 Route::get('/logout', [App\Http\Controllers\HomeController::class, 'loggedOut']);

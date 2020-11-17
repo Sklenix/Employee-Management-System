@@ -149,7 +149,7 @@
     <div id="page-content-wrapper" >
 
         <nav class="navbar navbar-expand-lg navbar-dark border-bottom" style="background:rgba(0,0,0,0.85);">
-            <button class="btn btn-danger" id="menu-toggle">Schovat menu</button>
+            <button class="btn btn-danger btn-lg" id="menu-toggle"><i class="fa fa-bars" aria-hidden="true"></i></button>
 
             <button class="navbar-toggler" style="color:rgba(255, 255, 255, 0.95);" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -159,10 +159,10 @@
                 <ul class="navbar-nav ml-auto mt-2 mt-lg-0" >
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" style="color:rgba(255, 255, 255, 0.95);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{ Auth::user()->admin_name }} {{ Auth::user()->admin_surname }}
+                            <i class="fa fa-user" style="font-size: 17px;margin-right: 4px;" aria-hidden="true"></i> {{ Auth::user()->admin_name }} {{ Auth::user()->admin_surname }}
                         </a>
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Profil admina</a>
+                            <a class="dropdown-item" href="{{route('showAdminProfileData')}}">Profil admina</a>
                             <a class="dropdown-item" href="{{ route('logout') }}"
                                onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">

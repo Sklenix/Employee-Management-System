@@ -1,0 +1,200 @@
+<?php
+
+namespace App\Http\Controllers;
+
+
+use GuzzleHttp\Client;
+use http\Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use GuzzleHttp\Exception\RequestException;
+use Guzzle\Http\Exception\ClientErrorResponseException;
+use GuzzleHttp\Exception\ServerException;
+use GuzzleHttp\Exception\BadResponseException;
+use Google_Client;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
+use Google_Service_Drive;
+use Google_Service_Drive_DriveFile;
+use Illuminate\Validation\ValidationException;
+
+class UserEmployeeController extends Controller
+{
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function index()
+    {
+        $user = Auth::user();
+        return view('home_user')->with('profilovka',$user->employee_picture);
+    }
+
+    public function showEmployeeProfileData(){
+        $user = Auth::user();
+        return view('profiles.employee_profile')->with('profilovka',$user->employee_picture);
+    }
+
+    protected function validator(array $data,$emailDuplicate,$verze){
+        if($verze == 1){
+            if($emailDuplicate == 1){
+                $pravidla = [
+                    'employee_name' => ['required', 'string', 'max:255'],
+                    'employee_surname' =>  ['required', 'string', 'max:255'],
+                    'employee_city' =>  ['required', 'string', 'max:255'],
+                    'employee_email' => ['required','string','email','max:255'],
+                    'employee_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                    'employee_street' =>  ['nullable', 'string', 'max:255']
+                ];
+            }else if($emailDuplicate == 0){
+                $pravidla = [
+                    'employee_name' => ['required', 'string', 'max:255'],
+                    'employee_surname' =>  ['required', 'string', 'max:255'],
+                    'employee_city' =>  ['required', 'string', 'max:255'],
+                    'employee_email' => ['required','unique:table_employees,email','string','email','max:255'],
+                    'employee_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                    'employee_street' =>  ['nullable', 'string', 'max:255']
+                ];
+            }
+
+            Validator::make($data, [
+                'employee_name' => ['required', 'string', 'max:255'],
+                'employee_surname' =>  ['required', 'string', 'max:255'],
+                'employee_city' =>  ['required', 'string', 'max:255'],
+                'employee_email' => ['required','string','email','max:255'],
+                'employee_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
+                'employee_street' =>  ['nullable', 'string', 'max:255']
+            ]);
+        }
+
+        $vlastniHlasky = [
+            'required' => 'Položka :attribute je povinná.',
+            'email' => 'U položky :attribute nebyl dodržen formát emailu.',
+            'regex' => 'Formát :attribute není validní.',
+            'max:255' => 'U položky :attribute je povoleno maximálně 255 znaků.',
+            'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.',
+            'digits' => 'Číslo musí mít 8 cifer'
+        ];
+        Validator::validate($data, $pravidla, $vlastniHlasky);
+    }
+
+    public function updateEmployeeProfileData(Request $request){
+        $user = Auth::user();
+        $emailDuplicate = 0;
+        if($user->email == $request->employee_email){
+            $emailDuplicate = 1;
+        }
+        $this->validator($request->all(),$emailDuplicate,1);
+
+        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
+        $jmeno = $request->employee_name;
+        $prijmeni = $request->employee_surname;
+        $souborZmena = $jmeno." ".$prijmeni;
+        /*Cesta k autorizačnímu klíči*/
+        $keyFileLocation =storage_path('app/credentials.json');
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+        try {
+            /*Inicializace klienta*/
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $service = new \Google_Service_Drive($client);
+            $zmena_jmena = new Google_Service_Drive_DriveFile();
+            $zmena_jmena->setName($souborZmena);
+            $service->files->update($user->employee_drive_url, $zmena_jmena, array(
+                'mimeType' => 'text/csv',
+                'uploadType' => 'multipart'
+            ));
+        } catch (Exception $e) {
+            print "Nastala chyba: " . $e->getMessage();
+        }
+
+        $user->employee_name=$request->employee_name;
+        $user->employee_surname = $request->employee_surname;
+        $user->employee_phone = $request->employee_phone;
+        $user->email = $request->employee_email;
+        $user->employee_city = $request->employee_city;
+        $user->employee_street = $request->employee_street;
+        $user->save();
+        session()->flash('message', 'Vaše údaje byly úspěšně změněny!');
+        return redirect()->route('showEmployeeProfileData');
+    }
+
+    public function updateEmployeeProfilePassword(Request $request){
+        $user = Auth::user();
+        if($request->password == $request->password_verify){
+            if($request->password == "" || $request->password_verify == ""){
+                session()->flash('errorZprava', 'Položky password, password_verify jsou povinné!');
+                return back()->withInput(['tab'=>'zmenaHesla']);
+            }else if(strlen($request->password) < 8){
+                session()->flash('errorZprava', 'Heslo musí mít alespoň 8 znaků!');
+                return back()->withInput(['tab'=>'zmenaHesla']);
+            }else{
+                $user->password= Hash::make($request->password);
+            }
+
+        }else{
+            if($request->password == "" || $request->password_verify == ""){
+                session()->flash('errorZprava', 'Položky password, password_verify jsou povinné!');
+            }
+            session()->flash('errorZprava', 'Hesla se neshodují!');
+            return back()->withInput(['tab'=>'zmenaHesla']);
+        }
+        $user->save();
+        session()->flash('message', 'Vaše heslo bylo úspešně změněno!');
+        return back()->withInput(['tab'=>'zmenaHesla']);
+    }
+
+    public function deleteEmployeeOldImage(){
+        $user = Auth::user();
+        if($user->employee_picture){
+            Storage::delete('/public/employee_images/'.$user->employee_picture);
+            $user->update(['employee_picture' => NULL]);
+        }
+        return redirect()->back();
+    }
+
+    public function uploadEmployeeImage(Request $request){
+        if($request->hasFile('obrazek')){
+            $nazev = $request->obrazek->getClientOriginalName();
+            $pripona = explode(".",$nazev);
+            if($pripona[1] == "jpg" || $pripona[1] == "png" || $pripona[1] == "jpeg"){
+                $user = Auth::user();
+                if($user->employee_picture){
+                    Storage::delete('/public/employee_images/'.$user->employee_picture);
+                }
+                $tokenUnique = Str::random(20);
+                $request->obrazek->storeAs('employee_images',$tokenUnique.$nazev,'public');
+                $user->update(['employee_picture' => $tokenUnique.$nazev]);
+                session()->flash('obrazekZpravaSuccess', 'Profilová fotka úspěšně nahrána.');
+            }else{
+                session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg]');
+            }
+        }
+        return redirect()->back();
+    }
+
+
+}

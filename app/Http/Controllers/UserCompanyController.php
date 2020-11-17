@@ -171,7 +171,8 @@ class UserCompanyController extends Controller
                 'employee_note' => ['nullable','max:500'],
                 'employee_city' => ['required','string', 'max:255'],
                 'employee_street' => ['nullable','max:255'],
-                'employee_password' => ['required', 'string', 'min:8','required_with:employee_password_confirm','same:employee_password_confirm']
+                'employee_password' => ['required', 'string', 'min:8','required_with:employee_password_confirm','same:employee_password_confirm'],
+                'employee_picture' => ['mimes:jpeg,jpg,png,gif','max:20000']
             ];
 
         }
@@ -300,11 +301,9 @@ class UserCompanyController extends Controller
         return redirect()->back();
     }
 
-
-
-    public function showProfileData(){
+    public function showCompanyProfileData(){
         $user = Auth::user();
-        return view('profiledata')->with('profilovka',$user->company_picture);
+        return view('profiles.company_profile')->with('profilovka',$user->company_picture);
     }
 
     public function createFolderGoogleDrive(Request $request){
@@ -466,7 +465,20 @@ class UserCompanyController extends Controller
             'employee_company' => $user->company_id
         ]);
 
+        $employeeSearch = Employee::where('employee_login', '=',$uzivatel )->first();
 
+        if($request->hasFile('employee_picture')){
+            $nazev = $request->employee_picture->getClientOriginalName();
+            $pripona = explode(".",$nazev);
+            if($pripona[1] == "jpg" || $pripona[1] == "png" || $pripona[1] == "jpeg"){
+                if($employeeSearch->employee_picture){
+                    Storage::delete('/public/employee_images/'.$employeeSearch->employee_picture);
+                }
+                $tokenUnique = Str::random(20);
+                $request->employee_picture->storeAs('employee_images',$tokenUnique.$nazev,'public');
+                $employeeSearch->update(['employee_picture' => $tokenUnique.$nazev]);
+            }
+        }
         /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
         $soubor = $request->employee_name.' '.$request->employee_surname;
 
@@ -524,8 +536,8 @@ class UserCompanyController extends Controller
             die();
         }
 
-        $employeeSearch = Employee::where('employee_login', '=',$uzivatel )->first();
         $employeeSearch->update(['employee_drive_url' => $fileId]);
+
         session()->flash('success', 'Zaměstnanec '.$request->employee_name.' '.$request->employee_surname.' byl úspešně vytvořen!');
         return redirect()->back();
     }

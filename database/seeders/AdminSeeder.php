@@ -20,7 +20,8 @@ class AdminSeeder extends Seeder
             'admin_name' => 'Josef',
             'admin_surname' => 'Malý',
             'admin_email' => 'google@gmail.com',
-            'admin_password' => Hash::make('admin1234'),
+            'admin_login' => 'admin',
+            'admin_password' => Hash::make('admin'),
             'remember_token' => Str::random(10),
         ]);
     }

@@ -21,22 +21,24 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/RegisterController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/Auth/LoginController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCreateController.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Company.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Company.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserHomeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserEmployeeController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Admin.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Admin.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/Employee.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/AdminFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/AdminFactory.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/factories/CompanyFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/CompanyFactory.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/factories/EmployeeFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/EmployeeFactory.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/migrations/2020_09_28_143126_create_employees_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_09_28_143126_create_employees_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2020_28_09_000000_create_companies_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_28_09_000000_create_companies_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeders/CompanySeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/CompanySeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/auth/login.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/login.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/auth/register.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/auth/register.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/emails_company_verify.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/emails_company_verify.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_09_28_153045_create_admin_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_09_28_153045_create_admin_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/AdminSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/AdminSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/admin.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/admin_home.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/home.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/layouts/dashboard.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/dashboard.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profiledata.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profiledata.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/welcome.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/dashboard_admin.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/dashboard_admin.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/dashboard_zamestnanec.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/dashboard_zamestnanec.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/profiledata.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profiles/company_profile.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/uploadGoogleDrive.blade.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -191,6 +193,8 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Bilbo\Desktop\Employee-Management-System\resources\views\profiles" />
+      <recent name="C:\Users\Bilbo\Desktop\Employee-Management-System\resources\views" />
       <recent name="C:\Users\Bilbo\Desktop\Employee-Management-System\resources\js" />
     </key>
   </component>
@@ -256,6 +260,9 @@
       <workItem from="1605304121992" duration="86000" />
       <workItem from="1605437926739" duration="67000" />
       <workItem from="1605440007337" duration="27107000" />
+      <workItem from="1605483728884" duration="2809000" />
+      <workItem from="1605562438385" duration="8709000" />
+      <workItem from="1605571749453" duration="2000" />
     </task>
     <servers />
   </component>
@@ -275,18 +282,18 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="464" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1601301412344">
+    <state x="464" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1605562501619">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="464" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1601301412344" />
-    <state x="689" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1601632935311">
+    <state x="464" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1605562501619" />
+    <state x="689" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog" timestamp="1605569132514">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="689" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1601632935311" />
-    <state x="1055" y="98" width="627" height="545" key="NewPhpClassDialog" timestamp="1601846512006">
+    <state x="689" y="275" key="#com.jetbrains.php.actions.copyPaste.importReferences.PhpImportReferencesDialog/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1605569132514" />
+    <state x="1055" y="98" width="627" height="545" key="NewPhpClassDialog" timestamp="1605566744834">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1055" y="98" width="627" height="545" key="NewPhpClassDialog/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1601846512006" />
+    <state x="1055" y="98" width="627" height="545" key="NewPhpClassDialog/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1605566744834" />
     <state x="1102" y="313" key="NewPhpFileDialog" timestamp="1604359439093">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -301,10 +308,10 @@
     </state>
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1605471010480" />
     <state x="777" y="434" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/1920.0.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1600518319006" />
-    <state x="1131" y="199" width="585" height="534" key="find.popup" timestamp="1605468216184">
+    <state x="1131" y="199" width="585" height="534" key="find.popup" timestamp="1605563199640">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="1131" y="199" width="585" height="534" key="find.popup/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1605468216184" />
+    <state x="1131" y="199" width="585" height="534" key="find.popup/0.0.1920.1040/1920.0.1366.728@0.0.1920.1040" timestamp="1605563199640" />
     <state x="667" y="253" width="585" height="534" key="find.popup/1920.0.1366.728/0.0.1920.1040@0.0.1920.1040" timestamp="1600788618745" />
     <state x="616" y="242" key="run.anything.popup" timestamp="1605018092413">
       <screen x="0" y="0" width="1920" height="1040" />
