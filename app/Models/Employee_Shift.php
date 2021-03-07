@@ -46,6 +46,10 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
 
 
     public static function getEmployeeCurrentShiftsWithAttendance($employee_id){
+        date_default_timezone_set('Europe/Prague');
+        $now = Carbon::now();
+        $pondeli = $now->startOfWeek()->format('Y-m-d H:i:s');
+        $nedele = $now->endOfWeek()->format('Y-m-d H:i:s');
         return DB::table('table_employee_shifts')
             ->select('table_shifts.shift_id','table_shifts.shift_start','table_shifts.shift_end',
                 'table_shifts.shift_place','table_shifts.shift_note','table_shifts.shift_importance_id','table_employees.employee_id')
@@ -54,8 +58,8 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->leftJoin('table_attendances','table_employee_shifts.shift_id','=','table_attendances.shift_id')
             ->where(['table_employee_shifts.employee_id' => $employee_id])
             ->whereBetween('table_shifts.shift_start', [
-                Carbon::parse('last monday')->startOfDay(),
-                Carbon::parse('next sunday')->endOfDay(),
+                $pondeli,
+                $nedele,
             ])
             ->orderBy('table_shifts.shift_start', 'asc')
             ->distinct()

@@ -811,18 +811,20 @@ class ShiftDatatableController extends Controller
             ->select('table_attendances.attendance_check_in_company')
             ->where(['table_attendances.shift_id' => $smena_id,'table_attendances.employee_id' => $zamestnanec_id])
             ->get();
-
+          $smena = Shift::findOrFail($smena_id);
           if($dochazka->isEmpty()){
+              $datumStart = date('Y-m-d\TH:i', strtotime($smena->shift_start));
               $html .= '<div class="alert alert-info alert-block text-center">
                         <strong>Aktuálně nastaveno na: nedefinováno</strong>
                     </div>';
-              $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkin" id="attendance_create_checkin" value="'.date('Y-m-d\TH:i').'"  autocomplete="attendance_create_checkin" autofocus>';
+              $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkin" id="attendance_create_checkin" value="'.$datumStart.'"  autocomplete="attendance_create_checkin" autofocus>';
           }else{
               if($dochazka[0]->attendance_check_in_company == NULL){
+                  $datumStart = date('Y-m-d\TH:i', strtotime($smena->shift_start));
                   $html .= '<div class="alert alert-info alert-block text-center">
                         <strong>Aktuálně nastaveno na: nedefinováno</strong>
                     </div>';
-                  $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkin" id="attendance_create_checkin" value="'.date('Y-m-d\TH:i').'"  autocomplete="attendance_create_checkin" autofocus>';
+                  $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkin" id="attendance_create_checkin" value="'.$datumStart.'"  autocomplete="attendance_create_checkin" autofocus>';
               }else{
                   $date_start = new DateTime($dochazka[0]->attendance_check_in_company);
                   $datumZobrazeni = $date_start->format('d.m.Y H:i');
@@ -837,13 +839,35 @@ class ShiftDatatableController extends Controller
     }
 
     public function updateCheckIn(Request $request,$zamestnanec_id,$smena_id){
-        $user = Auth::user();
+        $smena = Shift::findOrFail($smena_id);
+        $shift_start = new DateTime($smena->shift_start);
+        $shift_end = new DateTime($smena->shift_end);
+        $shift_checkin = new DateTime($request->attendance_check_in_company);
+        $sekundy = 900; // 15 minut
+        $difference_start = $shift_checkin->format('U') - ($shift_start->format('U') - $sekundy);
+        $difference_end = $shift_end->format('U') - $shift_checkin->format('U');
+        $chybaDatumy = array();
+        $bool_datumy = 0;
+
+        if($difference_start < 0){
+            array_push($chybaDatumy,'Zapsaný check-in je dříve než začátek směny samotné!');
+            $bool_datumy = 1;
+        }
+
+        if($difference_end < 0){
+            array_push($chybaDatumy,'Zapsaný check-in je později než konec směny samotné!');
+            $bool_datumy = 1;
+        }
+
+        if ($bool_datumy == 1) {
+            return response()->json(['fail' => $chybaDatumy]);
+        }
 
         $dochazka = DB::table('table_attendances')
             ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
             ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
             ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-            ->select('table_attendances.attendance_check_in_company')
+            ->select('table_attendances.attendance_check_in_company','table_attendances.attendance_check_out_company')
             ->where(['table_attendances.shift_id' => $smena_id,'table_attendances.employee_id' => $zamestnanec_id])
             ->get();
 
@@ -857,6 +881,14 @@ class ShiftDatatableController extends Controller
                 'attendance_came' => 1
             ]);
         }else{
+            if($dochazka[0]->attendance_check_out_company != NULL){
+                $shift_checkout = new DateTime($dochazka[0]->attendance_check_out_company);
+                $difference_checkins = $shift_checkout->format('U') - $shift_checkin->format('U');
+                if($difference_checkins < 0){
+                    array_push($chybaDatumy,'Zapsaný check-in je později než zapsaný check-out směny!');
+                    return response()->json(['fail' => $chybaDatumy]);
+                }
+            }
             Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(array('attendance_check_in_company' => $request->attendance_check_in_company,'attendance_came' => 1));
         }
 
@@ -883,17 +915,20 @@ class ShiftDatatableController extends Controller
             ->where(['table_attendances.shift_id' => $smena_id,'table_attendances.employee_id' => $zamestnanec_id])
             ->get();
 
+        $smena = Shift::findOrFail($smena_id);
         if($dochazka->isEmpty()){
+            $datumEnd = date('Y-m-d\TH:i', strtotime($smena->shift_end));
             $html .= '<div class="alert alert-info alert-block text-center">
                         <strong>Aktuálně nastaveno na: nedefinováno</strong>
                     </div>';
-            $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkout" id="attendance_create_checkout" value="'.date('Y-m-d\TH:i').'"  autocomplete="attendance_create_checkout" autofocus>';
+            $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkout" id="attendance_create_checkout" value="'.$datumEnd.'"  autocomplete="attendance_create_checkout" autofocus>';
         }else{
             if($dochazka[0]->attendance_check_out_company == NULL){
+                $datumEnd = date('Y-m-d\TH:i', strtotime($smena->shift_end));
                 $html .= '<div class="alert alert-info alert-block text-center">
                         <strong>Aktuálně nastaveno na: nedefinováno</strong>
                     </div>';
-                $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkout" id="attendance_create_checkout" value="'.date('Y-m-d\TH:i').'"  autocomplete="attendance_create_checkout" autofocus>';
+                $html .= '<input type="datetime-local" class="form-control" name="attendance_create_checkout" id="attendance_create_checkout" value="'.$datumEnd.'"  autocomplete="attendance_create_checkout" autofocus>';
             }else{
                 $date_start = new DateTime($dochazka[0]->attendance_check_out_company);
                 $datumZobrazeni = $date_start->format('d.m.Y H:i');
@@ -910,13 +945,28 @@ class ShiftDatatableController extends Controller
     }
 
     public function updateCheckOut(Request $request,$zamestnanec_id,$smena_id){
-        $user = Auth::user();
+        $smena = Shift::findOrFail($smena_id);
+        $shift_start = new DateTime($smena->shift_start);
+        $shift_checkout = new DateTime($request->attendance_check_out_company);
+        $sekundy = 900; // 15 minut
+        $difference_start = $shift_checkout->format('U') - ($shift_start->format('U') - $sekundy);
+        $chybaDatumy = array();
+        $bool_datumy = 0;
+
+        if($difference_start < 0){
+            array_push($chybaDatumy,'Zapsaný check-out je dříve než začátek směny samotné!');
+            $bool_datumy = 1;
+        }
+
+        if ($bool_datumy == 1) {
+            return response()->json(['fail' => $chybaDatumy]);
+        }
 
         $dochazka = DB::table('table_attendances')
             ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
             ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
             ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-            ->select('table_attendances.attendance_check_out_company')
+            ->select('table_attendances.attendance_check_out_company','table_attendances.attendance_check_in_company')
             ->where(['table_attendances.shift_id' => $smena_id,'table_attendances.employee_id' => $zamestnanec_id])
             ->get();
 
@@ -930,6 +980,14 @@ class ShiftDatatableController extends Controller
                 'attendance_came' => 1
             ]);
         }else{
+            if($dochazka[0]->attendance_check_in_company != NULL){
+                $shift_checkin = new DateTime($dochazka[0]->attendance_check_in_company);
+                $difference_checkins = $shift_checkout->format('U') - $shift_checkin->format('U');
+                if($difference_checkins < 0){
+                    array_push($chybaDatumy,'Zapsaný check-out je dřívě než zapsaný check-in směny!');
+                    return response()->json(['fail' => $chybaDatumy]);
+                }
+            }
             Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(array('attendance_check_out_company' => $request->attendance_check_out_company,'attendance_came' => 1));
         }
 
@@ -1095,7 +1153,7 @@ class ShiftDatatableController extends Controller
         }else{
             Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(array('attendance_note' => $request->attendance_note));
         }
-        return response()->json(['success'=>'Status docházky zaměstnance: '.$zamestnanec->employee_name.' '.$zamestnanec->employee_surname.' byl úspěšně zapsán.']);
+        return response()->json(['success'=>'Poznámka k docházce zaměstnance: '.$zamestnanec->employee_name.' '.$zamestnanec->employee_surname.' byla úspěšně zapsána.']);
     }
 
 }

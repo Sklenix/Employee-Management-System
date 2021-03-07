@@ -165,10 +165,10 @@ class EmployeeCurrentShiftsController extends Controller
         $shift_end = new DateTime($smena->shift_end);
         $now2 = new DateTime();
         $difference_start = $now->format('U') - $shift_start->format('U');
-        $difference_end = $shift_end->format('U') - $now2->format('U');
+       // $difference_end = $shift_end->format('U') - $now2->format('U');
 
-        if($difference_start < 0 || $difference_end < 0){
-            return response()->json(['fail'=>'Příchod je možný nejdříve 15 minut před startem směny, nebo po konec směny.']);
+        if($difference_start < 0){
+            return response()->json(['fail'=>'Zapsat odchod před startem směny není možné.']);
         }
         if($dochazka->isEmpty()){
             Attendance::create([
@@ -179,7 +179,7 @@ class EmployeeCurrentShiftsController extends Controller
         }else{
             Attendance::where(['employee_id' => $user->employee_id, 'shift_id' => $shift_id])->update(array('attendance_check_out' => $now,'attendance_came' => 1));
         }
-        return response()->json(['success'=>'Váš příchod byl úspěšně zaznamenán.']);
+        return response()->json(['success'=>'Váš odchod byl úspěšně zaznamenán.']);
     }
 
 }

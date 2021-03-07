@@ -264,13 +264,10 @@
                             </div>
                         </div>
                     </form>
-
-                </div><!--/tab-pane-->
-
-            </div><!--/tab-pane-->
-        </div><!--/tab-content-->
-
-    </div><!--/col-9-->
-</div><!--/row-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

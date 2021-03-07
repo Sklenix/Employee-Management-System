@@ -221,6 +221,8 @@
                     <h5 class="modal-title">Check-in</h5>
                 </div>
                 <div class="modal-body">
+                    <div class="chyby_checkin">
+                    </div>
                     <div id="ShowAttendanceCheckinBody">
                     </div>
                 </div>
@@ -240,6 +242,8 @@
                     <h5 class="modal-title">Check-out</h5>
                 </div>
                 <div class="modal-body">
+                    <div class="chyby_checkout">
+                    </div>
                     <div id="ShowAttendanceCheckoutBody">
                     </div>
                 </div>
@@ -303,8 +307,23 @@
                 $('.chyby').hide();
             })
 
+            $('#ShowAttendanceOptionsModal').on('hidden.bs.modal', function () {
+                $('.attendancesuccess').hide();
+            })
+
+            $('#ShowAttendanceCheckinModal').on('hidden.bs.modal', function () {
+                $('.chyby_checkin').hide();
+            })
+
+            $('#ShowAttendanceCheckoutModal').on('hidden.bs.modal', function () {
+                $('.chyby_checkout').hide();
+            })
+
             $('.chyby_add').hide();
+            $('.chyby_checkin').hide();
+            $('.chyby_checkout').hide();
             $('.chyby').hide();
+
             /* Zobrazení datatable */
             var datatable = $('.shift_list').DataTable({
                 processing: true,
@@ -606,9 +625,15 @@
                         $('#SubmitShowAttendanceCheckin').text('Aktualizace...');
                     },
                     success: function(data) {
-                        if(data.errors) {
+                        if(data.fail) {
                             $('#SubmitShowAttendanceCheckin').text('Uložit');
-                        } else {
+                            var failHtml = '<div class="alert alert-danger">'+
+                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
+                                '</div>';
+                            $('.chyby_checkin').html(failHtml);
+                            $('.chyby_checkin').show();
+                        }  else {
                             $('.shift_list').DataTable().ajax.reload();
                             var successHtml = '<div class="alert alert-success">'+
                                 '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
@@ -616,6 +641,7 @@
                                 '</div>';
 
                             $('.attendancesuccess').html(successHtml);
+                            $('.attendancesuccess').show();
                             $('#SubmitShowAttendanceCheckin').text('Uložit');
 
                             $("#ShowAttendanceCheckinModal").modal('hide');
@@ -667,9 +693,15 @@
                         $('#SubmitShowAttendanceCheckout').text('Aktualizace...');
                     },
                     success: function(data) {
-                        if(data.errors) {
+                        if(data.fail) {
                             $('#SubmitShowAttendanceCheckout').text('Uložit');
-                        } else {
+                            var failHtml = '<div class="alert alert-danger">'+
+                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
+                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
+                                '</div>';
+                            $('.chyby_checkout').html(failHtml);
+                            $('.chyby_checkout').show();
+                        }  else {
                             $('.shift_list').DataTable().ajax.reload();
                             var successHtml = '<div class="alert alert-success">'+
                                 '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
@@ -677,8 +709,8 @@
                                 '</div>';
 
                             $('.attendancesuccess').html(successHtml);
+                            $('.attendancesuccess').show();
                             $('#SubmitShowAttendanceCheckout').text('Uložit');
-
                             $("#ShowAttendanceCheckoutModal").modal('hide');
                         }
                     }
@@ -738,8 +770,8 @@
                                 '</div>';
 
                             $('.attendancesuccess').html(successHtml);
+                            $('.attendancesuccess').show();
                             $('#SubmitShowAttendanceAbsence').text('Uložit');
-
                             $("#ShowAttendanceAbsenceModal").modal('hide');
                         }
                     }
@@ -799,8 +831,8 @@
                                 '</div>';
 
                             $('.attendancesuccess').html(successHtml);
+                            $('.attendancesuccess').show();
                             $('#SubmitShowAttendanceNote').text('Uložit');
-
                             $("#ShowAttendanceNoteModal").modal('hide');
                         }
                     }

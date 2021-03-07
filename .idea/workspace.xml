@@ -21,16 +21,20 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Employee_Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee_Shift.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Shift.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/ikona_profil3.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/jazyky.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/jazyky_add.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/jazyky_delete.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/public/images/zamestnanecImage.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/attendances.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/attendances.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/company_actions/employee_list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/employee_list.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/homes/admin_home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/homes/admin_home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/homes/employee_home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/homes/employee_home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/company_dashboard.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/company_dashboard.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/employee_dashboard.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/employee_dashboard.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/shift_list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/shift_list.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/profiles/admin_profile.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profiles/admin_profile.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profiles/company_profile.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profiles/company_profile.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profiles/employee_profile.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profiles/employee_profile.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/welcome.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -364,6 +368,8 @@
       <workItem from="1615024832411" duration="14566000" />
       <workItem from="1615110799980" duration="17465000" />
       <workItem from="1615136448108" duration="5808000" />
+      <workItem from="1615142818839" duration="922000" />
+      <workItem from="1615145487179" duration="13032000" />
     </task>
     <servers />
   </component>

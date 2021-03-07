@@ -190,21 +190,30 @@ class Shift extends Authenticatable
     }
 
     public static function getEmployeeCurrentShifts($employee_id){
+            date_default_timezone_set('Europe/Prague');
+            $now = Carbon::now();
+            $pondeli = $now->startOfWeek()->format('Y-m-d H:i:s');
+            $nedele = $now->endOfWeek()->format('Y-m-d H:i:s');
             return DB::table('table_employee_shifts')
                 ->select('table_shifts.shift_id','table_shifts.shift_start','table_shifts.shift_end',
                     'table_shifts.shift_place','table_shifts.shift_note','table_shifts.shift_importance_id')
                 ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
                 ->where(['table_employee_shifts.employee_id' => $employee_id])
-                ->whereBetween('table_shifts.shift_start', [
-                    Carbon::parse('last monday')->startOfDay(),
-                    Carbon::parse('next sunday')->endOfDay(),
-                ])
+               /* ->whereBetween('table_shifts.shift_start', [
+                    Carbon::parse('this monday')->startOfDay(),
+                    Carbon::parse('this sunday')->endOfDay(),
+                ])*/
+               ->whereBetween('table_shifts.shift_start', [
+                   $pondeli,
+                   $nedele,
+               ])
                 ->orderBy('table_shifts.shift_start', 'asc')
                 ->distinct()
                 ->get();
     }
 
     public static function getEmployeeCurrentMonthShifts($employee_id){
+        date_default_timezone_set('Europe/Prague');
         return DB::table('table_employee_shifts')
             ->select('table_shifts.shift_id','table_shifts.shift_start','table_shifts.shift_end',
                 'table_shifts.shift_place','table_shifts.shift_note','table_shifts.shift_importance_id')
