@@ -51,7 +51,6 @@
     <link rel="icon" href="{{ asset('images/favicon16x16.png') }}" type="image/png" sizes="16x16"/>
     <link rel="icon" href="{{ asset('images/favicon32x32.png') }}" type="image/png" sizes="32x32"/>
     <link rel="icon" href="{{ asset('images/favicon96x96.png') }}" type="image/png" sizes="96x96"/>
-
 </head>
 
 <body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-color:cadetblue">
@@ -79,11 +78,10 @@
         <hr></div>
     </div>
     <div class="row">
-        <div class="col-sm-3"><!--left col-->
+        <div class="col-sm-3">
             <div class="text-center">
-
                  @if($profilovka == NULL)
-                        <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" alt="profilovka">
+                        <img src="{{ URL::asset('images/company_default_profile.png') }}" class="profilovka img-thumbnail" alt="profilovka">
                  @else
                         <img src =" {{ asset('/storage/company_images/'.Auth::user()->company_picture) }}" width="250" style="margin-right: 5px;"  alt="profilovka" />
                 @endif
@@ -99,7 +97,7 @@
                          {{ Session::get('obrazekZpravaSuccess') }}
                      </div>
                  @endif
-                <form method="post" style="margin-top: 15px;" action="{{route('uploadImage')}}" id="zamestnanec_form" enctype="multipart/form-data">
+                <form method="post" style="margin-top: 15px;" action="{{route('uploadImage')}}" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group nahratTlacitko">
                     <input type="file" name="obrazek" required id="file" hidden />
@@ -114,31 +112,28 @@
                             output.innerHTML = show;
                             output.classList.add("active");
                         };
-
                         let fileInput = document.getElementById("file");
                         fileInput.addEventListener("change",loader);
-
                     </script>
                     <input class="btn btn-primary btn-block btn-lg"  style="margin-top: 8px;" type="submit" value="Nahrát">
                 </div>
                 </form>
-
-                 <form method="post"  style="margin-top: 15px;" action="{{route('deleteOldImage')}}" id="zamestnanec_form" enctype="multipart/form-data">
+                 <form method="post"  style="margin-top: 15px;" action="{{route('deleteOldImage')}}" enctype="multipart/form-data">
                      @csrf
                      <div class="form-group nahratTlacitko">
                          <input class="btn btn-danger btn-block btn-lg" type="submit" value="Smazat obrázek">
                      </div>
                  </form>
                 <ul class="list-group">
-                    <li class="list-group-item text-muted">Statistiky </li>
-                    <li class="list-group-item text-right"><span class="pull-left"><strong>Počet zaměstnanců</strong></span> 125</li>
-                    <li class="list-group-item text-right"><span class="pull-left"><strong>Počet směn</strong></span> 13</li>
+                    <li class="list-group-item text-muted">Statistiky počtu </li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong>Zaměstnanců</strong></span> {{$pocetZamestnancu}}</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong>Směn celkově</strong></span> {{$pocetSmen}}</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong>Nadcházejících směn</strong></span> {{$pocetNadchazejicich}}</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong>Proběhnutých směn</strong></span> {{$pocetHistorie}}</li>
+                    <li class="list-group-item text-right"><span class="pull-left"><strong>Účet vytvořen</strong></span> {{$vytvorenUcet}}</li>
                 </ul>
             </div><br>
-
-
-
-        </div><!--/col-3-->
+        </div>
         <div class="col-sm-9">
             <ul class="nav nav-stacked nav-pills" id="menuTabu">
                 <li class="nav-item">
@@ -170,7 +165,6 @@
 
             <div class="tab-content">
                 <div class="tab-pane active" id="obecneUdaje">
-
                     <form class="form" action="{{ route('updateProfileData') }}" method="post">
                         @csrf
                         <div class="form-group">
@@ -189,7 +183,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="company_ico"><h4>IČO</h4></label>
@@ -206,7 +199,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="company_city"><h4>Město</h4></label>
@@ -223,8 +215,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="company_street"><h4>Ulice</h4></label>
@@ -241,8 +231,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="company_email"><h4>Email</h4></label>
@@ -259,9 +247,7 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
-
                             <div class="col-xs-6">
                                 <label for="company_firstname"><h4>Jméno</h4></label>
                                 <div class="input-group">
@@ -277,7 +263,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="company_surname"><h4>Příjmení</h4></label>
@@ -294,8 +279,6 @@
                                 </div>
                             </div>
                         </div>
-
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="company_phone"><h4>Telefon</h4></label>
@@ -334,7 +317,7 @@
                             </div>
                         </div>
                     </form>
-                </div><!--/tab-pane-->
+                </div>
                 <div class="tab-pane" id="zmenaHesla">
                     <form class="form" action="{{ route('updateProfilePassword') }}" method="post">
                         @csrf
@@ -346,17 +329,29 @@
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
                                     </div>
-                                <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Zadejte heslo..." title="Zadejte nové heslo.">
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Zadejte heslo..." title="Zadejte nové heslo." >
+
                                 @error('password')
                                 <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
                                 </div>
+                                <span toggle="#password" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword"></span>
+                                <script>
+                                    $(".showpassword").click(function() {
+                                        $(this).toggleClass("fa-eye fa-eye-slash");
+                                        var input = $($(this).attr("toggle"));
+                                        if (input.attr("type") == "password") {
+                                            input.attr("type", "text");
+                                        } else {
+                                            input.attr("type", "password");
+                                        }
+                                    });
+                                </script>
                             </div>
                         </div>
                         <div class="form-group">
-
                             <div class="col-xs-6">
                                 <label for="password_verify"><h4>Zopakujte heslo</h4></label>
                                 <div class="input-group">
@@ -378,13 +373,10 @@
                             </div>
                         </div>
                     </form>
-
-                </div><!--/tab-pane-->
-
-            </div><!--/tab-pane-->
-        </div><!--/tab-content-->
-
-    </div><!--/col-9-->
-</div><!--/row-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

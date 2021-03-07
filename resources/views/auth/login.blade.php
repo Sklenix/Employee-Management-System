@@ -66,9 +66,9 @@
         }
     </style>
 </head>
+<!-- Textura pouzita ze stranky https://www.toptal.com/designers/subtlepatterns/cloudy-day/, vytvorili Toptal Subtle Patterns -->
 <body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
 
-<!-- Menu-->
 <nav class="fill navbar sticky-top navbar-light navbar-expand-sm " style="background-color: #F5F5F5" id="myScrollspy">
     <!-- Sekce logo -->
     <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 22px;margin-left: 20px;"> <img src="{{ URL::asset('images/logo.png') }}" height="25" width="30" /> | Tozondo</a>
@@ -184,11 +184,16 @@
                                     <label class="form-check-label" for="remember" style="font-size: 14px;">
                                         Zapamatovat
                                     </label>
-                                      @if (Route::has('password.request'))
-                                        <a class="btn btn-link" style="float:right;position:relative;margin-top:-7px;" href="{{ route('password.request') }}">
+                                     @isset($url)
+                                        @if($url == "company")
+                                            @if (Route::has('password.request'))
+                                                <a class="btn btn-link" style="float:right;position:relative;margin-top:-7px;" href="{{ route('password.request') }}">
                                         Zapomněl jste heslo?
                                     </a>
-                                    @endif
+                                            @endif
+                                        @endif
+                                    @else
+                                    @endisset
                                 </span>
                             </div>
                         </div>

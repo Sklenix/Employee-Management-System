@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Shift;
+use DateTime;
 use http\Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Company;
+use App\Models\Languages;
 use App\Models\Employee;
 use App\Providers\RouteServiceProvider;
 use Google_Service_Drive_Permission;
@@ -47,46 +50,17 @@ class UserCompanyController extends Controller
      */
     public function index()
     {
-        $slozky="";
-        $keyFileLocation =storage_path('app/credentials.json');
-        $client = new Google_Client();
-        $httpClient = $client->getHttpClient();
-        $config = $httpClient->getConfig();
-        $config['verify'] = false;
-        $client->setHttpClient(new Client($config));
-        $client->setApplicationName("BackupDrive");
+        $user = Auth::user();
 
-        try {
-            $client->setAuthConfig($keyFileLocation);
-            $client->useApplicationDefaultCredentials();
-            $client->addScope([
-                \Google_Service_Drive::DRIVE,
-                \Google_Service_Drive::DRIVE_METADATA
-            ]);
-            $mimeType = 'application/vnd.google-apps.folder';
-            $service = new \Google_Service_Drive($client);
-            $user = Auth::user();
-            $userSearch = Company::where('company_url', '=', $user->company_url)->first();
-            $optParams = array(
-                'pageSize' => 10,
-                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
-                'q' => "trashed = false AND mimeType='application/vnd.google-apps.folder' AND '" . $userSearch->company_url . "' in parents"
-            );
-            $slozky = $service->files->listFiles($optParams);
+        $userJazyky = Languages::where('company_id', '=', $user->company_id)->get();
+        $moznostiImportance = DB::table('table_importances_shifts')
+            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
+            ->get();
 
-            $optParams = array(
-                'pageSize' => 10,
-                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
-                'q' => "'" . $userSearch->company_url . "' in parents"
-            );
-            $slozkyDelete = $service->files->listFiles($optParams);
-
-
-        }catch (Exception $e){
-
-        }
-        return view('homes.company_home')->with('slozky',$slozky)->with('slozkyDelete',$slozkyDelete)->with('profilovka',$user->company_picture);;
-
+        return view('homes.company_home')
+            ->with('profilovka',$user->company_picture)
+            ->with('jazyky',$userJazyky)
+            ->with('importances',$moznostiImportance);
     }
 
     public function showVerifySuccess()
@@ -291,8 +265,10 @@ class UserCompanyController extends Controller
                    Storage::delete('/public/company_images/'.$user->company_picture);
                }
                $tokenUnique = Str::random(20);
-               $request->obrazek->storeAs('company_images',$tokenUnique.$nazev,'public');
-               $user->update(['company_picture' => $tokenUnique.$nazev]);
+               $tokenUnique2 = Str::random(5);
+               $tokenUnique3 = Str::random(10);
+               $request->obrazek->storeAs('company_images',$tokenUnique.$tokenUnique2.$tokenUnique3,'public');
+               $user->update(['company_picture' => $tokenUnique.$tokenUnique2.$tokenUnique3]);
                session()->flash('obrazekZpravaSuccess', 'Profilová fotka úspěšně nahrána.');
            }else{
                session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg]');
@@ -303,7 +279,19 @@ class UserCompanyController extends Controller
 
     public function showCompanyProfileData(){
         $user = Auth::user();
-        return view('profiles.company_profile')->with('profilovka',$user->company_picture);
+        $pocetZamestnancu = Employee::getCompanyEmployeesCount($user->company_id);
+        $pocetSmen = Shift::getCompanyTotalShiftCount($user->company_id);
+        $pocetNadchazejicich = Shift::getUpcomingCompanyShiftsCount($user->company_id);
+        $pocetHistorie = Shift::getHistoricalCompanyShiftsCount($user->company_id);
+        $datumVytvoreni = new DateTime($user->created_at);
+        $datumZobrazeniVytvoreni = $datumVytvoreni->format('d.m.Y');
+        return view('profiles.company_profile')
+            ->with('profilovka',$user->company_picture)
+            ->with('pocetZamestnancu',$pocetZamestnancu)
+            ->with('pocetSmen',$pocetSmen)
+            ->with('pocetNadchazejicich',$pocetNadchazejicich)
+            ->with('pocetHistorie',$pocetHistorie)
+            ->with('vytvorenUcet',$datumZobrazeniVytvoreni);
     }
 
     public function createFolderGoogleDrive(Request $request){
@@ -352,13 +340,41 @@ class UserCompanyController extends Controller
             file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
             die();
         }
-        session()->flash('successCreateFolder', 'Složka '.$request->nazev.' byla úspešně vytvořena na Vašem Google Drive!');
-        return redirect()->intended('/company/profile/');
+        session()->flash('success', 'Složka '.$request->nazev.' byla úspešně vytvořena na Vašem Google Drive!');
+        return redirect()->back();
+    }
+
+    public function addLanguage(Request $request){
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'jazyk' => ['required','min:2','string', 'max:30'],
+        ]);
+
+        if ($validator->fails()) {
+            $chyby = implode($validator->errors()->all());
+            session()->flash('errory', $chyby);
+            return redirect()->back();
+        }
+
+        \App\Models\Languages::create([
+            'language_name' => $request->jazyk,
+            'company_id' =>  $user->company_id
+        ]);
+        session()->flash('success', 'Jazyk '.$request->jazyk.' byl úspešně přidán do výběru!');
+        return redirect()->back();
     }
 
 
-    public function uploadGoogleDrive(Request $request){
+    public function removeLanguage(Request $request){
+        for ($i = 0;$i < count($request->jazyky);$i++){
+            Languages::where('language_id', $request->jazyky[$i])->delete();
+        }
+        session()->flash('success', 'Jazyk/y '.$request->jazyk.' byl úspešně smazán z výběru!');
+        return redirect()->back();
+    }
 
+    public function uploadGoogleDrive(Request $request){
         /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
         $jmenoSouboru = $request->fileInput;
 
@@ -409,16 +425,62 @@ class UserCompanyController extends Controller
             file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
             die();
         }
-        session()->flash('successUpload', 'Soubor '.$request->file('fileInput')->getClientOriginalName().' byl úspešně nahrán na Váš Google Drive!');
-        return redirect()->intended('/company/profile/');
+        session()->flash('success', 'Soubor '.$request->file('fileInput')->getClientOriginalName().' byl úspešně nahrán na Váš Google Drive!');
+        return redirect()->back();
 
     }
-
-
-    public function deleteFileGoogleDrive(Request $request){
-
+    public function getAllGoogleDriveFoldersOptions(){
+        $html = '';
+        $slozky="";
         $keyFileLocation =storage_path('app/credentials.json');
-        /*ID složky, do které chceme soubory nahrávat*/
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+
+        try {
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $mimeType = 'application/vnd.google-apps.folder';
+            $service = new \Google_Service_Drive($client);
+            $user = Auth::user();
+            $userSearch = Company::where('company_url', '=', $user->company_url)->first();
+            $userJazyky = Languages::where('company_id', '=', $user->company_id)->get();
+            $optParams = array(
+                'pageSize' => 10,
+                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
+                'q' => "trashed = false AND mimeType='application/vnd.google-apps.folder' AND '" . $userSearch->company_url . "' in parents"
+            );
+            $slozky = $service->files->listFiles($optParams);
+
+            $html .= '<div class="alert alert-info alert-block text-center">
+                        <strong>Vyberte, do které složky chcete nahrát soubor.</strong>
+                    </div>';
+            $html .='<div class="form-group">
+                        <select name="slozky" required id="slozky" style="color:black" class="form-control input-lg dynamic" data-dependent="state">
+                             <option value="">Vyber složku</option>
+                             <option value="'.$user->company_url.'">/</option>';
+            foreach ($slozky as $slozka){
+                $html .= '<option value="'.$slozka->id.'">'.$slozka->name.'</option>';
+            }
+            $html .= ' </select></div>';
+
+        }catch (Exception $e){
+        }
+
+        return response()->json(['html'=>$html]);
+    }
+
+    public function getAllGoogleDriveFilesCheckboxes(){
+        $html = '';
+        $slozky="";
+        $keyFileLocation =storage_path('app/credentials.json');
         $client = new Google_Client();
         $httpClient = $client->getHttpClient();
         $config = $httpClient->getConfig();
@@ -426,24 +488,92 @@ class UserCompanyController extends Controller
         $client->setHttpClient(new Client($config));
         $client->setApplicationName("BackupDrive");
         try {
-            /*Inicializace klienta*/
             $client->setAuthConfig($keyFileLocation);
             $client->useApplicationDefaultCredentials();
             $client->addScope([
                 \Google_Service_Drive::DRIVE,
                 \Google_Service_Drive::DRIVE_METADATA
             ]);
+            $mimeType = 'application/vnd.google-apps.folder';
             $service = new \Google_Service_Drive($client);
-            $service->files->delete( $request->slozkyDelete);
+            $user = Auth::user();
+            $userSearch = Company::where('company_url', '=', $user->company_url)->first();
+
+            $optParams = array(
+                'pageSize' => 10,
+                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
+                'q' => "'" . $userSearch->company_url . "' in parents"
+            );
+            $slozkyDelete = $service->files->listFiles($optParams);
+            if(count($slozkyDelete) == 0){
+                $html .= '<div class="alert alert-danger alert-block">
+                            <strong>Na Google Drive nemáte žadné soubory/složky.</strong>
+                        </div>';
+            }else{
+                $html .= '<div class="alert alert-info alert-block text-center">
+                            <strong>Seznam souborů na Vašem Google Drive, vyberte, které soubory chcete smazat.</strong>
+                        </div>';
+                foreach ($slozkyDelete as $slozkaDelete){
+                    $html .= '<center><div class="custom-control form-control-lg custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="'.$slozkaDelete->name.'" name="google_drive_delete_listFile[]" value="'.$slozkaDelete->id.'">
+                             <label class="custom-control-label" style="font-size:16px;" for="'.$slozkaDelete->name.'">
+                                    '.$slozkaDelete->name.'
+                            </label>
+                            </div></center>
+                            ';
+                }
+            }
+
         }catch (Exception $e){
-            file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
-            die();
         }
+        return response()->json(['html'=>$html]);
+    }
 
+    public function deleteFileGoogleDrive(Request $request){
+        if($request->google_drive_delete_listFile != NULL){
+           /* $emailAddress = 'tozondoservices@tozondo-drive.iam.gserviceaccount.com';
+          $role = 'organizer';
 
-        session()->flash('successDelete', 'Soubor byl úspešně smazán!');
-        return redirect()->intended('/company/profile/');
+          $userPermission = new Google_Service_Drive_Permission(array(
+              'type' => 'user',
+              'role' => $role,
+              'emailAddress' => $emailAddress
+          ));*/
 
+          $keyFileLocation =storage_path('app/credentials.json');
+          /*ID složky, do které chceme soubory nahrávat*/
+            $client = new Google_Client();
+            $httpClient = $client->getHttpClient();
+            $config = $httpClient->getConfig();
+            $config['verify'] = false;
+            $client->setHttpClient(new Client($config));
+            $client->setApplicationName("BackupDrive");
+            try {
+                /*Inicializace klienta*/
+                $client->setAuthConfig($keyFileLocation);
+                $client->useApplicationDefaultCredentials();
+                $client->addScope([
+                    \Google_Service_Drive::DRIVE,
+                    \Google_Service_Drive::DRIVE_METADATA
+                ]);
+                $service = new \Google_Service_Drive($client);
+                foreach ($request->google_drive_delete_listFile as $slozka){
+                    $service->files->delete($slozka);
+                }
+
+            }catch (Exception $e){
+                file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
+                die();
+            }
+            if(count($request->google_drive_delete_listFile) == 1){
+                session()->flash('success', 'Soubor byl úspešně smazán!');
+            }else{
+                session()->flash('success', 'Soubory byly úspešně smazány!');
+            }
+        }else{
+                session()->flash('fail', 'Nevybral jste žádný soubor!');
+        }
+        return redirect()->back();
     }
 
     public function addEmployee(Request $request){
@@ -466,6 +596,14 @@ class UserCompanyController extends Controller
         ]);
 
         $employeeSearch = Employee::where('employee_login', '=',$uzivatel )->first();
+        if($request->jazyky != ""){
+            for($i = 0;$i < count($request->jazyky);$i++){
+                \App\Models\Employee_Language::create([
+                    'language_id' => $request->jazyky[$i],
+                    'employee_id' => $employeeSearch->employee_id,
+                ]);
+            }
+        }
 
         if($request->hasFile('employee_picture')){
             $nazev = $request->employee_picture->getClientOriginalName();
@@ -479,6 +617,7 @@ class UserCompanyController extends Controller
                 $employeeSearch->update(['employee_picture' => $tokenUnique.$nazev]);
             }
         }
+
         /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
         $soubor = $request->employee_name.' '.$request->employee_surname;
 
@@ -535,11 +674,353 @@ class UserCompanyController extends Controller
             file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
             die();
         }
-
         $employeeSearch->update(['employee_drive_url' => $fileId]);
-
         session()->flash('success', 'Zaměstnanec '.$request->employee_name.' '.$request->employee_surname.' byl úspešně vytvořen!');
         return redirect()->back();
     }
 
+    public function addShift(Request $request){
+        $user = Auth::user();
+        $validator = Validator::make($request->all(), [
+            'shift_start' => ['required'],
+            'shift_end' =>  ['required'],
+            'shift_place' =>  ['required', 'string', 'max:255'],
+        ]);
+
+        $shift_start = new DateTime($request->shift_start);
+        $shift_end = new DateTime($request->shift_end);
+        $now = new DateTime();
+        $chybaDatumy = array();
+        $bool_datumy = 0;
+        $difference_start = $shift_start->format('U') - $now->format('U');
+        $difference_end = $shift_end->format('U') - $now->format('U');
+        $difference_shifts = $shift_end->format('U') - $shift_start->format('U');
+
+        $hodinyRozdil = $shift_end->diff($shift_start);
+        $pocetDnu = $hodinyRozdil->d;
+        $pocetHodin = $hodinyRozdil->h;
+        $pocetMinut = $hodinyRozdil->i;
+
+        if($request->shift_start != NULL){
+            if($difference_start < 0 || $difference_end < 0 || $difference_shifts <= 0){
+                array_push($chybaDatumy,'Start směny dříve než dnes, nebo konec směny dříve než dnes, nebo  je konec směny stejný  jako její začátek, nebo je dříve než začátek!');
+                $bool_datumy = 1;
+            }
+
+            if(($pocetHodin == 12 && $pocetMinut > 0) || $pocetHodin > 12 || $pocetDnu > 0){
+                array_push($chybaDatumy,'Maximální délka jedné směny je 12 hodin!');
+                $bool_datumy = 1;
+            }
+        }
+
+        foreach ($validator->errors()->all() as $valid){
+            array_push($chybaDatumy,$valid);
+        }
+
+        if ($validator->fails() || $bool_datumy == 1) {
+            session()->flash('erroryShift', $chybaDatumy);
+            return redirect()->back();
+        }
+
+        \App\Models\Shift::create([
+            'shift_start' => $request->shift_start,
+            'shift_end' => $request->shift_end,
+            'shift_place' =>  $request->shift_place,
+            'shift_importance_id' => $request->shiftImportance,
+            'shift_note' => $request->shift_note,
+            'company_id' => $user->company_id
+        ]);
+
+        session()->flash('success', 'Směna byla úspešně vytvořena!');
+        return redirect()->back();
+    }
+
+
+    public function getAllShifts(){
+        $user = Auth::user();
+        $html = '
+ <input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavac" onkeyup="Search()" placeholder="Hledat směnu na základě ID, začátku, lokace, nebo konce směny ..." title="Zadejte údaje o směně">
+                    <table class="table table-dark" id="show_table_employee_delete" style="font-size: 16px;">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width:25%;text-align: center;">Začátek</th>
+                            <th scope="col" style="width:25%;text-align: center;">Konec</th>
+                            <th scope="col" style="width:25%;text-align: center;">Lokace <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(2,this);"></i></th>
+                            <th scope="col" style="width:25%;text-align: center;">Počet zaměstnanců <i class="fa fa-sort-numeric-desc" style="margin-left: 5px" onclick="zmenaIkonkyCisla(this);sortTable(3,this);"></i></th>
+                            <th scope="col" style="width:25%;text-align: center;">Smazat</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+        $smeny = DB::table('table_shifts')
+            ->select('table_shifts.shift_start','table_shifts.shift_end',
+                'table_shifts.shift_place','table_shifts.shift_id')
+            ->where(['table_shifts.company_id' => $user->company_id])
+            ->orderByDesc('table_shifts.shift_start')
+            ->get();
+
+        foreach ($smeny as $smena){
+            $shift_start = new DateTime($smena->shift_start);
+            $smena->shift_start = $shift_start->format('d.m.Y H:i');
+            $shift_end = new DateTime($smena->shift_end);
+            $smena->shift_end = $shift_end->format('d.m.Y H:i');
+
+            $pocet_zamestnancu = DB::table('table_employee_shifts')
+                ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
+                ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
+                ->select('table_shifts.shift_start','table_shifts.shift_end',
+                    'table_shifts.shift_place','table_shifts.shift_id')
+                ->where(['table_employee_shifts.shift_id' => $smena->shift_id])
+                ->orderByDesc('table_shifts.shift_start')
+                ->count();
+
+            $html .= '<tr><td class="text-center">'.$smena->shift_start.'</td><td class="text-center"> '.$smena->shift_end.'</td>
+                      <td class="text-center"> '.$smena->shift_place.'</td>
+                      <td class="text-center"> '.$pocet_zamestnancu.'</td>
+                      <td class="text-center"><center><input type="checkbox" class="form-check-input"  id="smenyDeleteDashboard" name="smenyDeleteDashboard[]" value="'.$smena->shift_id.'"></center></td>';
+        }
+        $html .= '</tbody></table>
+           <script>
+            function zmenaIkonky(x) {
+                x.classList.toggle("fa-sort-alpha-desc");
+                x.classList.toggle("fa-sort-alpha-asc");
+            }
+
+            function zmenaIkonkyCisla(x) {
+                x.classList.toggle("fa-sort-numeric-asc");
+                x.classList.toggle("fa-sort-numeric-desc");
+            }
+
+            function Search() {
+                var input, filter, table, tr, td, td2, td3, td4, i, txtValue, txtValue2, txtValue3, txtValue4;
+                input = document.getElementById("vyhledavac");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("show_table_employee_delete");
+                tr = table.getElementsByTagName("tr");
+
+                for (i = 0; i < tr.length; i++) {
+                    td3 = tr[i].getElementsByTagName("td")[0];
+                    td = tr[i].getElementsByTagName("td")[1];
+                    td2 = tr[i].getElementsByTagName("td")[2];
+                    td4 = tr[i].getElementsByTagName("td")[3];
+                    if (td || td2 || td3 || td4) {
+                        txtValue = td.textContent || td.innerText;
+                        txtValue2 = td2.textContent || td2.innerText;
+                        txtValue3 = td3.textContent || td3.innerText;
+                        txtValue4 = td4.textContent || td4.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1
+                            || txtValue3.toUpperCase().indexOf(filter) > -1 || txtValue4.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+
+                    }
+
+                }
+            }
+
+            function sortTable(n,ikonka) {
+                var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                table = document.getElementById("show_table_employee_delete");
+                switching = true;
+                dir = "asc";
+                while (switching) {
+                    switching = false;
+                    rows = table.rows;
+
+                    for (i = 1; i < (rows.length - 1); i++) {
+                        shouldSwitch = false;
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                        if (dir == "asc") {
+                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                shouldSwitch= true;
+                                break;
+                            }
+                        } else if (dir == "desc") {
+                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        switchcount ++;
+                    } else {
+                        if (switchcount == 0 && dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+            }
+        </script>';
+        return response()->json(['html'=>$html]);
+    }
+
+    public function deleteShift(Request  $request){
+        if($request->smenyDeleteDashboard != NULL){
+            foreach ($request->smenyDeleteDashboard as $smena){
+                DB::table('table_shifts')
+                    ->where(['table_shifts.shift_id' => $smena])
+                    ->delete();
+
+                DB::table('table_employee_shifts')
+                    ->where(['table_employee_shifts.shift_id' => $smena])
+                    ->delete();
+            }
+            if(count($request->smenyDeleteDashboard) == 1){
+                session()->flash('success', 'Směna byla úspešně smazána!');
+            }else{
+                session()->flash('success', 'Směny byly úspešně smazány!');
+            }
+        }else{
+            session()->flash('fail', 'Vyberte nějakou směnu!');
+        }
+        return redirect()->back();
+    }
+
+    public function getAllEmployees(){
+        $user = Auth::user();
+        $html = '<input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavac" onkeyup="Search()" placeholder="Hledat směnu na základě ID, začátku, lokace, nebo konce směny ..." title="Zadejte údaje o směně">
+                    <table class="table table-dark" id="show_table" style="font-size: 16px;">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="width:25%;text-align: center;">Jméno <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(0,this);"></i></th>
+                            <th scope="col" style="width:25%;text-align: center;">Příjmení <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(1,this);"></i></th>
+                            <th scope="col" style="width:25%;text-align: center;">Pozice <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(2,this);"></i></th>
+                            <th scope="col" style="width:25%;text-align: center;">Počet směn <i class="fa fa-sort-numeric-desc" style="margin-left: 5px" onclick="zmenaIkonkyCisla(this);sortTable(3,this);"></i></th>
+                            <th scope="col" style="width:25%;text-align: center;">Smazat</th>
+                        </tr>
+                    </thead>
+                    <tbody>';
+
+        $zamestnanci = DB::table('table_employees')
+            ->select('table_employees.employee_id','table_employees.employee_name','table_employees.employee_surname',
+                'table_employees.employee_position')
+            ->where(['table_employees.employee_company' => $user->company_id])
+            ->orderByDesc('table_employees.employee_surname')
+            ->get();
+
+        foreach ($zamestnanci as $zamestnanec){
+
+            $pocet_smen = DB::table('table_employee_shifts')
+                ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
+                ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
+                ->where(['table_employee_shifts.employee_id' => $zamestnanec->employee_id])
+                ->count();
+
+            $html .= '<tr><td class="text-center">'.$zamestnanec->employee_name.'</td><td class="text-center"> '.$zamestnanec->employee_surname.'</td>
+                      <td class="text-center"> '.$zamestnanec->employee_position.'</td>
+                      <td class="text-center"> '.$pocet_smen.'</td>
+                      <td class="text-center"><center><input type="checkbox" class="form-check-input"  id="zamestnanciDeleteDashboard" name="zamestnanciDeleteDashboard[]" value="'.$zamestnanec->employee_id.'"></center></td>';
+        }
+        $html .= '</tbody></table>
+        <script>
+            function zmenaIkonky(x) {
+                x.classList.toggle("fa-sort-alpha-desc");
+                x.classList.toggle("fa-sort-alpha-asc");
+            }
+
+            function zmenaIkonkyCisla(x) {
+                x.classList.toggle("fa-sort-numeric-asc");
+                x.classList.toggle("fa-sort-numeric-desc");
+            }
+
+            function Search() {
+                var input, filter, table, tr, td, td2, td3, td4, i, txtValue, txtValue2, txtValue3, txtValue4;
+                input = document.getElementById("vyhledavac");
+                filter = input.value.toUpperCase();
+                table = document.getElementById("show_table");
+                tr = table.getElementsByTagName("tr");
+
+                for (i = 0; i < tr.length; i++) {
+                    td3 = tr[i].getElementsByTagName("td")[0];
+                    td = tr[i].getElementsByTagName("td")[1];
+                    td2 = tr[i].getElementsByTagName("td")[2];
+                    td4 = tr[i].getElementsByTagName("td")[3];
+                    if (td || td2 || td3 || td4) {
+                        txtValue = td.textContent || td.innerText;
+                        txtValue2 = td2.textContent || td2.innerText;
+                        txtValue3 = td3.textContent || td3.innerText;
+                        txtValue4 = td4.textContent || td4.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1
+                            || txtValue3.toUpperCase().indexOf(filter) > -1 || txtValue4.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+
+                    }
+
+                }
+            }
+
+            function sortTable(n,ikonka) {
+                var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                table = document.getElementById("show_table");
+                switching = true;
+                dir = "asc";
+                while (switching) {
+                    switching = false;
+                    rows = table.rows;
+
+                    for (i = 1; i < (rows.length - 1); i++) {
+                        shouldSwitch = false;
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                        if (dir == "asc") {
+                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                shouldSwitch= true;
+                                break;
+                            }
+                        } else if (dir == "desc") {
+                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        switchcount ++;
+                    } else {
+                        if (switchcount == 0 && dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+            }
+        </script>';
+        return response()->json(['html'=>$html]);
+    }
+
+    public function deleteEmployee(Request $request){
+        if($request->zamestnanciDeleteDashboard != NULL){
+            foreach ($request->zamestnanciDeleteDashboard as $zamestnanec){
+                DB::table('table_employees')
+                    ->where(['table_employees.employee_id' => $zamestnanec])
+                    ->delete();
+
+                DB::table('table_employee_shifts')
+                    ->where(['table_employee_shifts.employee_id' => $zamestnanec])
+                    ->delete();
+            }
+            if(count($request->zamestnanciDeleteDashboard) == 1){
+                session()->flash('success', 'Zaměstnanec byl úspešně smazán!');
+            }else{
+                session()->flash('success', 'Zaměstnanci byli úspešně smazáni!');
+            }
+        }else{
+            session()->flash('fail', 'Vyberte nějakého zaměstnance k smazání!');
+        }
+        return redirect()->back();
+    }
 }

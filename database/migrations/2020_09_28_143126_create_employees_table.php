@@ -14,6 +14,7 @@ class CreateEmployeesTable extends Migration
     public function up()
     {
         Schema::create('table_employees', function (Blueprint $table) {
+            $table->engine = 'MyISAM';
             $table->id('employee_id');
             $table->string('employee_name');
             $table->string('employee_surname');
@@ -26,9 +27,11 @@ class CreateEmployeesTable extends Migration
             $table->string('employee_reliability')->nullable();
             $table->string('employee_absence')->nullable();
             $table->string('employee_workindex')->nullable();
+            $table->string('employee_overall')->nullable();
             $table->string('employee_drive_url')->nullable();
             $table->string('employee_picture')->nullable();
             $table->string('employee_login')->unique();
+            $table->string('employee_department')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

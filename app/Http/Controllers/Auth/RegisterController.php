@@ -44,7 +44,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = "/login/company";
+    protected $redirectTo = "/email/verify";
 
     /**
      * Create a new controller instance.
@@ -74,7 +74,7 @@ class RegisterController extends Controller
             'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'company_ico' => ['nullable','digits:8'],
-            'company_city' => ['nullable','string', 'max:255'],
+            'company_city' => ['required','string', 'max:255'],
             'company_street' => ['nullable','max:255']
         ];
 
@@ -98,7 +98,7 @@ class RegisterController extends Controller
             'company_login' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'company_ico' => ['nullable','digits:8'],
-            'company_city' => ['nullable','string', 'max:255'],
+            'company_city' => ['required','string', 'max:255'],
             'company_street' => ['nullable','max:255']
         ]);
     }
@@ -172,7 +172,7 @@ class RegisterController extends Controller
             die();
         }
 
-        redirect($this->redirectPath())->with('successRegister', 'Registrace proběhla úspěšně, byl vám zaslán e-mail pro ověření e-mailové adresy, před přihlášením ověřte svou e-mailovou adresu.');
+        redirect($this->redirectPath())->with('successRegister', 'Registrace proběhla úspěšně, byl Vám zaslán e-mail pro ověření e-mailové adresy.');
 
         return \App\Models\Company::create([
             'company_name' => $data['company'],

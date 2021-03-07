@@ -3,6 +3,13 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Attendance;
+use App\Models\Disease;
+use App\Models\Employee;
+use App\Models\Injury;
+use App\Models\Report;
+use App\Models\Shift;
+use App\Models\Vacation;
 use GuzzleHttp\Client;
 use http\Exception;
 use Illuminate\Http\Request;
@@ -46,7 +53,16 @@ class UserEmployeeController extends Controller
 
     public function showEmployeeProfileData(){
         $user = Auth::user();
-        return view('profiles.employee_profile')->with('profilovka',$user->employee_picture);
+        $pocetSmen = Shift::getEmployeeShiftsCount($user->employee_id);
+        $pocetAbsenci = Attendance::getEmployeeAbsenceCount($user->employee_id);
+        $pocetDovolenych = Vacation::getEmployeeVacationsCount($user->employee_id);
+        $pocetNemoci = Disease::getEmployeeDiseasesCount($user->employee_id);
+        $pocetZraneni = Injury::getEmployeeInjuriesInjuryCentreCount($user->employee_id);
+        return view('profiles.employee_profile')
+            ->with('profilovka',$user->employee_picture)
+            ->with('pocetSmen',$pocetSmen)
+            ->with('pocetAbsenci',$pocetAbsenci)
+            ->with('pocetDovolenych',$pocetDovolenych);
     }
 
     protected function validator(array $data,$emailDuplicate,$verze){
@@ -192,6 +208,245 @@ class UserEmployeeController extends Controller
             }else{
                 session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg]');
             }
+        }
+        return redirect()->back();
+    }
+
+
+    public function getAllGoogleDriveFilesCheckboxes(){
+        $html = '';
+        $keyFileLocation =storage_path('app/credentials.json');
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+        try {
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $service = new \Google_Service_Drive($client);
+            $user = Auth::user();
+
+            $optParams = array(
+                'pageSize' => 10,
+                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
+                'q' => "'" . $user->employee_drive_url . "' in parents"
+            );
+
+            $slozkyDelete = $service->files->listFiles($optParams);
+            if(count($slozkyDelete) == 0){
+                $html .= '<div class="alert alert-danger alert-block">
+                            <strong>Na Google Drive nemáte žadné soubory/složky.</strong>
+                        </div>';
+            }else{
+                $html .= '<div class="alert alert-info alert-block text-center">
+                            <strong>Seznam souborů na Vašem Google Drive, vyberte, které soubory chcete smazat.</strong>
+                        </div>';
+                foreach ($slozkyDelete as $slozkaDelete){
+                    $html .= '<center><div class="custom-control form-control-lg custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="'.$slozkaDelete->name.'" name="google_drive_delete_listFile[]" value="'.$slozkaDelete->id.'">
+                             <label class="custom-control-label" style="font-size:16px;" for="'.$slozkaDelete->name.'">
+                                    '.$slozkaDelete->name.'
+                            </label>
+                            </div></center>
+                            ';
+                }
+            }
+
+        }catch (Exception $e){
+        }
+        return response()->json(['html'=>$html]);
+    }
+
+
+    public function getAllGoogleDriveFoldersOptions(){
+        $html = '';
+        $slozky="";
+        $keyFileLocation =storage_path('app/credentials.json');
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+
+        try {
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $mimeType = 'application/vnd.google-apps.folder';
+            $service = new \Google_Service_Drive($client);
+            $user = Auth::user();
+            $optParams = array(
+                'pageSize' => 10,
+                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
+                'q' => "trashed = false AND mimeType='application/vnd.google-apps.folder' AND '" . $user->employee_drive_url . "' in parents"
+            );
+            $slozky = $service->files->listFiles($optParams);
+
+            $html .= '<div class="alert alert-info alert-block text-center">
+                        <strong>Vyberte, do které složky chcete nahrát soubor.</strong>
+                    </div>';
+            $html .='<div class="form-group">
+                        <select name="slozky" required id="slozky" style="color:black" class="form-control input-lg dynamic" data-dependent="state">
+                             <option value="">Vyber složku</option>
+                             <option value="'.$user->employee_drive_url.'">/</option>';
+            foreach ($slozky as $slozka){
+                $html .= '<option value="'.$slozka->id.'">'.$slozka->name.'</option>';
+            }
+            $html .= ' </select></div>';
+
+        }catch (Exception $e){
+        }
+
+        return response()->json(['html'=>$html]);
+    }
+
+    public function createFolderGoogleDrive(Request $request){
+        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
+        $slozka=$request->nazev;
+        /*Service účet pro pripojeni ke Google Drive*/
+        $emailAddress = 'tozondoservices@tozondo-drive.iam.gserviceaccount.com';
+        /*Cesta k autorizačnímu klíči*/
+        $user = Auth::user();
+        $keyFileLocation =storage_path('app/credentials.json');
+        /*ID složky, do které chceme soubory nahrávat*/
+        $folderId = $user->employee_drive_url;
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+        try {
+            /*Inicializace klienta*/
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $service = new \Google_Service_Drive($client);
+            /*Vytvoření složky*/
+            $file = new Google_Service_Drive_DriveFile();
+            $file->setName($slozka);
+            $mimeType = 'application/vnd.google-apps.folder';
+            $file->setMimeType($mimeType);
+            /*Nasměrování do zvolené složky*/
+
+            $file->setParents(array($folderId));
+
+            /*Odeslání dat*/
+            $createdFile = $service->files->create($file, array(
+                'mimeType' => $mimeType,
+                'uploadType' => "multipart"
+            ));
+
+
+        } catch (Exception $e) {
+            file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
+            die();
+        }
+        session()->flash('success', 'Složka '.$request->nazev.' byla úspešně vytvořena na Vašem Google Drive!');
+        return redirect()->back();
+    }
+
+    public function uploadGoogleDrive(Request $request){
+        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
+        $jmenoSouboru = $request->fileInput;
+
+        /*Service účet pro pripojeni ke Google Drive*/
+        $emailAddress = 'tozondoservices@tozondo-drive.iam.gserviceaccount.com';
+        /*Cesta k autorizačnímu klíči*/
+        $keyFileLocation =storage_path('app/credentials.json');
+        /*ID složky, do které chceme soubory nahrávat*/
+        $folderId =  $request->slozky;
+        $client = new Google_Client();
+        $httpClient = $client->getHttpClient();
+        $config = $httpClient->getConfig();
+        $config['verify'] = false;
+        $client->setHttpClient(new Client($config));
+        $client->setApplicationName("BackupDrive");
+        try {
+            /*Inicializace klienta*/
+            $client->setAuthConfig($keyFileLocation);
+            $client->useApplicationDefaultCredentials();
+            $client->addScope([
+                \Google_Service_Drive::DRIVE,
+                \Google_Service_Drive::DRIVE_METADATA
+            ]);
+            $service = new \Google_Service_Drive($client);
+            /*Vytvoření složky*/
+            $file = new Google_Service_Drive_DriveFile();
+            $file->setName( $request->file('fileInput')->getClientOriginalName());
+            $mime = finfo_open(FILEINFO_MIME);
+
+            $mimeType = finfo_file($mime,$jmenoSouboru);
+            finfo_close($mime);
+
+            $file->setMimeType($mimeType);
+            /*Nasměrování do zvolené složky*/
+
+            $file->setParents(array($folderId));
+
+            /*Odeslání dat*/
+            $createdFile = $service->files->create($file, array(
+                'data' => file_get_contents($jmenoSouboru),
+                'mimeType' => $mimeType,
+                'uploadType' => "multipart"
+            ));
+        }catch (Exception $e){
+            file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
+            die();
+        }
+        session()->flash('success', 'Soubor '.$request->file('fileInput')->getClientOriginalName().' byl úspešně nahrán na Váš Google Drive!');
+        return redirect()->back();
+
+    }
+
+
+    public function deleteFileGoogleDrive(Request $request){
+        if($request->google_drive_delete_listFile != NULL){
+            $keyFileLocation =storage_path('app/credentials.json');
+            /*ID složky, do které chceme soubory nahrávat*/
+            $client = new Google_Client();
+            $httpClient = $client->getHttpClient();
+            $config = $httpClient->getConfig();
+            $config['verify'] = false;
+            $client->setHttpClient(new Client($config));
+            $client->setApplicationName("BackupDrive");
+            try {
+                /*Inicializace klienta*/
+                $client->setAuthConfig($keyFileLocation);
+                $client->useApplicationDefaultCredentials();
+                $client->addScope([
+                    \Google_Service_Drive::DRIVE,
+                    \Google_Service_Drive::DRIVE_METADATA
+                ]);
+                $service = new \Google_Service_Drive($client);
+                foreach ($request->google_drive_delete_listFile as $slozka){
+                    $service->files->delete($slozka);
+                }
+
+            }catch (Exception $e){
+                file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
+                die();
+            }
+            if(count($request->google_drive_delete_listFile) == 1){
+                session()->flash('success', 'Soubor byl úspešně smazán!');
+            }else{
+                session()->flash('success', 'Soubory byly úspešně smazány!');
+            }
+        }else{
+            session()->flash('fail', 'Nevybral jste žádný soubor!');
         }
         return redirect()->back();
     }

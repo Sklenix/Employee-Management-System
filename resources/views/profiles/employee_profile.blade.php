@@ -79,9 +79,8 @@
             <hr></div>
     </div>
     <div class="row">
-        <div class="col-sm-3"><!--left col-->
+        <div class="col-sm-3">
             <div class="text-center">
-
                 @if($profilovka == NULL)
                     <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" alt="profilovka">
                 @else
@@ -122,23 +121,20 @@
                         <input class="btn btn-primary btn-block btn-lg"  style="margin-top: 8px;" type="submit" value="Nahrát">
                     </div>
                 </form>
-
                 <form method="post" style="margin-top: 15px;" action="{{route('deleteEmployeeOldImage')}}" enctype="multipart/form-data">
                     @csrf
                     <div class="form-group nahratTlacitko">
                         <input class="btn btn-danger btn-block btn-lg" type="submit" value="Smazat obrázek">
                     </div>
                 </form>
-                <ul class="list-group">
-                    <li class="list-group-item text-muted">Statistiky </li>
-                    <li class="list-group-item text-right"><span class="pull-left"><strong>Počet směn</strong></span> 55</li>
-                    <li class="list-group-item text-right"><span class="pull-left"><strong>Počet nemocí</strong></span> 1</li>
-                </ul>
+                    <ul class="list-group">
+                        <li class="list-group-item" style="color:black;">Statistiky</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet směn</strong></span> {{$pocetSmen}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet absencí</strong></span> {{$pocetAbsenci}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet dovolených</strong></span> {{$pocetDovolenych}}</li>
+                    </ul>
             </div><br>
-
-
-
-        </div><!--/col-3-->
+        </div>
         <div class="col-sm-9">
             <ul class="nav nav-stacked nav-pills" id="menuTabu">
                 <li class="nav-item">
@@ -160,14 +156,12 @@
                     {{ Session::get('message') }}
                 </div>
             @endif
-
             @if(Session::has('errorZprava'))
                 <div class="alert alert-danger">
                     <button type="button" class="close" data-dismiss="alert">x</button>
                     {{ Session::get('errorZprava') }}
                 </div>
             @endif
-
             <div class="tab-content">
                 <div class="tab-pane active" id="obecneUdaje">
                     <form class="form" action="{{ route('updateEmployeeProfileData') }}" method="post">
@@ -188,7 +182,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="employee_surname"><h4>Příjmení</h4></label>
@@ -205,7 +198,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="employee_phone"><h4>Telefon</h4></label>
@@ -222,7 +214,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="employee_email"><h4>Email</h4></label>
@@ -239,7 +230,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="employee_city"><h4>Město</h4></label>
@@ -256,7 +246,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group">
                             <div class="col-xs-6">
                                 <label for="employee_street"><h4>Ulice</h4></label>
@@ -284,7 +273,6 @@
                     <form class="form" action="{{ route('updateEmployeeProfilePassword') }}" method="post">
                         @csrf
                         <div class="form-group">
-
                             <div class="col-xs-6">
                                 <label for="password"><h4>Heslo</h4></label>
                                 <div class="input-group">
@@ -301,7 +289,6 @@
                             </div>
                         </div>
                         <div class="form-group">
-
                             <div class="col-xs-6">
                                 <label for="password_verify"><h4>Zopakujte heslo</h4></label>
                                 <div class="input-group">
@@ -323,13 +310,10 @@
                             </div>
                         </div>
                     </form>
-
-                </div><!--/tab-pane-->
-
-            </div><!--/tab-pane-->
-        </div><!--/tab-content-->
-
-    </div><!--/col-9-->
-</div><!--/row-->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

@@ -91,10 +91,16 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header" style="font-size: 18px;background-color: #d9534f;color:white;">Ověřte svou emailovou adresu</div>
-
                 <div class="card-body">
+                    @if(Session::has('successRegister'))
+                        <div class="alert alert-success" style="margin-bottom: 15px;">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
+                            {{ Session::get('successRegister') }}
+                        </div>
+                    @endif
                     @if (session('resent'))
-                        <div class="alert alert-success" role="alert">
+                        <div class="alert alert-success" style="margin-bottom: 10px;">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
                             Nový verifikační email byl zaslán na Vaši emailovou adresu.
                         </div>
                     @endif

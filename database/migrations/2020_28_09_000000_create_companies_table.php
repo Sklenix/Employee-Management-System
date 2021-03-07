@@ -14,6 +14,7 @@ class CreateCompaniesTable extends Migration
     public function up()
     {
         Schema::create('table_companies', function (Blueprint $table) {
+            $table->engine = 'MyISAM';
             $table->id('company_id');
             $table->string('company_name');
             $table->string('company_user_name');
@@ -40,6 +41,6 @@ class CreateCompaniesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('companies');
+        Schema::dropIfExists('table_companies');
     }
 }

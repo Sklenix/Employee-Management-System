@@ -14,6 +14,7 @@ class CreateFailedJobsTable extends Migration
     public function up()
     {
         Schema::create('failed_jobs', function (Blueprint $table) {
+            $table->engine = 'MyISAM';
             $table->id();
             $table->string('uuid')->unique();
             $table->text('connection');

@@ -19,20 +19,14 @@ class RedirectIfAuthenticated
     public function handle($request, Closure $next, $guard = null)
     {
         if ($guard == "admin" && Auth::guard($guard)->check()) {
-            return redirect('/admin/profile/');
+            return redirect('/admin/dashboard/');
         }
         if ($guard == "employee" && Auth::guard($guard)->check()) {
-            return redirect('/employee/profile/');
+            return redirect('/employee/dashboard/');
         }
-
-        if ($guard == "user" && Auth::guard($guard)->check()) {
-            return redirect('/company/profile/');
+        if ($guard == "company" && Auth::guard($guard)->check()) {
+            return redirect('/company/dashboard/');
         }
-
-        if (Auth::guard($guard)->check()) {
-            return redirect('/company/profile/');
-        }
-
         return $next($request);
     }
 }
