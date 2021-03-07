@@ -233,14 +233,13 @@ class EmployeeDatatableController extends Controller
         return redirect()->back();
     }
 
-
     public function edit($id){
         date_default_timezone_set('Europe/Prague');
         $employee = new Employee;
         $data = $employee->findData($id);
         $html = '';
         if($data->employee_picture === NULL){
-            $html = '<center><img src=/images/ikona_profil.png width="300" /></center>';
+            $html = '<center><img src=/images/default_profile.png width="300" /></center>';
         }else{
             $html = '<center><img src=/storage/employee_images/'.$data->employee_picture.' width="300" class="img-thumbnail"  /></center>';
         }
@@ -667,6 +666,11 @@ class EmployeeDatatableController extends Controller
                     <p class="d-flex justify-content-center">Účet vytvořen '.$data->created_at.', naposledy aktualizován '.$data->updated_at.'.</p>
                     </div>
                     <div class="tab-pane" id="zmenaHesla">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <input type="button" class="btn btn-sm btn-warning pull-right" value="Generovat heslo" onClick="generator_edit();">
+                            </div>
+                        </div>
                         <div class="form-group">
                         <label for="password_edit" class="formularLabels">Heslo:</label>
                          <div class="input-group">
@@ -675,9 +679,9 @@ class EmployeeDatatableController extends Controller
                                 </div>
                         <input type="password" class="form-control formularInputs" placeholder="Zadejte heslo zaměstnance..." autocomplete="password_edit" name="password_edit" id="password_edit">
                         </div>
-                         <span toggle="#password_edit" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword"></span>
+                         <span toggle="#password_edit" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword_edit"></span>
                            <script>
-                                $(".showpassword").click(function() {
+                                $(".showpassword_edit").click(function() {
                                     $(this).toggleClass("fa-eye fa-eye-slash");
                                     var input = $($(this).attr("toggle"));
                                     if (input.attr("type") == "password") {
@@ -696,6 +700,26 @@ class EmployeeDatatableController extends Controller
                                 </div>
                             <input type="password" class="form-control formularInputs" name="password_confirm" placeholder="Zopakujte heslo zaměstnance..." autocomplete="password_edit_confirm" id="password_edit_confirm">
                             </div>
+                              <span toggle="#password_edit_confirm" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpasswordverify_edit"></span>
+                                <script>
+                                    function generator_edit() {
+                                        var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
+                                        var password_tmp = "";
+                                        for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
+                                        password_edit.value = password_tmp;
+                                        password_edit_confirm.value = password_tmp;
+                                    }
+
+                                    $(".showpasswordverify_edit").click(function() {
+                                        $(this).toggleClass("fa-eye fa-eye-slash");
+                                        var input = $($(this).attr("toggle"));
+                                        if (input.attr("type") == "password") {
+                                            input.attr("type", "text");
+                                        } else {
+                                            input.attr("type", "password");
+                                        }
+                                    });
+                                </script>
                         </div>
                     </div>
                     <div class="tab-pane" id="hodnoceni">

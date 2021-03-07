@@ -306,7 +306,7 @@
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" style="color:rgba(255, 255, 255, 0.95);" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if($profilovka === NULL)
-                                <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka img-thumbnail" style="margin-right: 5px;" width="45" alt="profilovka">
+                                <img src="{{ URL::asset('images/ikona_profil.png') }}" class="profilovka" style="margin-right: 5px;" width="45" alt="profilovka">
                             @else
                                 <img src =" {{ asset('/storage/employee_images/'.Auth::user()->employee_picture) }}" width="45" class="rounded-circle" style="margin-right: 5px;max-height: 45px;"  alt="profilovka" />
                             @endif

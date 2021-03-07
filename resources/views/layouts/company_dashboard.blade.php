@@ -890,6 +890,13 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <input type="button" style="margin-bottom: 15px;" class="btn btn-sm btn-warning pull-right" value="Generovat heslo" onClick="generator();">
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <div class="row">
                                         <label class="col-md-2 text-left">Heslo(<span class="text-danger">*</span>)</label>
@@ -905,6 +912,18 @@
                                                 </span>
                                                 @enderror
                                             </div>
+                                            <span toggle="#employee_password" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword"></span>
+                                            <script>
+                                                $(".showpassword").click(function() {
+                                                    $(this).toggleClass("fa-eye fa-eye-slash");
+                                                    var input = $($(this).attr("toggle"));
+                                                    if (input.attr("type") == "password") {
+                                                        input.attr("type", "text");
+                                                    } else {
+                                                        input.attr("type", "password");
+                                                    }
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                 </div>
@@ -923,6 +942,26 @@
                                                 </span>
                                                 @enderror
                                             </div>
+                                            <span toggle="#employee_password_confirm" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpasswordverify"></span>
+                                            <script>
+                                                function generator() {
+                                                    var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
+                                                    var password_tmp = "";
+                                                    for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
+                                                    employee_password.value = password_tmp;
+                                                    employee_password_confirm.value = password_tmp;
+                                                }
+
+                                                $(".showpasswordverify").click(function() {
+                                                    $(this).toggleClass("fa-eye fa-eye-slash");
+                                                    var input = $($(this).attr("toggle"));
+                                                    if (input.attr("type") == "password") {
+                                                        input.attr("type", "text");
+                                                    } else {
+                                                        input.attr("type", "password");
+                                                    }
+                                                });
+                                            </script>
                                         </div>
                                     </div>
                                 </div>

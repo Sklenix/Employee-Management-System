@@ -81,7 +81,7 @@
         <div class="col-sm-3">
             <div class="text-center">
                  @if($profilovka == NULL)
-                        <img src="{{ URL::asset('images/company_default_profile.png') }}" class="profilovka img-thumbnail" alt="profilovka">
+                        <img src="{{ URL::asset('images/default_profile.png') }}" class="profilovka img-thumbnail" alt="profilovka">
                  @else
                         <img src =" {{ asset('/storage/company_images/'.Auth::user()->company_picture) }}" width="250" style="margin-right: 5px;"  alt="profilovka" />
                 @endif
@@ -319,10 +319,10 @@
                     </form>
                 </div>
                 <div class="tab-pane" id="zmenaHesla">
+                    <input type="button" class="btn btn-warning pull-right" value="Generovat heslo" onClick="generator();">
                     <form class="form" action="{{ route('updateProfilePassword') }}" method="post">
                         @csrf
                         <div class="form-group">
-
                             <div class="col-xs-6">
                                 <label for="password"><h4>Heslo</h4></label>
                                 <div class="input-group">
@@ -365,6 +365,26 @@
                                     </span>
                                 @enderror
                                 </div>
+                                <span toggle="#password_verify" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpasswordverify"></span>
+                                <script>
+                                    function generator() {
+                                        var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
+                                        var password_tmp = "";
+                                        for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
+                                        password.value = password_tmp;
+                                        password_verify.value = password_tmp;
+                                    }
+
+                                    $(".showpasswordverify").click(function() {
+                                        $(this).toggleClass("fa-eye fa-eye-slash");
+                                        var input = $($(this).attr("toggle"));
+                                        if (input.attr("type") == "password") {
+                                            input.attr("type", "text");
+                                        } else {
+                                            input.attr("type", "password");
+                                        }
+                                    });
+                                </script>
                             </div>
                         </div>
                         <div class="form-group">
