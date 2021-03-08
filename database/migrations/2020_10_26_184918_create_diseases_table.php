@@ -14,7 +14,7 @@ class CreateDiseasesTable extends Migration
     public function up()
     {
         Schema::create('table_diseases', function (Blueprint $table) {
-            $table->engine = 'MyISAM';
+            $table->engine = 'InnoDB';
             $table->id('disease_id');
             $table->string('disease_name')->nullable();
             $table->dateTime('disease_from')->nullable();
@@ -22,7 +22,10 @@ class CreateDiseasesTable extends Migration
             $table->integer('disease_state')->default('0');
             $table->string('disease_note')->nullable();
             $table->timestamps();
-            $table->integer('employee_id');
+            $table->bigInteger('employee_id')->unsigned();
+        });
+
+        Schema::table('table_diseases', function($table) {
             $table->foreign('employee_id')->references('employee_id')->on('table_employees')->onDelete('cascade');
         });
     }

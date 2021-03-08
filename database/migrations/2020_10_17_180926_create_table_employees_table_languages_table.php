@@ -14,11 +14,13 @@ class CreateTableEmployeesTableLanguagesTable extends Migration
     public function up()
     {
         Schema::create('table_employee_table_languages', function (Blueprint $table) {
-            $table->engine = 'MyISAM';
+            $table->engine = 'InnoDB';
             $table->id('language_employee_id');
-            $table->integer('language_id');
-            $table->integer('employee_id');
-            $table->timestamps();
+            $table->bigInteger('language_id')->unsigned();
+            $table->bigInteger('employee_id')->unsigned();
+        });
+
+        Schema::table('table_employee_table_languages', function($table) {
             $table->foreign('employee_id')->references('employee_id')->on('table_employees')->onDelete('cascade');
             $table->foreign('language_id')->references('language_id')->on('table_employee_languages')->onDelete('cascade');
         });

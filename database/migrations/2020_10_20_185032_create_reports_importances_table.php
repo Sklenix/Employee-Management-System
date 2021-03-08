@@ -14,11 +14,10 @@ class CreateReportsImportancesTable extends Migration
     public function up()
     {
         Schema::create('table_reports_importances', function (Blueprint $table) {
-            $table->engine = 'MyISAM';
+            $table->engine = 'InnoDB';
             $table->id('importance_report_id');
             $table->string('importance_report_value')->nullable();
             $table->string('importance_report_description')->nullable();
-            $table->timestamps();
         });
     }
 

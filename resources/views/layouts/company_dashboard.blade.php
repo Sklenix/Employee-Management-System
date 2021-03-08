@@ -402,26 +402,36 @@
             <a href="{{route('home')}}" class="odkaz border-bottom {{ request()->routeIs('home') ? 'active' : '' }}" style="padding-left:60px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 20px;padding-top: 20px;font-size:17px;"><i class="fa fa-cube" aria-hidden="true"></i> Dashboard</a>
             <a href="#zamestnanciDropdown" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle odkaz" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-user" aria-hidden="true"></i> Zaměstnanci <i style="margin-left: 15px;" class="fa fa-caret-down" aria-hidden="true"></i></a>
             <ul class="collapse list-unstyled keep-open" id="zamestnanciDropdown" style="margin-bottom:0px;">
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" data-target="#formAddEmployee" ><i class="fa fa-user-plus" aria-hidden="true"></i> Přidat zaměstnance</a>
-                </li>
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" data-target="#formDeleteEmployee" id="getDeleteEmployeeData"><i class="fa fa-user-times" aria-hidden="true"></i> Smazat zaměstnance</a>
-                </li>
-                <li class="{{ request()->routeIs('ratings.index') ? 'active' : '' }} hoverList" style="padding-left:30px;text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
-                    <a href="{{route('ratings.index')}}" style="text-decoration: none;color:rgba(255, 255, 255, 0.95);"><i class="fa fa-th-large" aria-hidden="true"></i> Hodnocení zaměstnanců</a>
-                </li>
+                <a data-toggle="modal" data-target="#formAddEmployee" >
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                        <i class="fa fa-user-plus" aria-hidden="true"></i> Přidat zaměstnance
+                    </li>
+                </a>
+                <a data-toggle="modal" data-target="#formDeleteEmployee" id="getDeleteEmployeeData">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                        <i class="fa fa-user-times" aria-hidden="true"></i> Smazat zaměstnance
+                    </li>
+                </a>
+                <a href="{{route('ratings.index')}}" style="text-decoration: none;color:rgba(255, 255, 255, 0.95);">
+                    <li class="{{ request()->routeIs('ratings.index') ? 'active' : '' }} hoverList" style="padding-left:30px;text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
+                        <i class="fa fa-th-large" aria-hidden="true"></i> Hodnocení zaměstnanců
+                    </li>
+                </a>
             </ul>
             <a href="{{route('employees.index')}}" class="border-bottom odkaz {{ request()->routeIs('employees.index') ? 'active' : '' }}" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);padding-top: 16px;padding-bottom: 16px;font-size: 16px;text-decoration: none;color:rgba(255, 255, 255, 0.95);"><i class="fa fa-list" aria-hidden="true"></i> Seznam zaměstnanců</a>
 
             <a href="#smenyDropdown" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle odkaz" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-clock-o" aria-hidden="true"></i> Směny <i style="margin-left: 15px;" class="fa fa-caret-down" aria-hidden="true"></i></a>
             <ul class="collapse list-unstyled" id="smenyDropdown" style="margin-bottom:0px;">
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" data-target="#formAddShift"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Přidat směnu</a>
-                </li>
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" id="getDeleteShiftData" data-target="#formDeleteShift"><i class="fa fa-minus-square-o" aria-hidden="true"></i> Smazat směnu(y)</a>
-                </li>
+                <a data-toggle="modal" data-target="#formAddShift">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                       <i class="fa fa-plus-square-o" aria-hidden="true"></i> Přidat směnu
+                    </li>
+                </a>
+                <a data-toggle="modal" id="getDeleteShiftData" data-target="#formDeleteShift">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                        <i class="fa fa-minus-square-o" aria-hidden="true"></i> Smazat směnu(y)
+                    </li>
+                </a>
             </ul>
 
             <a href="{{route('shifts.index')}}" class="odkaz {{ request()->routeIs('shifts.index') ? 'active' : '' }}" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-list" aria-hidden="true"></i> Seznam směn</a>
@@ -429,44 +439,64 @@
 
             <a href="#googleDriveDropdown" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle odkaz" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-server" aria-hidden="true"></i> Google Drive <i style="margin-left: 15px;" class="fa fa-caret-down" aria-hidden="true"></i></a>
             <ul class="collapse list-unstyled keep-open" id="googleDriveDropdown" style="margin-bottom:0px;">
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" data-target="#formAddFolder"><i class="fa fa-upload" aria-hidden="true"></i> Přidat složku</a>
-                </li>
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" id="getDeleteFileDataCheckBox" data-target="#formDeleteFile"><i class="fa fa-upload" aria-hidden="true"></i> Smazat soubor</a>
-                </li>
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" id="getUploadFileDataOptions" data-target="#formUpload"><i class="fa fa-upload" aria-hidden="true"></i> Nahrání souboru</a>
-                </li>
-                <li style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a href="https://drive.google.com/drive/u/1/folders/{{ Auth::user()->company_url }}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;" target="_blank"><i class="fa fa-eye" aria-hidden="true"></i> Zobrazit Google Drive</a>
-                </li>
+                <a data-toggle="modal" data-target="#formAddFolder">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                       <i class="fa fa-upload" aria-hidden="true"></i> Přidat složku
+                    </li>
+                </a>
+                <a data-toggle="modal" id="getDeleteFileDataCheckBox" data-target="#formDeleteFile">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                        <i class="fa fa-upload" aria-hidden="true"></i> Smazat soubor
+                    </li>
+                </a>
+                <a data-toggle="modal" id="getUploadFileDataOptions" data-target="#formUpload">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                        <i class="fa fa-upload" aria-hidden="true"></i> Nahrání souboru
+                    </li>
+                </a>
+                <a href="https://drive.google.com/drive/u/1/folders/{{ Auth::user()->company_url }}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;" target="_blank">
+                    <li style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                       <i class="fa fa-eye" aria-hidden="true"></i> Zobrazit Google Drive
+                    </li>
+                </a>
             </ul>
 
             <a href="#languageDropdown" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle odkaz" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-language" aria-hidden="true"></i> Jazyky <i style="margin-left: 15px;" class="fa fa-caret-down" aria-hidden="true"></i></a>
             <ul class="collapse list-unstyled keep-open" id="languageDropdown" style="margin-bottom:0px;">
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" data-target="#formAddLanguage" ><i class="fa fa-plus-square-o" aria-hidden="true"></i> Přidat jazyk</a>
-                </li>
-                <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
-                    <a data-toggle="modal" data-target="#formDeleteLanguage"><i class="fa fa-minus-square-o" aria-hidden="true"></i> Odstranit jazyk(y)</a>
-                </li>
+                <a data-toggle="modal" data-target="#formAddLanguage">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                       <i class="fa fa-plus-square-o" aria-hidden="true"></i> Přidat jazyk
+                    </li>
+                </a>
+                <a data-toggle="modal" data-target="#formDeleteLanguage">
+                    <li style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;" class="hoverList">
+                        <i class="fa fa-minus-square-o" aria-hidden="true"></i> Odstranit jazyk(y)
+                    </li>
+                </a>
             </ul>
 
             <a href="#centresDropdown" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle odkaz" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-university" aria-hidden="true"></i> Centra <i style="margin-left: 15px;" class="fa fa-caret-down" aria-hidden="true"></i></a>
             <ul class="collapse list-unstyled keep-open" id="centresDropdown" style="margin-bottom:0px;">
-                <li class="{{ request()->routeIs('injuries.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
-                    <a href="{{route('injuries.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;"><i class="fa fa-heartbeat" aria-hidden="true"></i> Centrum zranění</a>
-                </li>
-                <li class="{{ request()->routeIs('vacations.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
-                    <a href="{{route('vacations.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;"><i class="fa fa-sun-o" aria-hidden="true"></i> Centrum dovolených</a>
-                </li>
-                <li class="{{ request()->routeIs('diseases.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
-                    <a href="{{route('diseases.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;"><i class="fa fa-medkit" aria-hidden="true"></i> Centrum nemocenských</a>
-                </li>
-                <li class="{{ request()->routeIs('reports.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
-                    <a href="{{route('reports.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;"><i class="fa fa-list-alt" aria-hidden="true"></i> Centrum nahlášení</a>
-                </li>
+                <a href="{{route('injuries.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;">
+                    <li class="{{ request()->routeIs('injuries.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
+                       <i class="fa fa-heartbeat" aria-hidden="true"></i> Centrum zranění
+                    </li>
+                </a>
+                <a href="{{route('vacations.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;">
+                    <li class="{{ request()->routeIs('vacations.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
+                        <i class="fa fa-sun-o" aria-hidden="true"></i> Centrum dovolených
+                    </li>
+                </a>
+                <a href="{{route('diseases.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;">
+                    <li class="{{ request()->routeIs('diseases.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
+                        <i class="fa fa-medkit" aria-hidden="true"></i> Centrum nemocenských
+                    </li>
+                </a>
+                <a href="{{route('reports.index')}}" style="color:rgba(255, 255, 255, 0.95);text-decoration: none;">
+                    <li class="{{ request()->routeIs('reports.index') ? 'active' : '' }} hoverList" style="cursor: pointer;padding-left:30px;padding-bottom: 16px;padding-top: 16px;font-size: 16px;">
+                        <i class="fa fa-list-alt" aria-hidden="true"></i> Centrum nahlášení
+                    </li>
+                </a>
             </ul>
 
             <a href="{{route('statistics.index')}}" class="odkaz {{ request()->routeIs('statistics.index') ? 'active' : '' }}" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-pie-chart" aria-hidden="true"></i> Statistiky</a>

@@ -30,7 +30,7 @@ class Report_Importance extends Model
 
     protected $primaryKey = 'report_id';
     protected $table = 'table_reports_importances';
-
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

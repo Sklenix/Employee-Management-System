@@ -14,16 +14,19 @@ class CreateShiftsTable extends Migration
     public function up()
     {
         Schema::create('table_shifts', function (Blueprint $table) {
-            $table->engine = 'MyISAM';
+            $table->engine = 'InnoDB';
             $table->id('shift_id');
             $table->dateTime('shift_start')->nullable();
             $table->dateTime('shift_end')->nullable();
             $table->string('shift_note')->nullable();
             $table->string('shift_place')->nullable();
-            $table->integer('shift_importance_id')->nullable();
-            $table->integer('company_id');
+            $table->bigInteger('shift_importance_id')->unsigned();
+            $table->bigInteger('company_id')->unsigned();
             $table->timestamps();
-            $table->foreign('shift_importance_id')->references('importance_id')->on('table_importances')->onDelete('cascade');
+        });
+
+        Schema::table('table_shifts', function($table) {
+            $table->foreign('shift_importance_id')->references('importance_id')->on('table_importances_shifts')->onDelete('restrict');
             $table->foreign('company_id')->references('company_id')->on('table_companies')->onDelete('cascade');
         });
     }

@@ -25,7 +25,7 @@ class ImportancesShifts extends Model
 
     protected $primaryKey = 'importance_id';
     protected $table = 'table_importances_shifts';
-
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

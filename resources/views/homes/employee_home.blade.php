@@ -3,7 +3,21 @@
     <section class="page-section"  id="vlastnosti" style="padding-top:40px;padding-bottom: 60px;background-color: #F5F5F5" >
         <div class="fluid-container" style="margin-left: 20px;margin-right: 20px;">
             <div class="row">
+                <div class="col-12 text-center">
+                    @if($message = Session::get('fail'))
+                        <div class="alert alert-danger alert-block">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
+                            <strong>{{$message}}</strong>
+                        </div>
+                    @endif
 
+                    @if($message = Session::get('success'))
+                        <div class="alert alert-success alert-block">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
+                            <strong>{{$message}}</strong>
+                        </div>
+                @endif
+                </div>
                 <div class="col-lg-2 col-md-2 text-center">
                 </div>
 

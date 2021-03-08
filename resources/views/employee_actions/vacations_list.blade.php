@@ -23,9 +23,9 @@
                 <tr>
                     <th width="8%">Od</th>
                     <th width="8%">Do</th>
-                    <th width="15%">Poznámka</th>
-                    <th width="8%">Aktuálnost</th>
-                    <th width="8%">Stav</th>
+                    <th width="20%">Poznámka</th>
+                    <th width="7%">Aktuálnost</th>
+                    <th width="7%">Stav</th>
                     <th width="13%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button"  data-toggle="modal" data-target="#CreateVacationModal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Vytvořit</button></th>
                 </tr>
                 </thead>

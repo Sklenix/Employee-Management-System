@@ -118,7 +118,7 @@ class Shift extends Authenticatable
         return DB::table('table_shifts')
             ->select('table_shifts.shift_id')
             ->where(['table_shifts.company_id' => $company_id])
-            ->where('table_shifts.shift_start', '>=',  Carbon::now())
+            ->where('table_shifts.shift_start', '<',  Carbon::now())
             ->count();
     }
 

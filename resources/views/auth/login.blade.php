@@ -106,7 +106,12 @@
                         </div>
                     @endif
 
-
+                    @if(Session::has('success'))
+                        <div class="alert alert-success">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
+                            {{ Session::get('success') }}
+                        </div>
+                    @endif
                     @if(Session::has('message'))
                         <div class="alert alert-danger">
                             <button type="button" class="close" data-dismiss="alert">x</button>

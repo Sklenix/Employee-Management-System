@@ -21,12 +21,12 @@
             <table class="table-responsive disease-list">
                 <thead>
                 <tr>
-                    <th width="8%">Od</th>
-                    <th width="8%">Do</th>
-                    <th width="9%">Název</th>
-                    <th width="15%">Poznámka</th>
-                    <th width="8%">Aktuálnost</th>
-                    <th width="8%">Stav</th>
+                    <th width="10%">Od</th>
+                    <th width="10%">Do</th>
+                    <th width="15%">Název</th>
+                    <th width="25%">Poznámka</th>
+                    <th width="7%">Aktuálnost</th>
+                    <th width="9%">Stav</th>
                     <th width="15%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button"  data-toggle="modal" data-target="#CreateDiseaseModal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Vytvořit</button></th>
                 </tr>
                 </thead>

@@ -110,8 +110,8 @@ class ShiftDatatableController extends Controller
         $shift_end = new DateTime($request->shift_end);
         $now = new DateTime();
 
-        $difference_start = $shift_start->format('U') - $now->format('U');
-        $difference_end = $shift_end->format('U') - $now->format('U');
+      //  $difference_start = $shift_start->format('U') - $now->format('U');
+      //  $difference_end = $shift_end->format('U') - $now->format('U');
         $difference_shifts = $shift_end->format('U') - $shift_start->format('U');
         $chybaDatumy = array();
         $bool_datumy = 0;
@@ -122,8 +122,8 @@ class ShiftDatatableController extends Controller
         $pocetMinut = $hodinyRozdil->i;
 
         if($request->shift_start != NULL){
-            if($difference_start < 0 || $difference_end < 0 || $difference_shifts <= 0){
-                array_push($chybaDatumy,'Start směny dříve než dnes, nebo konec směny dříve než dnes, nebo  je konec směny stejný  jako její začátek, nebo je dříve než začátek!');
+            if($difference_shifts <= 0){
+                array_push($chybaDatumy,'Konec směny je stejný jako její začátek, nebo je dříve než začátek!');
                 $bool_datumy = 1;
             }
 
@@ -474,14 +474,14 @@ class ShiftDatatableController extends Controller
         $shift_end = new DateTime($request->shift_end);
         $now = new DateTime();
 
-        $difference_start = $shift_start->format('U') - $now->format('U');
-        $difference_end = $shift_end->format('U') - $now->format('U');
+       // $difference_start = $shift_start->format('U') - $now->format('U');
+       // $difference_end = $shift_end->format('U') - $now->format('U');
         $difference_shifts = $shift_end->format('U') - $shift_start->format('U');
         $chybaDatumy = array();
         $bool_datumy = 0;
 
-        if($difference_start < 0 || $difference_end < 0 || $difference_shifts < 0){
-            array_push($chybaDatumy,'Start směny dříve než dnes, nebo konec směny dříve než dnes, nebo konec směny dřív než její začátek!');
+        if($difference_shifts < 0){
+            array_push($chybaDatumy,'Konec směny je stejný, nebo je dříve než její začátek!');
             $bool_datumy = 1;
         }
 
@@ -659,6 +659,7 @@ class ShiftDatatableController extends Controller
     }
 
     public function updateassignEmployee(Request $request, $id){
+        date_default_timezone_set('Europe/Prague');
         $shift = new Shift();
         $data = $shift->findData($id);
 

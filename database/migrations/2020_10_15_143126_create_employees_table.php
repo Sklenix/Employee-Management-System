@@ -14,7 +14,7 @@ class CreateEmployeesTable extends Migration
     public function up()
     {
         Schema::create('table_employees', function (Blueprint $table) {
-            $table->engine = 'MyISAM';
+            $table->engine = 'InnoDB';
             $table->id('employee_id');
             $table->string('employee_name');
             $table->string('employee_surname');
@@ -35,9 +35,15 @@ class CreateEmployeesTable extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
-            $table->integer('employee_company');
+            $table->bigInteger('employee_company')->unsigned();
+        });
+
+        Schema::table('table_employees', function($table) {
             $table->foreign('employee_company')->references('company_id')->on('table_companies')->onDelete('cascade');
         });
+
+
+
     }
 
     /**

@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
 class Languages extends Model
 {
     use HasFactory;
-
+    public $timestamps = false;
     protected $primaryKey = 'language_id';
     protected $table = 'table_employee_languages';
     protected $guard = 'employees';

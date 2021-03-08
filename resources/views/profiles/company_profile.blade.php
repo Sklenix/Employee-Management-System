@@ -9,6 +9,31 @@
         html {
             scroll-behavior: smooth;
         }
+
+        .modal-content {
+            background-color: #1a202c !important;
+
+        }
+        .modal-header h5{
+            color:rgba(255, 255, 255, 0.95);
+        }
+
+        .btn-modalClose{
+            background-color: #4aa0e6 !important;
+        }
+
+        .btn-modalClose:hover{
+            background-color: #c51f1a !important;
+        }
+
+        .btn-modalSuccess{
+            background-color: #4aa0e6 !important;
+        }
+
+        .btn-modalSuccess:hover{
+            background-color: green !important;
+        }
+
         nav ul li a { text-decoration: none; font-weight: 800; text-transform: uppercase; }
         nav.fill ul li a { position: relative; }
 
@@ -115,13 +140,17 @@
                         let fileInput = document.getElementById("file");
                         fileInput.addEventListener("change",loader);
                     </script>
-                    <input class="btn btn-primary btn-block btn-lg"  style="margin-top: 8px;" type="submit" value="Nahrát">
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fa fa-upload" aria-hidden="true"></i> Nahrát
+                        </button>
                 </div>
                 </form>
                  <form method="post"  style="margin-top: 15px;" action="{{route('deleteOldImage')}}" enctype="multipart/form-data">
                      @csrf
                      <div class="form-group nahratTlacitko">
-                         <input class="btn btn-danger btn-block btn-lg" type="submit" value="Smazat obrázek">
+                         <button type="submit" class="btn btn-danger btn-block btn-lg">
+                             <i class="fa fa-times" aria-hidden="true"></i> Smazat obrázek
+                         </button>
                      </div>
                  </form>
                 <ul class="list-group">
@@ -132,6 +161,7 @@
                     <li class="list-group-item text-right"><span class="pull-left"><strong>Proběhnutých směn</strong></span> {{$pocetHistorie}}</li>
                     <li class="list-group-item text-right"><span class="pull-left"><strong>Účet vytvořen</strong></span> {{$vytvorenUcet}}</li>
                 </ul>
+                 <button type="button" data-id="{{Auth::user()->company_id}}" data-toggle="modal" style="margin-top:15px;" data-target="#confirmDeleteModal" class="btn btn-danger btn-block" id="getDeleteId" ><i class="fa fa-trash-o" aria-hidden="true"></i> Smazat účet</button>
             </div><br>
         </div>
         <div class="col-sm-9">
@@ -145,7 +175,7 @@
             </ul>
             <script>
                 $(document).ready(function () {
-                    $('#menuTabu a[href="#{{ old('tab') }}"]').tab('show')
+                  //  $('#menuTabu a[href="#{{ old('tab') }}"]').tab('show')
                 });
             </script>
             <br>
@@ -313,7 +343,9 @@
                         </div>
                         <div class="form-group">
                             <div class="col-xs-12">
-                                <input class="btn btn-primary btn-block btn-lg" type="submit" value="Uložit">
+                                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Uložit
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -389,7 +421,9 @@
                         </div>
                         <div class="form-group">
                             <div class="col-xs-12">
-                                <input class="btn btn-primary btn-block btn-lg" type="submit" value="Změnit heslo">
+                                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Změnit heslo
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -398,5 +432,27 @@
         </div>
     </div>
 </div>
+<!-- Smazani uctu firmy -->
+<div id="confirmDeleteModal" class="modal fade" style="color:white;" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Potvrzení smazání Vašeho účtu</h5>
+                <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete smazat Váš účet?</p>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <form method="post" action="{{route('deleteCompanyProfile')}}">
+                    @csrf
+                    <button type="submit" name="confirm" style="color:white;" id="confirm" class="btn btn-modalSuccess">Ano</button>
+                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

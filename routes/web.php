@@ -174,6 +174,9 @@ Route::group(['middleware' => 'auth:company'], function () {
     /* Statistiky */
     Route::get('/company/statistics', [\App\Http\Controllers\StatisticsController::class, 'index'])->name('statistics.index');
 
+    /* Smazani uctu firmy */
+    Route::post('/company/profile/delete', [App\Http\Controllers\UserCompanyController::class, 'deleteCompanyProfile'])->name('deleteCompanyProfile');
+
     Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
     Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');
     Route::post('/company/profile/deleteFile', [App\Http\Controllers\UserCompanyController::class, 'deleteFileGoogleDrive'])->name('deleteFile');
@@ -245,6 +248,9 @@ Route::group(['middleware' => 'auth:employee'], function () {
     Route::get('/dashboard/googleFilesCheckboxes/employee/show/', [\App\Http\Controllers\UserEmployeeController::class, 'getAllGoogleDriveFilesCheckboxes'])->name('dashboard.getAllGoogleDriveFilesEmployee');
     Route::get('/dashboard/googleFoldersOptions/employee/show/', [\App\Http\Controllers\UserEmployeeController::class, 'getAllGoogleDriveFoldersOptions'])->name('dashboard.getAllGoogleDriveFoldersOptionsEmployee');
     Route::get('/employee/dashboard/', [App\Http\Controllers\UserEmployeeController::class, 'index'])->name('homeEmployee');
+
+    /* Smazani uctu zamestnance */
+    Route::post('/employee/profile/delete', [App\Http\Controllers\UserEmployeeController::class, 'deleteEmployeeProfile'])->name('deleteEmployeeProfile');
     Route::get('/employee/profile/', [App\Http\Controllers\UserEmployeeController::class, 'showEmployeeProfileData'])->name('showEmployeeProfileData');
     Route::post('/employee/profile/update',[App\Http\Controllers\UserEmployeeController::class, 'updateEmployeeProfileData'])->name('updateEmployeeProfileData');
     Route::post('/employee/profile/update/password',[App\Http\Controllers\UserEmployeeController::class, 'updateEmployeeProfilePassword'])->name('updateEmployeeProfilePassword');
@@ -254,6 +260,10 @@ Route::group(['middleware' => 'auth:employee'], function () {
 
 Route::group(['middleware' => 'auth:admin'], function () {
     Route::get('/admin/dashboard/', [App\Http\Controllers\UserAdminController::class, 'index'])->name('homeAdmin');
+
+    /* Smazani uctu admina */
+    Route::post('/admin/profile/delete', [App\Http\Controllers\UserAdminController::class, 'deleteAdminProfile'])->name('deleteAdminProfile');
+
     Route::get('/admin/profile/', [App\Http\Controllers\UserAdminController::class, 'showAdminProfileData'])->name('showAdminProfileData');
     Route::post('/admin/profile/update',[App\Http\Controllers\UserAdminController::class, 'updateAdminProfileData'])->name('updateAdminProfileData');
     Route::post('/admin/profile/update/password',[App\Http\Controllers\UserAdminController::class, 'updateAdminProfilePassword'])->name('updateAdminProfilePassword');

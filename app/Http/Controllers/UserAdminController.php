@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use http\Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -22,6 +23,15 @@ class UserAdminController
 
     public function showAdminProfileData(){
         return view('profiles.admin_profile');
+    }
+
+    public function deleteAdminProfile(){
+        $user = Auth::user();
+        DB::table('table_admin')
+            ->where(['table_admin.admin_id' => $user->admin_id])
+            ->delete();
+        session()->flash('success', 'Váš účet byl úspěšně smazán!');
+        return redirect()->route('showAdminLoginForm');
     }
 
     protected function validator(array $data,$emailDuplicate,$loginDuplicate,$verze){

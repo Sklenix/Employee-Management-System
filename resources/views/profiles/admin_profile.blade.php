@@ -22,6 +22,31 @@
 
         label{font-size: 17px;}
 
+        .modal-content {
+            background-color: #1a202c !important;
+
+        }
+        .modal-header h5{
+            color:rgba(255, 255, 255, 0.95);
+        }
+
+        .btn-modalClose{
+            background-color: #4aa0e6 !important;
+        }
+
+        .btn-modalClose:hover{
+            background-color: #c51f1a !important;
+        }
+
+        .btn-modalSuccess{
+            background-color: #4aa0e6 !important;
+        }
+
+        .btn-modalSuccess:hover{
+            background-color: green !important;
+        }
+
+
         @-webkit-keyframes fill {
             0% { width: 0%; height: 1px; }
             50% { width: 100%; height: 1px; }
@@ -79,9 +104,8 @@
             <hr></div>
     </div>
     <div class="row">
-        <div class="col-sm-2">
-        </div>
-        <div class="col-sm-9">
+        <div class="col-sm-12">
+            <button type="button" data-id="{{Auth::user()->admin_id}}" data-toggle="modal" style="margin-top:15px;" data-target="#confirmDeleteModal" class="pull-right btn btn-danger" id="getDeleteId" ><i class="fa fa-trash-o" aria-hidden="true"></i> Smazat účet</button>
             <ul class="nav nav-stacked nav-pills" id="menuTabu">
                 <li class="nav-item">
                     <a class="nav-link active" data-toggle="tab" href="#obecneUdaje">Obecné údaje</a>
@@ -92,7 +116,7 @@
             </ul>
             <script>
                 $(document).ready(function () {
-                    $('#menuTabu a[href="#{{ old('tab') }}"]').tab('show')
+                  //  $('#menuTabu a[href="#{{ old('tab') }}"]').tab('show')
                 });
             </script>
             <br>
@@ -184,7 +208,9 @@
 
                         <div class="form-group">
                             <div class="col-xs-12">
-                                <input class="btn btn-primary btn-block btn-lg" type="submit" value="Uložit">
+                                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Uložit
+                                </button>
                             </div>
                         </div>
                     </form>
@@ -260,11 +286,34 @@
                         </div>
                         <div class="form-group">
                             <div class="col-xs-12">
-                                <input class="btn btn-primary btn-block btn-lg" type="submit" value="Změnit heslo">
+                                <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Změnit heslo
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Smazani uctu admina -->
+<div id="confirmDeleteModal" class="modal fade" style="color:white;" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Potvrzení smazání Vašeho účtu</h5>
+                <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete smazat Váš účet?</p>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <form method="post" action="{{route('deleteAdminProfile')}}">
+                    @csrf
+                    <button type="submit" name="confirm" style="color:white;" id="confirm" class="btn btn-modalSuccess">Ano</button>
+                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                </form>
             </div>
         </div>
     </div>

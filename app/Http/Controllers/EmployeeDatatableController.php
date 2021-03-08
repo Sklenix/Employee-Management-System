@@ -906,7 +906,6 @@ class EmployeeDatatableController extends Controller
             }
         }
 
-
         $bool = 0;
         $bool2 = 0;
         $bool3 = 0;
@@ -965,7 +964,7 @@ class EmployeeDatatableController extends Controller
         if(($vysledek->employee_name == $request->employee_name) && ($vysledek->employee_surname == $request->employee_surname)
             && ($vysledek->employee_phone == $request->employee_phone) && ($vysledek->email == $request->email) && ($vysledek->employee_note == $request->employee_note)
             && ($vysledek->employee_position == $request->employee_position) && ($vysledek->employee_city == $request->employee_city)
-            && ($vysledek->employee_street == $request->employee_street)){
+            && ($vysledek->employee_street == $request->employee_street) && ($vysledek->employee_login == $request->employee_login)){
             $bool = 0;
         }else{
             $bool = 1;
@@ -1171,6 +1170,7 @@ class EmployeeDatatableController extends Controller
     }
 
     public function updateassignShift(Request $request, $id){
+        date_default_timezone_set('Europe/Prague');
         $employee = new Employee();
         $data = $employee->findData($id);
 

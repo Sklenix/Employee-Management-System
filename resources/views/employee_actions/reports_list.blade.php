@@ -21,11 +21,11 @@
             <table class="table-responsive report-list">
                 <thead>
                 <tr>
-                    <th width="8%">Název</th>
-                    <th width="15%">Popis</th>
-                    <th width="9%">Důležitost</th>
-                    <th width="8%">Stav</th>
-                    <th width="15%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button"  data-toggle="modal" data-target="#CreateReportModal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Vytvořit</button></th>
+                    <th width="15%">Název</th>
+                    <th width="35%">Popis</th>
+                    <th width="7%">Důležitost</th>
+                    <th width="10%">Stav</th>
+                    <th width="20%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button"  data-toggle="modal" data-target="#CreateReportModal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Vytvořit</button></th>
                 </tr>
                 </thead>
                 <tbody>

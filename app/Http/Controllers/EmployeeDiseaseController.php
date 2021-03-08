@@ -27,15 +27,15 @@ class EmployeeDiseaseController extends Controller
                 ->addIndexColumn()
                 ->editColumn('disease_state', function($diseases){
                     if($diseases->disease_state == 0){
-                        return '<center><p class="col-md-10" style="color:whitesmoke;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Nezažádáno</p></center>';
+                        return '<center><p style="color:whitesmoke;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Nezažádáno</p></center>';
                     }else if($diseases->disease_state == 1){
-                        return '<center><p class="col-md-10" style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Odesláno</p></center>';
+                        return '<center><p style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Odesláno</p></center>';
                     }else if($diseases->disease_state == 2){
-                        return '<center><p class="col-md-10" style="color:greenyellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Schváleno</p></center>';
+                        return '<center><p style="color:greenyellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Schváleno</p></center>';
                     }else if($diseases->disease_state == 3){
-                        return '<center><p class="col-md-10" style="color:red;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Neschváleno</p></center>';
+                        return '<center><p style="color:red;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Neschváleno</p></center>';
                     }else if($diseases->vacation_state == 4){
-                        return '<center><p class="col-md-10" style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Přečteno</p></center>';
+                        return '<center><p style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Přečteno</p></center>';
                    }
                 })
                 ->addColumn('disease_actuality', function($diseases){
@@ -46,17 +46,17 @@ class EmployeeDiseaseController extends Controller
                     $rozhod_end = $now->lte($end);
                     $rozhod_end2 = $now->gte($end);
                     if($rozhod_start == 1 && $rozhod_end == 1){
-                        return '<center><p class="col-md-10" style="color:greenyellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Probíhá</p></center>';
+                        return '<center><p style="color:greenyellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Probíhá</p></center>';
                     }else if($rozhod_end2 == 1){
-                        return '<center><p class="col-md-10" style="color:whitesmoke;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Proběhla</p></center>';
+                        return '<center><p style="color:whitesmoke;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Proběhla</p></center>';
                     }else{
-                        return '<center><p class="col-md-10" style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Proběhne</p></center>';
+                        return '<center><p style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Proběhne</p></center>';
                     }
                 })
                 ->addColumn('action', function($diseases){
                     return '<button type="button" data-id="'.$diseases->disease_id.'" data-toggle="modal" data-target="#ApplyDiseaseModal" class="btn btn-dark btn-sm" id="getDiseaseApply"><i class="fa fa-bullhorn" aria-hidden="true"></i> Zažádat</button>
                             <button type="button" data-id="'.$diseases->disease_id.'" data-toggle="modal" data-target="#EditDiseaseModal" class="btn btn-primary btn-sm" id="getEditDisease"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> Editovat</button>
-                            <button type="button" data-id="'.$diseases->disease_id.'" data-toggle="modal" data-target="#DeleteApplyDiseaseModal" class="btn btn-dark btn-sm" id="getDiseaseDeleteApply"><i class="fa fa-times" aria-hidden="true"></i> Zrušit žádost</button>
+                            <button type="button" data-id="'.$diseases->disease_id.'" data-toggle="modal" data-target="#DeleteApplyDiseaseModal" class="btn btn-dark btn-sm" style="margin-top:6px;" id="getDiseaseDeleteApply"><i class="fa fa-times" aria-hidden="true"></i> Zrušit žádost</button>
                             <button type="button" data-id="'.$diseases->disease_id.'" data-toggle="modal" data-target="#DeleteDiseaseModal" class="btn btn-danger btn-sm" style="margin-top:6px;" id="getDiseaseDelete">&nbsp;<i class="fa fa-trash-o" aria-hidden="true"></i> Smazat&nbsp;&nbsp;</button>';
                 })
                 ->rawColumns(['action', 'disease_state', 'disease_actuality'])

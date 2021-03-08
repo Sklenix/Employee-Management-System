@@ -65,6 +65,41 @@ class UserEmployeeController extends Controller
             ->with('pocetDovolenych',$pocetDovolenych);
     }
 
+    public function deleteEmployeeProfile(){
+        $user = Auth::user();
+        DB::table('table_employees')
+            ->where(['table_employees.employee_id' => $user->employee_id])
+            ->delete();
+
+        if($user->employee_drive_url != NULL){
+            $keyFileLocation =storage_path('app/credentials.json');
+            /*ID složky, do které chceme soubory nahrávat*/
+            $client = new Google_Client();
+            $httpClient = $client->getHttpClient();
+            $config = $httpClient->getConfig();
+            $config['verify'] = false;
+            $client->setHttpClient(new Client($config));
+            $client->setApplicationName("BackupDrive");
+            try {
+                /*Inicializace klienta*/
+                $client->setAuthConfig($keyFileLocation);
+                $client->useApplicationDefaultCredentials();
+                $client->addScope([
+                    \Google_Service_Drive::DRIVE,
+                    \Google_Service_Drive::DRIVE_METADATA
+                ]);
+                $service = new \Google_Service_Drive($client);
+                $results = $service->files->get($user->employee_drive_url);
+                if($results != NULL) {
+                    $service->files->delete($user->employee_drive_url);
+                }
+            }catch (Exception $e){
+            }
+        }
+        session()->flash('success', 'Váš účet byl úspěšně smazán!');
+        return redirect()->route('employee');
+    }
+
     protected function validator(array $data,$emailDuplicate,$verze){
         if($verze == 1){
             if($emailDuplicate == 1){
