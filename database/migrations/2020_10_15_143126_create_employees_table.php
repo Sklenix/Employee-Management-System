@@ -31,7 +31,6 @@ class CreateEmployeesTable extends Migration
             $table->string('employee_drive_url')->nullable();
             $table->string('employee_picture')->nullable();
             $table->string('employee_login')->unique();
-            $table->string('employee_department')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

@@ -154,7 +154,7 @@
                      </div>
                  </form>
                 <ul class="list-group">
-                    <li class="list-group-item text-muted">Statistiky počtu </li>
+                    <li class="list-group-item" style="color: black;font-size: 15px;">Statistiky</li>
                     <li class="list-group-item text-right"><span class="pull-left"><strong>Zaměstnanců</strong></span> {{$pocetZamestnancu}}</li>
                     <li class="list-group-item text-right"><span class="pull-left"><strong>Směn celkově</strong></span> {{$pocetSmen}}</li>
                     <li class="list-group-item text-right"><span class="pull-left"><strong>Nadcházejících směn</strong></span> {{$pocetNadchazejicich}}</li>

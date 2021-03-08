@@ -22,6 +22,15 @@
                         </div>
                     @endif
                 </div>
+                <div class="col-lg-1"></div>
+                <div class="col-lg-1"></div>
+                <div class="col-lg-10">
+                    <ul class="list-group">
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet směn</strong></span> {{$pocetSmen}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet absencí</strong></span> {{$pocetAbsenci}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet dovolených</strong></span> {{$pocetDovolenych}}</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>

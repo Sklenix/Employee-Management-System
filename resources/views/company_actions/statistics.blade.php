@@ -22,6 +22,19 @@
                         </div>
                     @endif
                 </div>
+                <div class=" col-lg-1" style="font-size: 15px;">
+                </div>
+                <div class=" col-lg-1" style="font-size: 15px;">
+                </div>
+                <div class="col-lg-10">
+                    <ul class="list-group">
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Zaměstnanců</strong></span> {{$pocetZamestnancu}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Směn celkově</strong></span> {{$pocetSmen}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Nadcházejících směn</strong></span> {{$pocetNadchazejicich}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Proběhnutých směn</strong></span> {{$pocetHistorie}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Účet vytvořen</strong></span> {{$vytvorenUcet}}</li>
+                    </ul>
+                </div>
             </div>
         </div>
     </section>

@@ -378,6 +378,7 @@
     <title>Tozondo @yield('title')</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css" />
     <link href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
@@ -1220,7 +1221,9 @@
             e.preventDefault();
             $("#wrapper").toggleClass("toggled");
         });
-
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
         /* Zobrazeni smen urcenych k mazani */
         $('.modelClose').on('click', function(){
             $('#DeleteShiftModal').hide();
