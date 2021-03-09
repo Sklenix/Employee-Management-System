@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Company;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
 
@@ -27,7 +29,7 @@ class VerificationController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/login/company';
+    protected $redirectTo = '/company/dashboard';
 
     /**
      * Create a new controller instance.
@@ -41,20 +43,16 @@ class VerificationController extends Controller
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 
-   /* public function show(Request $request)
-    {
-        return $request->user()->hasVerifiedEmail()
-            ? redirect($this->redirectPath())
-            : view('auth.login', ['url' => 'company'])->with(["verifiedSuccess" => "Váš e-mail je nyní ověřen, lze se přihlásit do systému."]);
-    }*/
-
-
-   /* protected function verified(Request $request)
-    {
-        $request->session()->flash('alert', [
-            'status' => 'success',
-            'body' => 'Your email has been verified. Thanks!'
-        ]);
-    }*/
+    /* Prepsani metody verify z VerifiesEmails.php kvuli notifikaci nove registrovane firmy */
+    public function verify(Request $request){
+        $company = Company::find($request->route('id'));
+        if ($company->hasVerifiedEmail()) {
+            return redirect($this->redirectPath());
+        }
+        if ($company->markEmailAsVerified()) {
+            event(new Verified($request->user()));
+        }
+        return redirect($this->redirectPath())->with('verified', true)->with('success', 'Ověření emailové adresy proběhlo v pořádku, nyní můžete svůj účet používat.');
+    }
 
 }

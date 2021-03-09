@@ -61,12 +61,14 @@
             .pozadi {background-image: url({{ asset('images/pozadi.png') }});height: 95vh;width: auto;
                 background-size: cover;background-position: center center;}
         }
-
+        .card, .card-header, .card-body, .card-footer{
+            border-radius:35px !important;
+        }
     </style>
 </head>
+<!-- Textura pouzita ze stranky https://www.toptal.com/designers/subtlepatterns/cloudy-day/, vytvorili Toptal Subtle Patterns -->
 <body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
 
-<!-- Menu-->
 <nav class="fill navbar sticky-top navbar-light navbar-expand-sm " style="background-color: #F5F5F5" id="myScrollspy">
     <!-- Sekce logo -->
     <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 22px;margin-left: 20px;"> <img src="{{ URL::asset('images/logo.png') }}" height="25" width="30" /> | Tozondo</a>
@@ -83,7 +85,7 @@
     <div class="row justify-content-center" >
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header text-center" style="background-color: #0275d8;color:white;font-size: 20px;">Přihlašování
+                <div class="card-header text-center" style="background-color: #0275d8;color:white;font-size: 28px;font-family: 'Pacifico', cursive;">Přihlašování
                     @isset($url)
                         @if($url == "employee")
                            pro zaměstnance
@@ -104,7 +106,12 @@
                         </div>
                     @endif
 
-
+                    @if(Session::has('success'))
+                        <div class="alert alert-success">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
+                            {{ Session::get('success') }}
+                        </div>
+                    @endif
                     @if(Session::has('message'))
                         <div class="alert alert-danger">
                             <button type="button" class="close" data-dismiss="alert">x</button>
@@ -182,11 +189,16 @@
                                     <label class="form-check-label" for="remember" style="font-size: 14px;">
                                         Zapamatovat
                                     </label>
-                                      @if (Route::has('password.request'))
-                                        <a class="btn btn-link" style="float:right;position:relative;margin-top:-7px;" href="{{ route('password.request') }}">
+                                     @isset($url)
+                                        @if($url == "company")
+                                            @if (Route::has('password.request'))
+                                                <a class="btn btn-link" style="float:right;position:relative;margin-top:-7px;" href="{{ route('password.request') }}">
                                         Zapomněl jste heslo?
                                     </a>
-                                    @endif
+                                            @endif
+                                        @endif
+                                    @else
+                                    @endisset
                                 </span>
                             </div>
                         </div>
@@ -205,7 +217,7 @@
                                             </a>
                                         @endif
                                     @elseif($url == "admin")
-                                        adminy
+
                                     @elseif($url == "company")
                                         @if (Route::has('login'))
                                             <a id="zamestnanec_current" class="btn btn-link" style="font-size: 16px;" href="{{ route('employee') }}">
