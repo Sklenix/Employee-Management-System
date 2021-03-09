@@ -34,7 +34,7 @@ class EmployeeDiseaseController extends Controller
                         return '<center><p style="color:greenyellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Schváleno</p></center>';
                     }else if($diseases->disease_state == 3){
                         return '<center><p style="color:red;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Neschváleno</p></center>';
-                    }else if($diseases->vacation_state == 4){
+                    }else if($diseases->disease_state == 4){
                         return '<center><p style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Přečteno</p></center>';
                    }
                 })

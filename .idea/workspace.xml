@@ -21,14 +21,16 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeStatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeStatisticsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_15_143126_create_employees_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_15_143126_create_employees_table.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/employee_actions/statistics.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/employee_actions/statistics.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/company_dashboard.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/company_dashboard.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/profiles/company_profile.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/profiles/company_profile.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeAllShiftsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeAllShiftsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeAttendanceController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeAttendanceController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDiseaseController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDiseaseController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/FileGeneratorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/FileGeneratorController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Employee_Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee_Shift.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -365,7 +367,11 @@
       <workItem from="1615142818839" duration="922000" />
       <workItem from="1615145487179" duration="13032000" />
       <workItem from="1615189679638" duration="991000" />
-      <workItem from="1615194044323" duration="30258000" />
+      <workItem from="1615194044323" duration="30443000" />
+      <workItem from="1615239857194" duration="69000" />
+      <workItem from="1615243109659" duration="24000" />
+      <workItem from="1615243163649" duration="555000" />
+      <workItem from="1615288902874" duration="7192000" />
     </task>
     <servers />
   </component>

@@ -46,24 +46,24 @@ class FileGeneratorController extends Controller
                     <table class="table" style="font-family: DejaVu Sans;font-size: 12px;border-collapse: collapse;">
                      <thead>
                           <tr style="text-align: left;">
-                            <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;">Jméno</th>
-                            <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;">Příjmení</th>
-                            <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;">Telefon</th>
-                            <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;">Email</th>
-                            <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;">Pozice</th>
-                            <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;">Adresa</th>
+                            <th style="border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;font-size:13px;">Jméno</th>
+                            <th style="border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;font-size:13px;">Příjmení</th>
+                            <th style="border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;font-size:13px;">Telefon</th>
+                            <th style="border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;font-size:13px;">Email</th>
+                            <th style="border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;font-size:13px;">Pozice</th>
+                            <th style="border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;font-size:13px;">Adresa</th>
                            </tr>
                       </thead>
                       <tbody>
                     ';
         foreach ($zamestnanci as $zamestnanec){
             $html .= '<tr>
-                            <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;">'.$zamestnanec->employee_name.'</td>
-                            <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;">'.$zamestnanec->employee_surname.'</td>
-                            <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;">'.$zamestnanec->employee_phone.'</td>
-                            <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;">'.$zamestnanec->email.'</td>
-                            <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;">'.$zamestnanec->employee_position.'</td>
-                            <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;">'.$zamestnanec->employee_street.', '.$zamestnanec->employee_city.'</td>
+                            <td style="text-align: center;border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;">'.$zamestnanec->employee_name.'</td>
+                            <td style="text-align: center;border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;">'.$zamestnanec->employee_surname.'</td>
+                            <td style="text-align: center;border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;">'.$zamestnanec->employee_phone.'</td>
+                            <td style="text-align: center;border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;">'.$zamestnanec->email.'</td>
+                            <td style="text-align: center;border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;">'.$zamestnanec->employee_position.'</td>
+                            <td style="text-align: center;border-bottom: 1px solid black;padding-right:5px;padding-bottom: 8px;">'.$zamestnanec->employee_street.', '.$zamestnanec->employee_city.'</td>
                        </tr>';
         }
         $html .= '</tbody></table>';

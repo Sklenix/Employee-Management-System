@@ -34,18 +34,15 @@ class EmployeeAttendanceController extends Controller
 
     public function getAttendance(Request $request, $id){
         if ($request->ajax()) {
-            $data = Employee_Shift::getEmployeeAllShiftsWithAttendance($id);
+            $data = Employee_Shift::getEmployeeAllShifts($id);
             return Datatables::of($data)
                 ->addIndexColumn()
-                ->addColumn('shift_importance_id', function($data2){
-                    $aktualniDulezitost = Shift::getCurrentImportanceShift($data2->shift_importance_id);
+                ->addColumn('shift_importance_id', function($data){
+                    $aktualniDulezitost = Shift::getCurrentImportanceShift($data->shift_importance_id);
                     return $aktualniDulezitost[0]->importance_description;
                 })
                 ->addColumn('attendance_came', function($data){
-                    $came = DB::table('table_attendances')
-                        ->select('table_attendances.attendance_came')
-                        ->where(['table_attendances.shift_id' => $data->shift_id,'table_attendances.employee_id' => $data->employee_id])
-                        ->get();
+                    $came = Attendance::getAttendanceCame($data->shift_id, $data->employee_id);
                     if($came->isEmpty()){
                         return '<center><p class="col-md-10" style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Nezapsáno</p></center>';
                     }else {
@@ -59,10 +56,7 @@ class EmployeeAttendanceController extends Controller
                     }
                 })
                 ->addColumn('attendance_check_in_company', function($data){
-                    $checkin_company = DB::table('table_attendances')
-                        ->select('table_attendances.attendance_check_in_company')
-                        ->where(['table_attendances.shift_id' => $data->shift_id,'table_attendances.employee_id' => $data->employee_id])
-                        ->get();
+                    $checkin_company = Attendance::getCompanyCheckIn($data->shift_id, $data->employee_id);
                     if($checkin_company->isEmpty()){
                         return 'Invalid date';
                     }else{
@@ -74,10 +68,7 @@ class EmployeeAttendanceController extends Controller
                     }
                 })
                 ->addColumn('attendance_check_out_company', function($data){
-                    $checkout_company = DB::table('table_attendances')
-                        ->select('table_attendances.attendance_check_out_company')
-                        ->where(['table_attendances.shift_id' => $data->shift_id,'table_attendances.employee_id' => $data->employee_id])
-                        ->get();
+                    $checkout_company = Attendance::getCompanyCheckOut($data->shift_id, $data->employee_id);
                     if($checkout_company->isEmpty()){
                         return 'Invalid date';
                     }else{
@@ -88,13 +79,8 @@ class EmployeeAttendanceController extends Controller
                         }
                     }
                 })
-
-
                 ->addColumn('attendance_check_in', function($data){
-                    $checkin = DB::table('table_attendances')
-                        ->select('table_attendances.attendance_check_in')
-                        ->where(['table_attendances.shift_id' => $data->shift_id,'table_attendances.employee_id' => $data->employee_id])
-                        ->get();
+                    $checkin =Attendance::getEmployeeCheckIn($data->shift_id, $data->employee_id);
                     if($checkin->isEmpty()){
                         return 'Invalid date';
                     }else{
@@ -106,10 +92,7 @@ class EmployeeAttendanceController extends Controller
                     }
                 })
                 ->addColumn('attendance_check_out', function($data){
-                    $checkout = DB::table('table_attendances')
-                        ->select('table_attendances.attendance_check_out')
-                        ->where(['table_attendances.shift_id' => $data->shift_id,'table_attendances.employee_id' => $data->employee_id])
-                        ->get();
+                    $checkout = Attendance::getEmployeeCheckOut($data->shift_id, $data->employee_id);
                     if($checkout->isEmpty()){
                         return 'Invalid date';
                     }else{
@@ -121,11 +104,7 @@ class EmployeeAttendanceController extends Controller
                     }
                 })
                 ->addColumn('reason_description', function($data){
-                    $aktualniAbsence = DB::table('table_absence_reasons')
-                        ->select('table_absence_reasons.reason_description','table_attendances.absence_reason_id')
-                        ->join('table_attendances','table_absence_reasons.reason_id','=','table_attendances.absence_reason_id')
-                        ->where(['table_attendances.shift_id' => $data->shift_id,'table_attendances.employee_id' => $data->employee_id])
-                        ->get();
+                    $aktualniAbsence = Attendance::getEmployeeCurrentShiftAbsenceStatus($data->shift_id, $data->employee_id);
                     if($aktualniAbsence->isEmpty()){
                         return '<center><p class="col-md-10" style="color:yellow;display:block;background-color: #333333;padding-bottom: 5px;margin-top:15px;padding-top: 5px;border-radius: 10px;">Čekající</p></center>';
                     }else{
@@ -141,22 +120,28 @@ class EmployeeAttendanceController extends Controller
                     }
                 })
                 ->addColumn('hours_total', function($data){
-                    if ($data->attendance_check_in_company == NULL || $data->attendance_check_out_company == NULL){
-                            if($data->attendance_check_in == NULL || $data->attendance_check_out == NULL){
+                    $udaje = Attendance::getAllCheckInCheckOutForShift($data->shift_id, $data->employee_id);
+                    if($udaje->isEmpty()){
+                        return '<p style="color:black;">Nezapsaný check-in/out</p>';
+                    }else{
+                        if ($udaje[0]->attendance_check_in_company == NULL || $udaje[0]->attendance_check_out_company == NULL){
+                            if($udaje[0]->attendance_check_in == NULL || $udaje[0]->attendance_check_out == NULL){
                                 return '<p style="color:black;">Nezapsaný check-in/out</p>';
-                            }else if($data->attendance_check_in != NULL && $data->attendance_check_out != NULL){
-                                $checkin = new DateTime($data->attendance_check_in);
-                                $checkout = new DateTime($data->attendance_check_out);
+                            }else if($udaje[0]->attendance_check_in != NULL && $udaje[0]->attendance_check_out != NULL){
+                                $checkin = new DateTime($udaje[0]->attendance_check_in);
+                                $checkout = new DateTime($udaje[0]->attendance_check_out);
                                 $hodinyRozdilCheck =$checkout->diff($checkin);
                                 return '<p style="color:black;">'.$hodinyRozdilCheck->h.'h'.$hodinyRozdilCheck->i.'m</p>';
                             }
-                        return '<p style="color:black;">Nezapsaný check-in/out</p>';
-                    }else if($data->attendance_check_in_company != NULL && $data->attendance_check_out_company != NULL){
-                        $checkin = new DateTime($data->attendance_check_in_company);
-                        $checkout = new DateTime($data->attendance_check_out_company);
-                        $hodinyRozdilCheck =$checkout->diff($checkin);
-                        return '<p style="color:black;">'.$hodinyRozdilCheck->h.'h'.$hodinyRozdilCheck->i.'m</p>';
+                            return '<p style="color:black;">Nezapsaný check-in/out</p>';
+                        }else if($udaje[0]->attendance_check_in_company != NULL && $udaje[0]->attendance_check_out_company != NULL){
+                            $checkin = new DateTime($udaje[0]->attendance_check_in_company);
+                            $checkout = new DateTime($udaje[0]->attendance_check_out_company);
+                            $hodinyRozdilCheck =$checkout->diff($checkin);
+                            return '<p style="color:black;">'.$hodinyRozdilCheck->h.'h'.$hodinyRozdilCheck->i.'m</p>';
+                        }
                     }
+
                 })
                 ->addColumn('action', function($data){
                     return '<button type="button" data-id="'.$data->shift_id.'" data-toggle="modal" style="margin-top:5px;" data-target="#ShowAttendanceOptionsModal" class="btn btn-success btn-sm" id="getEmployeesOptions"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Docházka</button>';

@@ -988,7 +988,7 @@ class UserCompanyController extends Controller
 
     public function getAllEmployees(){
         $user = Auth::user();
-        $html = '<input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavac" onkeyup="Search()" placeholder="Hledat směnu na základě ID, začátku, lokace, nebo konce směny ..." title="Zadejte údaje o směně">
+        $html = '<input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavac" onkeyup="Search()" placeholder="Hledat zaměstnance na základě jeho jména, příjmení, pozice, nebo počtu směn ..." title="Zadejte údaje o směně">
                     <table class="table table-dark" id="show_table" style="font-size: 16px;">
                     <thead>
                         <tr>

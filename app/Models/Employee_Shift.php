@@ -45,7 +45,7 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
     ];
 
 
-    public static function getEmployeeCurrentShiftsWithAttendance($employee_id){
+    public static function getEmployeeCurrentShifts($employee_id){
         date_default_timezone_set('Europe/Prague');
         $now = Carbon::now();
         $pondeli = $now->startOfWeek()->format('Y-m-d H:i:s');
@@ -55,7 +55,6 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
                 'table_shifts.shift_place','table_shifts.shift_note','table_shifts.shift_importance_id','table_employees.employee_id')
             ->join('table_employees','table_employee_shifts.employee_id','=','table_employees.employee_id')
             ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
-            ->leftJoin('table_attendances','table_employee_shifts.shift_id','=','table_attendances.shift_id')
             ->where(['table_employee_shifts.employee_id' => $employee_id])
             ->whereBetween('table_shifts.shift_start', [
                 $pondeli,
@@ -66,15 +65,12 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->get();
     }
 
-    public static function getEmployeeAllShiftsWithAttendance($employee_id){
+    public static function getEmployeeAllShifts($employee_id){
         return DB::table('table_employee_shifts')
             ->select('table_shifts.shift_id','table_shifts.shift_start','table_shifts.shift_end',
-                'table_shifts.shift_place','table_shifts.shift_note','table_shifts.shift_importance_id','table_employees.employee_id',
-                'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                'table_attendances.attendance_check_out_company')
+                'table_shifts.shift_place','table_shifts.shift_note','table_shifts.shift_importance_id','table_employees.employee_id')
             ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
             ->join('table_employees','table_employee_shifts.employee_id','=','table_employees.employee_id')
-            ->leftJoin('table_attendances','table_employee_shifts.shift_id','=','table_attendances.shift_id')
             ->where(['table_employee_shifts.employee_id' => $employee_id])
             ->orderBy('table_shifts.shift_start', 'asc')
             ->distinct()

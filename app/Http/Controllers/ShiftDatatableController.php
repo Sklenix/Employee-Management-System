@@ -772,6 +772,7 @@ class ShiftDatatableController extends Controller
             ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
             ->select('table_employee_shifts.employee_id','table_employees.employee_name','table_employees.employee_surname','table_shifts.shift_start')
             ->where(['table_shifts.shift_id' => $id,'table_shifts.company_id' => $user->company_id])
+            ->orderBy('table_employees.employee_surname', 'asc')
             ->get();
 
         if(count($zamestnanci) == 0){
@@ -1077,7 +1078,7 @@ class ShiftDatatableController extends Controller
             ->get();
         $bool = 0;
         $zamestnanec = Employee::find($zamestnanec_id);
-        if($request->attendance_absence_reason_id == 5){
+        if($request->attendance_absence_reason_id == 4 || $request->attendance_absence_reason_id == 5){
             $bool = 1;
         }
         if($dochazka->isEmpty()){

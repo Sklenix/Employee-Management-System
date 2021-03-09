@@ -1315,6 +1315,8 @@ class EmployeeDatatableController extends Controller
             ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
             ->select('table_shifts.shift_start','table_shifts.shift_end','table_shifts.shift_id')
             ->where(['table_employees.employee_id' => $id,'table_employees.employee_company' => $user->company_id])
+            ->whereMonth('table_shifts.shift_start', Carbon::now()->month)
+            ->orderBy('table_shifts.shift_start', 'desc')
             ->get();
 
         if(count($smeny) == 0){
@@ -1624,7 +1626,7 @@ class EmployeeDatatableController extends Controller
             ->get();
         $bool = 0;
         $zamestnanec = Employee::find($zamestnanec_id);
-        if($request->attendance_absence_reason_id == 5){
+        if($request->attendance_absence_reason_id == 4 || $request->attendance_absence_reason_id == 5){
             $bool = 1;
         }
         if($dochazka->isEmpty()){

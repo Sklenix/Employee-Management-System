@@ -23,7 +23,7 @@ class EmployeeAllShiftsController extends Controller
     public function getAllEmployeeShiftsList(Request $request){
         $user = Auth::user();
         if ($request->ajax()) {
-            $data = Employee_Shift::getEmployeeAllShiftsWithAttendance($user->employee_id);
+            $data = Employee_Shift::getEmployeeAllShifts($user->employee_id);
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('shift_importance_id', function($data){

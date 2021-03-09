@@ -24,7 +24,7 @@ class EmployeeCurrentShiftsController extends Controller
     public function getEmployeeCurrentShifts(Request $request){
         $user = Auth::user();
         if ($request->ajax()) {
-            $data = Employee_Shift::getEmployeeCurrentShiftsWithAttendance($user->employee_id);
+            $data = Employee_Shift::getEmployeeCurrentShifts($user->employee_id);
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('shift_importance_id', function($data){
