@@ -24,9 +24,9 @@ class AdminFactory extends Factory
     public function definition()
     {
         return [
-            'admin_name' => 'Josef',
-            'admin_surname' => 'Malý',
-            'admin_email' => 'google@gmail.com',
+            'admin_name' => 'Admin',
+            'admin_surname' => 'Admin',
+            'admin_email' => 'admin@gmail.com',
             'admin_password' => Hash::make('admin'),
             'admin_login' => 'admin',
             'remember_token' => Str::random(10),

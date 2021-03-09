@@ -26,7 +26,7 @@ class CreateCompaniesTable extends Migration
             $table->string('company_picture')->nullable();
             $table->string('password');
             $table->string('company_ico')->nullable();
-            $table->string('company_city')->nullable();;
+            $table->string('company_city')->nullable();
             $table->string('company_street')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->rememberToken();
