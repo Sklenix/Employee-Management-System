@@ -75,6 +75,52 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->orderBy('table_shifts.shift_start', 'asc')
             ->distinct()
             ->get();
+
+    }
+
+    public static function getEmployeeParticularShift($employee_id, $shift_id){
+        return DB::table('table_employee_shifts')
+            ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
+            ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
+            ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
+            ->where(['table_employee_shifts.employee_id' => $employee_id, 'table_shifts.shift_id' => $shift_id])
+            ->get();
+    }
+
+    public static function deleteEmployeeAssignedShiftsWithAttendance($employee_id,$tmp_arr){
+        date_default_timezone_set('Europe/Prague');
+         DB::table('table_employee_shifts')
+            ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
+            ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
+            ->whereNotIn('table_employee_shifts.shift_id',$tmp_arr)
+            ->where(['table_employee_shifts.employee_id' => $employee_id])
+            ->where('table_shifts.shift_start', '>=',  Carbon::now())
+            ->delete();
+
+        DB::table('table_attendances')
+            ->select('table_attendances.employee_id','table_attendances.shift_id')
+            ->join('table_shifts','table_attendances.shift_id','=','table_shifts.shift_id')
+            ->where('table_shifts.shift_start', '>=',  Carbon::now())
+            ->whereNotIn('table_attendances.shift_id',$tmp_arr)
+            ->where(['table_attendances.employee_id' => $employee_id])
+            ->delete();
+    }
+
+    public static function deleteEmployeeAllUpcomingShiftsWithAttendance($employee_id){
+        date_default_timezone_set('Europe/Prague');
+        DB::table('table_employee_shifts')
+            ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
+            ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
+            ->where(['table_employee_shifts.employee_id' => $employee_id])
+            ->where('table_shifts.shift_start', '>=',  Carbon::now())
+            ->delete();
+
+        DB::table('table_attendances')
+            ->select('table_attendances.employee_id','table_attendances.shift_id')
+            ->join('table_shifts','table_attendances.shift_id','=','table_shifts.shift_id')
+            ->where(['table_attendances.employee_id' => $employee_id])
+            ->where('table_shifts.shift_start', '>=',  Carbon::now())
+            ->delete();
     }
 
 }

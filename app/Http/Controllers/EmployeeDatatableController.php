@@ -4,12 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Company;
+use App\Models\CompanyDimension;
 use App\Models\Disease;
 use App\Models\Employee_Language;
 use App\Models\Employee_Shift;
+use App\Models\EmployeeDimension;
+use App\Models\ImportancesShifts;
 use App\Models\Injury;
 use App\Models\Languages;
 use App\Models\Shift;
+use App\Models\ShiftFacts;
+use App\Models\ShiftInfoDimension;
+use App\Models\TimeDimension;
 use App\Models\Vacation;
 use Carbon\Carbon;
 use DateTime;
@@ -203,22 +209,23 @@ class EmployeeDatatableController extends Controller
 
     public function uploadImageEmployeeProfile(Request $request){
         if($request->hasFile('obrazek')){
-            $nazev = $request->obrazek->getClientOriginalName();
-            $pripona = explode(".",$nazev);
-            if($pripona[1] == "jpg" || $pripona[1] == "png" || $pripona[1] == "jpeg"){
-                $user = Employee::find($request->employee_id);
-                if($user->employee_picture){
-                    Storage::delete('/public/employee_images/'.$user->employee_picture);
-                }
-                $tokenUnique = Str::random(20);
-                $tokenUnique2 = Str::random(5);
-                $tokenUnique3 = Str::random(10);
-                $request->obrazek->storeAs('employee_images',$tokenUnique.$tokenUnique2.$tokenUnique3,'public');
-                $user->update(['employee_picture' => $tokenUnique.$tokenUnique2.$tokenUnique3]);
-                session()->flash('obrazekZpravaSuccess', 'Profilová fotka zaměstnance '.$user->employee_name.' '.$user->employee_surname.' úspěšně nahrána.');
-            }else{
-                session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg]');
+            $validator = Validator::make($request->all(),[
+                'obrazek' => 'required|mimes:jpg,jpeg,png|max:8096',
+            ]);
+            if($validator->fails()){
+                session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg], maximální velikost obrázku je 8MB!');
+                return redirect()->back();
             }
+            $user = Employee::find($request->employee_id);
+            if($user->employee_picture){
+                Storage::delete('/public/employee_images/'.$user->employee_picture);
+            }
+            $tokenUnique = Str::random(20);
+            $tokenUnique2 = Str::random(5);
+            $tokenUnique3 = Str::random(10);
+            $request->obrazek->storeAs('employee_images',$tokenUnique.$tokenUnique2.$tokenUnique3,'public');
+            $user->update(['employee_picture' => $tokenUnique.$tokenUnique2.$tokenUnique3]);
+            session()->flash('obrazekZpravaSuccess', 'Profilová fotka zaměstnance '.$user->employee_name.' '.$user->employee_surname.' úspěšně nahrána.');
         }
         return redirect()->back();
     }
@@ -1051,33 +1058,21 @@ class EmployeeDatatableController extends Controller
                             <th scope="col" style="width:19%;text-align: center;">Lokace <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(2,this);"></i></th>
                             <th scope="col" style="width:19%;text-align: center;">Důležitost <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(3,this);" ></i></th>
                             <th scope="col" style="width:19%;text-align: center;">Poznámka</th>
-                            <th scope="col" style="width:5%;text-align: center;">Obsazeno</th>
+                            <th scope="col" style="width:5%;text-align: center;">Přiřazeno</th>
                         </tr>
                     </thead>
                 <tbody>';
         $smeny = Shift::getUpcomingCompanyShifts($user->company_id);
 
         foreach ($smeny as $smena){
-            $res = DB::table('table_employee_shifts')
-                ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
-                ->select('table_employee_shifts.employee_id')
-                ->where(['table_employee_shifts.employee_id' => $id, 'table_shifts.shift_id' => $smena->shift_id])
-                ->get();
-
-            $aktualniDulezitost = DB::table('table_importances_shifts')
-                ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
-                ->join('table_shifts','table_shifts.shift_importance_id','=','table_importances_shifts.importance_id')
-                ->where(['table_shifts.shift_importance_id' => $smena->shift_importance_id])
-                ->get();
-
+            $aktualniSmena = Employee_Shift::getEmployeeParticularShift($id, $smena->shift_id);
+            $aktualniDulezitost = ImportancesShifts::getParticularImportance($smena->shift_importance_id);
             $shift_start = new DateTime( $smena->shift_start);
             $smena->shift_start = $shift_start->format('d.m.Y H:i');
             $shift_end = new DateTime( $smena->shift_end);
             $smena->shift_end = $shift_end->format('d.m.Y H:i');
-
             $html .= '<tr><td class="text-center">'.$smena->shift_start.'</td><td class="text-center"> '.$smena->shift_end.'</td><td class="text-center"> '.$smena->shift_place.'</td> <td class="text-center"> '.$aktualniDulezitost[0]->importance_description.'</td> <td class="text-center"> '.$smena->shift_note.'</td>';
-            if($res->isEmpty()){
+            if($aktualniSmena->isEmpty()){
                 $html .= '<td><center><input type="checkbox" name="shift_shift_assign_id" class="form-check-input shift_shift_assign_id" id="shift_shift_assign_id" name="shift_shift_assign_id[]" value="'.$smena->shift_id.'"></center></td> </tr>';
             }else{
                 $html .= '<td><center><input type="checkbox" name="shift_shift_assign_id" class="form-check-input shift_shift_assign_id" id="shift_shift_assign_id" name="shift_shift_assign_id[]" value="'.$smena->shift_id.'" checked></center></td> </tr>';
@@ -1163,102 +1158,63 @@ class EmployeeDatatableController extends Controller
                       }
                     }
                  </script>';
-        $shift = new Shift();
-        $data = $shift->findData($id);
-
         return response()->json(['html'=>$html]);
     }
 
     public function updateassignShift(Request $request, $id){
         date_default_timezone_set('Europe/Prague');
-        $employee = new Employee();
-        $data = $employee->findData($id);
-
-        $smeny_nazvy = '';
+        $employee = Employee::findOrFail($id);
+        $smena_info = '';
         $count = 0;
-
         if($request->shifts_ids != "") {
-            $params = explode('&', $request->shifts_ids);
-            $delka = count($params);
-
-            $tmp_arr = array();
-
-            foreach ($params as $param) {
-                $name_value = explode('=', $param);
-                $name = $name_value[1];
-                array_push($tmp_arr,$name);
+            $shift_id_arr = explode('&', $request->shifts_ids);
+            $delka = count($shift_id_arr);
+            $shift_ids_collector = array();
+            foreach ($shift_id_arr as $shift_id) {
+                $shift_id_value = explode('=', $shift_id);
+                array_push($shift_ids_collector,$shift_id_value[1]);
             }
-
-            DB::table('table_employee_shifts')
-                ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
-                ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
-                ->whereNotIn('table_employee_shifts.shift_id',$tmp_arr)
-                ->where(['table_employee_shifts.employee_id' => $id])
-                ->where('table_shifts.shift_start', '>=',  Carbon::now())
-                ->delete();
-
-           DB::table('table_attendances')
-                ->select('table_attendances.employee_id','table_attendances.shift_id')
-                ->join('table_shifts','table_attendances.shift_id','=','table_shifts.shift_id')
-                ->where('table_shifts.shift_start', '>=',  Carbon::now())
-                ->whereNotIn('table_attendances.shift_id',$tmp_arr)
-                ->where(['table_attendances.employee_id' => $id])
-                ->delete();
-
-            foreach ($params as $param) {
-                $name_value = explode('=', $param);
-                $name = $name_value[1];
-
-                $res = DB::table('table_employee_shifts')
-                    ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
-                    ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
-                    ->select('table_employee_shifts.shift_id')
-                    ->where(['table_employee_shifts.employee_id' => $id, 'table_shifts.shift_id' => $name])
-                    ->get();
-
-                $shiftName = new Shift();
-                $data_shift = $shiftName->findData($name);
+            Employee_Shift::deleteEmployeeAssignedShiftsWithAttendance($id, $shift_ids_collector);
+            foreach ($shift_id_arr as $shift_id) {
+                $shift_id_value = explode('=', $shift_id);
+                $concreteShift = Employee_Shift::getEmployeeParticularShift($id,$shift_id_value[1]);
+                $shift = Shift::findOrFail($shift_id_value[1]);
                 if ($count == $delka - 1) {
-                    $smeny_nazvy .= "<br>".$data_shift->shift_start.' '.$data_shift->shift_end.', lokace: '.$data_shift->shift_place.".";
+                    $smena_info .= "<br>".$shift->shift_start.' '.$shift->shift_end.', lokace: '.$shift->shift_place.".";
                 }else{
-                    $smeny_nazvy .= "<br>".$data_shift->shift_start.' '.$data_shift->shift_end.', lokace: '.$data_shift->shift_place.", ";
+                    $smena_info .= "<br>".$shift->shift_start.' '.$shift->shift_end.', lokace: '.$shift->shift_place.", ";
                 }
-
-                if($res->isEmpty()){
-                    $shiftsEmployee = new Employee_Shift();
-                    $shiftsEmployee->shift_id = $name;
-                    $shiftsEmployee->employee_id = $data->employee_id;
-                    $shiftsEmployee->save();
+                if($concreteShift->isEmpty()){
+                    $user = Auth::user();
+                    Employee_Shift::create(['shift_id' => $shift_id_value[1], 'employee_id' => $employee->employee_id]);
+                    $new_shift_info_dimension = ShiftInfoDimension::create(['shift_start' => $shift->shift_start, 'shift_end' => $shift->shift_end, 'attendance_came' => NULL, 'attendance_check_in' => NULL, 'attendance_check_out' => NULL, 'attendance_check_in_company' => NULL, 'attendance_check_out_company' => NULL]);
+                    TimeDimension::create(['time_id' => $new_shift_info_dimension->shift_id, 'day' => Carbon::parse($shift->shift_start)->day, 'month' => Carbon::parse($shift->shift_start)->month, 'quarter' => Carbon::parse($shift->shift_start)->quarter, 'year' => Carbon::parse($shift->shift_start)->year]);
+                    EmployeeDimension::firstOrCreate(['employee_id' => $employee->employee_id],['employee_id' => $employee->employee_id, 'employee_name' => $employee->employee_name, 'employee_surname' => $employee->employee_surname, 'employee_position' => $employee->employee_position, 'employee_overall' => $employee->employee_overall]);
+                    CompanyDimension::firstOrCreate(['company_id' => $user->company_id],['company_id' => $user->company_id, 'company_name' => $user->company_name, 'company_city' => $user->company_city, 'company_street' => $user->company_street, 'company_user_name' => $user->company_user_name, 'company_user_surname' => $user->company_user_surname]);
+                    $shift_start = new DateTime($shift->shift_start);
+                    $shift_end = new DateTime($shift->shift_end);
+                    $hodinyRozdil = $shift_end->diff($shift_start);
+                    $pocetHodin = $hodinyRozdil->h;
+                    $pocetMinut = $hodinyRozdil->i;
+                    $celkove = $pocetHodin + ($pocetMinut/60);
+                    // ShiftFacts::firstOrCreate(['company_id' => $user->company_id, 'time_id' => $new_shift_info_dimension->shift_id, 'employee_id' => $employee->employee_id, 'shift_id' => $new_shift_info_dimension->shift_id],['company_id' => $user->company_id, 'time_id' => $new_shift_info_dimension->shift_id, 'employee_id' => $employee->employee_id, 'shift_id' => $new_shift_info_dimension->shift_id
+                     //                           ,'shift_total_hours' => $celkove, '']);
                 }
                 $count++;
             }
         }
-
         if($count > 0){
         }else{
-            DB::table('table_employee_shifts')
-                ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
-                ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
-                ->where(['table_employee_shifts.employee_id' => $id])
-                ->where('table_shifts.shift_start', '>=',  Carbon::now())
-                ->delete();
-
-            DB::table('table_attendances')
-                ->select('table_attendances.employee_id','table_attendances.shift_id')
-                ->join('table_shifts','table_attendances.shift_id','=','table_shifts.shift_id')
-                ->where(['table_attendances.employee_id' => $id])
-                ->where('table_shifts.shift_start', '>=',  Carbon::now())
-                ->delete();
+            Employee_Shift::deleteEmployeeAllUpcomingShiftsWithAttendance($id);
         }
-        substr_replace($smeny_nazvy, ".", -1);
-
-        if($smeny_nazvy == ""){
+        substr_replace($smena_info, ".", -1);
+        if($smena_info == ""){
             return response()->json(['success'=>'Zaměstnancovi směny byly všechny úspěšně smazány.']);
         }
         if($count == 1){
-            return response()->json(['success'=>'Zaměstnanci: '.$data->employee_name.' '.$data->employee_surname.' byla přidána následující směna: '.$smeny_nazvy]);
+            return response()->json(['success'=>'Zaměstnanci: '.$employee->employee_name.' '.$employee->employee_surname.' byla přidána následující směna: '.$smena_info]);
         }else{
-            return response()->json(['success'=>'Zaměstnanci: '.$data->employee_name.' '.$data->employee_surname.' byly přidány následující směny: '.$smeny_nazvy]);
+            return response()->json(['success'=>'Zaměstnanci: '.$employee->employee_name.' '.$employee->employee_surname.' byly přidány následující směny: '.$smena_info]);
         }
     }
 

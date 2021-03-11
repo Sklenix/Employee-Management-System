@@ -323,22 +323,23 @@ class UserCompanyController extends Controller
 
     public function uploadImage(Request $request){
         if($request->hasFile('obrazek')){
-           $nazev = $request->obrazek->getClientOriginalName();
-           $pripona = explode(".",$nazev);
-           if($pripona[1] == "jpg" || $pripona[1] == "png" || $pripona[1] == "jpeg"){
-               $user = Auth::user();
-               if($user->company_picture){
-                   Storage::delete('/public/company_images/'.$user->company_picture);
-               }
-               $tokenUnique = Str::random(20);
-               $tokenUnique2 = Str::random(5);
-               $tokenUnique3 = Str::random(10);
-               $request->obrazek->storeAs('company_images',$tokenUnique.$tokenUnique2.$tokenUnique3,'public');
-               $user->update(['company_picture' => $tokenUnique.$tokenUnique2.$tokenUnique3]);
-               session()->flash('obrazekZpravaSuccess', 'Profilová fotka úspěšně nahrána.');
-           }else{
-               session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg]');
+           $validator = Validator::make($request->all(),[
+                'obrazek' => 'required|mimes:jpg,jpeg,png|max:8096',
+            ]);
+           if($validator->fails()){
+                session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg], maximální velikost obrázku je 8MB!');
+                return redirect()->back();
            }
+           $user = Auth::user();
+           if($user->company_picture){
+               Storage::delete('/public/company_images/'.$user->company_picture);
+           }
+           $tokenUnique = Str::random(20);
+           $tokenUnique2 = Str::random(5);
+           $tokenUnique3 = Str::random(10);
+           $request->obrazek->storeAs('company_images',$tokenUnique.$tokenUnique2.$tokenUnique3,'public');
+           $user->update(['company_picture' => $tokenUnique.$tokenUnique2.$tokenUnique3]);
+           session()->flash('obrazekZpravaSuccess', 'Profilová fotka úspěšně nahrána.');
         }
         return redirect()->back();
     }

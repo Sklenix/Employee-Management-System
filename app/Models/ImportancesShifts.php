@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\ImportancesShifts
@@ -34,4 +36,13 @@ class ImportancesShifts extends Model
     protected $fillable = [
         'importance_value', 'importance_description'
     ];
+
+    public static function getParticularImportance($importance_id){
+        date_default_timezone_set('Europe/Prague');
+        return DB::table('table_importances_shifts')
+            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
+            ->join('table_shifts','table_shifts.shift_importance_id','=','table_importances_shifts.importance_id')
+            ->where(['table_shifts.shift_importance_id' => $importance_id])
+            ->get();
+    }
 }

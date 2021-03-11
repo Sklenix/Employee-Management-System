@@ -15,10 +15,11 @@ class CreateShiftInfoDimension extends Migration
     {
         Schema::create('shift_info_dimension', function (Blueprint $table) {
             $table->engine = 'InnoDB';
-            $table->id('shift_id');
+            $table->id('shift_info_id');
             $table->dateTime('shift_start')->nullable();
             $table->dateTime('shift_end')->nullable();
             $table->integer('attendance_came')->nullable();
+            $table->integer('absence_reason_value')->nullable();
             $table->dateTime('attendance_check_in')->nullable();
             $table->dateTime('attendance_check_out')->nullable();
             $table->dateTime('attendance_check_in_company')->nullable();
