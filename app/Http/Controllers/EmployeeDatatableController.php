@@ -19,6 +19,7 @@ use App\Models\TimeDimension;
 use App\Models\Vacation;
 use Carbon\Carbon;
 use DateTime;
+use App\Http\Controllers\OlapETL;
 use Google_Client;
 use Google_Service_Drive_DriveFile;
 use Google_Service_Drive_Permission;
@@ -1084,19 +1085,16 @@ class EmployeeDatatableController extends Controller
                       x.classList.toggle("fa-sort-alpha-desc");
                       x.classList.toggle("fa-sort-alpha-asc");
                     }
-
                      function zmenaIkonkyCisla(x) {
                         x.classList.toggle("fa-sort-numeric-asc");
                         x.classList.toggle("fa-sort-numeric-desc");
                      }
-
                     function Search() {
                       var input, filter, table, tr, td, td2, td3, td4, i, txtValue, txtValue2, txtValue3, txtValue4;
                       input = document.getElementById("vyhledavac");
                       filter = input.value.toUpperCase();
                       table = document.getElementById("tableShifts");
                       tr = table.getElementsByTagName("tr");
-
                       for (i = 0; i < tr.length; i++) {
                           td3 = tr[i].getElementsByTagName("td")[0];
                           td = tr[i].getElementsByTagName("td")[1];
@@ -1113,12 +1111,9 @@ class EmployeeDatatableController extends Controller
                               } else {
                                   tr[i].style.display = "none";
                               }
-
                           }
-
                       }
                     }
-
                      function sortTable(n,ikonka) {
                       var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
                       table = document.getElementById("tableShifts");
@@ -1127,7 +1122,6 @@ class EmployeeDatatableController extends Controller
                       while (switching) {
                         switching = false;
                         rows = table.rows;
-
                         for (i = 1; i < (rows.length - 1); i++) {
                           shouldSwitch = false;
                           x = rows[i].getElementsByTagName("TD")[n];
@@ -1170,10 +1164,16 @@ class EmployeeDatatableController extends Controller
             $shift_id_arr = explode('&', $request->shifts_ids);
             $delka = count($shift_id_arr);
             $shift_ids_collector = array();
+            $shift_starts_collector = array();
+            $shift_ends_collector = array();
             foreach ($shift_id_arr as $shift_id) {
                 $shift_id_value = explode('=', $shift_id);
                 array_push($shift_ids_collector,$shift_id_value[1]);
+                $shift_tmp = Shift::findOrFail($shift_id_value[1]);
+                array_push($shift_starts_collector,$shift_tmp->shift_start);
+                array_push($shift_ends_collector,$shift_tmp->shift_end);
             }
+            OlapETL::deleteCancelledPreviouslyAssignedShift($employee->employee_id, $shift_starts_collector, $shift_ends_collector);
             Employee_Shift::deleteEmployeeAssignedShiftsWithAttendance($id, $shift_ids_collector);
             foreach ($shift_id_arr as $shift_id) {
                 $shift_id_value = explode('=', $shift_id);
@@ -1187,24 +1187,19 @@ class EmployeeDatatableController extends Controller
                 if($concreteShift->isEmpty()){
                     $user = Auth::user();
                     Employee_Shift::create(['shift_id' => $shift_id_value[1], 'employee_id' => $employee->employee_id]);
-                    $new_shift_info_dimension = ShiftInfoDimension::create(['shift_start' => $shift->shift_start, 'shift_end' => $shift->shift_end, 'attendance_came' => NULL, 'attendance_check_in' => NULL, 'attendance_check_out' => NULL, 'attendance_check_in_company' => NULL, 'attendance_check_out_company' => NULL]);
-                    TimeDimension::create(['time_id' => $new_shift_info_dimension->shift_id, 'day' => Carbon::parse($shift->shift_start)->day, 'month' => Carbon::parse($shift->shift_start)->month, 'quarter' => Carbon::parse($shift->shift_start)->quarter, 'year' => Carbon::parse($shift->shift_start)->year]);
-                    EmployeeDimension::firstOrCreate(['employee_id' => $employee->employee_id],['employee_id' => $employee->employee_id, 'employee_name' => $employee->employee_name, 'employee_surname' => $employee->employee_surname, 'employee_position' => $employee->employee_position, 'employee_overall' => $employee->employee_overall]);
-                    CompanyDimension::firstOrCreate(['company_id' => $user->company_id],['company_id' => $user->company_id, 'company_name' => $user->company_name, 'company_city' => $user->company_city, 'company_street' => $user->company_street, 'company_user_name' => $user->company_user_name, 'company_user_surname' => $user->company_user_surname]);
-                    $shift_start = new DateTime($shift->shift_start);
-                    $shift_end = new DateTime($shift->shift_end);
-                    $hodinyRozdil = $shift_end->diff($shift_start);
-                    $pocetHodin = $hodinyRozdil->h;
-                    $pocetMinut = $hodinyRozdil->i;
-                    $celkove = $pocetHodin + ($pocetMinut/60);
-                    // ShiftFacts::firstOrCreate(['company_id' => $user->company_id, 'time_id' => $new_shift_info_dimension->shift_id, 'employee_id' => $employee->employee_id, 'shift_id' => $new_shift_info_dimension->shift_id],['company_id' => $user->company_id, 'time_id' => $new_shift_info_dimension->shift_id, 'employee_id' => $employee->employee_id, 'shift_id' => $new_shift_info_dimension->shift_id
-                     //                           ,'shift_total_hours' => $celkove, '']);
+                    $shift_info_id = OlapETL::extractDataToShiftInfoDimension($shift);
+                    $time_id = OlapETL::extractDataToTimeDimension($shift_info_id, $shift);
+                    $employee_id = OlapETL::extractDataToEmployeeDimension($employee);
+                    $company_id = OlapETL::extractDataToCompanyDimension($user);
+                    OlapETL::extractDataToShiftFact($shift, $employee, $shift_info_id, $time_id, $employee_id, $company_id);
+                    //return response()->json(['success' => 'Firma je: '.$company_id.', ID času je: '.$time_id.', ID zaměstnance je: '.$employee_id.', ID směny je: '.$shift_info_id]);
                 }
                 $count++;
             }
         }
         if($count > 0){
         }else{
+            OlapETL::deleteAllCancelledPreviouslyAssignedShift($employee->employee_id);
             Employee_Shift::deleteEmployeeAllUpcomingShiftsWithAttendance($id);
         }
         substr_replace($smena_info, ".", -1);

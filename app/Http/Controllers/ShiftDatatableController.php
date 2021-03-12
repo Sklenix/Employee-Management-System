@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\OlapETL;
 use App\Models\Attendance;
 use App\Models\Company;
 use App\Models\Employee_Language;
@@ -558,18 +559,11 @@ class ShiftDatatableController extends Controller
                     </thead>
                 <tbody>';
         $zamestnanci = Employee::getCompanyEmployees($user->company_id);
-
         foreach ($zamestnanci as $zamestnanec){
-            $res = DB::table('table_employee_shifts')
-                    ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
-                    ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
-                    ->select('table_employee_shifts.employee_id')
-                    ->where(['table_employee_shifts.employee_id' => $zamestnanec->employee_id, 'table_shifts.shift_id' => $id])
-                    ->get();
-
+            $aktualniZamestnanec = Employee_Shift::getEmployeeParticularShift($zamestnanec->employee_id, $id);
             $skore = ($zamestnanec->employee_reliability + $zamestnanec->employee_absence + $zamestnanec->employee_workindex) / 3;
             $html .= '<tr><td class="text-center">'.$zamestnanec->employee_id.'</td><td class="text-center"> '.$zamestnanec->employee_name.' '.$zamestnanec->employee_surname.'</td><td class="text-center"> '.$zamestnanec->employee_position.'</td> <td class="text-center"> '.round($skore,2).'</td>';
-            if($res->isEmpty()){
+            if($aktualniZamestnanec->isEmpty()){
                 $html .= '<td><center><input type="checkbox" name="shift_employee_assign_id" class="form-check-input shift_employee_assign_id" id="shift_employee_assign_id" name="shift_employee_assign_id[]" value="'.$zamestnanec->employee_id.'"></center></td> </tr>';
             }else{
                 $html .= '<td><center><input type="checkbox" name="shift_employee_assign_id" class="form-check-input shift_employee_assign_id" id="shift_employee_assign_id" name="shift_employee_assign_id[]" value="'.$zamestnanec->employee_id.'" checked></center></td> </tr>';
@@ -581,19 +575,16 @@ class ShiftDatatableController extends Controller
                       x.classList.toggle("fa-sort-alpha-desc");
                       x.classList.toggle("fa-sort-alpha-asc");
                     }
-
                      function zmenaIkonkyCisla(x) {
                         x.classList.toggle("fa-sort-numeric-asc");
                         x.classList.toggle("fa-sort-numeric-desc");
                      }
-
                     function Search() {
                       var input, filter, table, tr, td, td2, td3, i, txtValue, txtValue2, txtValue3;
                       input = document.getElementById("vyhledavac");
                       filter = input.value.toUpperCase();
                       table = document.getElementById("tableShifts");
                       tr = table.getElementsByTagName("tr");
-
                       for (i = 0; i < tr.length; i++) {
                           td3 = tr[i].getElementsByTagName("td")[0];
                           td = tr[i].getElementsByTagName("td")[1];
@@ -607,12 +598,9 @@ class ShiftDatatableController extends Controller
                               } else {
                                   tr[i].style.display = "none";
                               }
-
                           }
-
                       }
                     }
-
                      function sortTable(n,ikonka) {
                       var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
                       table = document.getElementById("tableShifts");
@@ -652,117 +640,70 @@ class ShiftDatatableController extends Controller
                       }
                     }
                  </script>';
-        $shift = new Shift();
-        $data = $shift->findData($id);
-
         return response()->json(['html'=>$html]);
     }
 
     public function updateassignEmployee(Request $request, $id){
         date_default_timezone_set('Europe/Prague');
-        $shift = new Shift();
-        $data = $shift->findData($id);
-
-        $date_start = new DateTime( $data->shift_start);
-        $data->shift_start = $date_start->format('d.m.Y H:i');
-        $date_end = new DateTime( $data->shift_end);
-        $data->shift_end = $date_end->format('d.m.Y H:i');
-
+        $shift = Shift::findOrFail($id);
         $jmena = '';
         $count = 0;
-
         if($request->employees_ids != "") {
-            $params = explode('&', $request->employees_ids);
-            $delka = count($params);
-
-            $tmp_arr = array();
-
-            foreach ($params as $param) {
-                $name_value = explode('=', $param);
-                $name = $name_value[1];
-                array_push($tmp_arr,$name);
+            $employee_id_arr = explode('&', $request->employees_ids);
+            $delka = count($employee_id_arr);
+            $employee_ids_collector = array();
+            foreach ($employee_id_arr as $employee_id) {
+                $employee_id_value = explode('=', $employee_id);
+                array_push($employee_ids_collector,$employee_id_value[1]);
             }
-
-            DB::table('table_employee_shifts')
-                ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
-                ->whereNotIn('employee_id',$tmp_arr)
-                ->where(['table_employee_shifts.shift_id' => $id])
-                ->delete();
-
-            DB::table('table_attendances')
-                ->select('table_attendances.employee_id','table_attendances.shift_id')
-                ->whereNotIn('table_attendances.shift_id',$tmp_arr)
-                ->where(['table_attendances.employee_id' => $id])
-                ->delete();
-
-            foreach ($params as $param) {
-                $name_value = explode('=', $param);
-                $name = $name_value[1];
-
-                $res = DB::table('table_employee_shifts')
-                    ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
-                    ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
-                    ->select('table_employee_shifts.employee_id')
-                    ->where(['table_employee_shifts.employee_id' => $name, 'table_shifts.shift_id' => $id])
-                    ->get();
-
-                $employeeName = new Employee();
-                $data_employee = $employeeName->findData($name);
+            Employee_Shift::deleteAssignedEmployeesShiftWithAttendance($shift->shift_id, $employee_ids_collector);
+            foreach ($employee_id_arr as $employee_id) {
+                $employee_id_value = explode('=', $employee_id);
+                $aktualniZamestnanec = Employee_Shift::getEmployeeParticularShift($employee_id_value[1], $id);
+                $employee = Employee::findOrFail($employee_id_value[1]);
                 if ($count == $delka - 1) {
-                    $jmena .= $data_employee->employee_name.' '.$data_employee->employee_surname.'.';
+                    $jmena .= $employee->employee_name.' '.$employee->employee_surname.'.';
                 }else{
-                    $jmena .= $data_employee->employee_name.' '.$data_employee->employee_surname.', ';
+                    $jmena .= $employee->employee_name.' '.$employee->employee_surname.', ';
                 }
-
-                if($res->isEmpty()){
-                    $employeeShift = new Employee_Shift();
-                    $employeeShift->shift_id = $data->shift_id;
-                    $employeeShift->employee_id = $name;
-                    $employeeShift->save();
+                if($aktualniZamestnanec->isEmpty()){
+                    $user = Auth::user();
+                    Employee_Shift::create(['shift_id' => $shift->shift_id, 'employee_id' => $employee_id_value[1]]);
+                    $shift_info_id = OlapETL::extractDataToShiftInfoDimension($shift);
+                    $time_id = OlapETL::extractDataToTimeDimension($shift_info_id, $shift);
+                    $employee_id = OlapETL::extractDataToEmployeeDimension($employee);
+                    $company_id = OlapETL::extractDataToCompanyDimension($user);
+                    OlapETL::extractDataToShiftFact($shift, $employee, $shift_info_id, $time_id, $employee_id, $company_id);
+                    //return response()->json(['success' => 'Firma je: '.$company_id.', ID času je: '.$time_id.', ID zaměstnance je: '.$employee_id.', ID směny je: '.$shift_info_id]);
                 }
                 $count++;
             }
         }
-
         if($count > 0){
         }else{
-            DB::table('table_employee_shifts')
-                ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
-                ->where(['table_employee_shifts.shift_id' => $id])
-                ->delete();
-
-            DB::table('table_attendances')
-                ->select('table_attendances.employee_id','table_attendances.shift_id')
-                ->where(['table_attendances.shift_id' => $id])
-                ->delete();
+            Employee_Shift::deleteAllAssignedEmployeesShiftWithAttendance($shift->shift_id);
         }
-
         substr_replace($jmena, ".", -1);
-
         if($jmena == ""){
             return response()->json(['success'=>'Ze směny byly úspešně odebráni všichni zaměstnanci.']);
         }
         if($count == 1){
-            return response()->json(['success'=>'Směna v lokaci: '.$data->shift_place.', v čase od: '.$data->shift_start.' do '.$data->shift_end.' byla úspěšně přiřazena tomuto zaměstnanci: '.$jmena]);
+            return response()->json(['success'=>'Směna v lokaci: '.$shift->shift_place.', v čase od: '.$shift->shift_start.' do '.$shift->shift_end.' byla úspěšně přiřazena tomuto zaměstnanci: '.$jmena]);
         }else{
-            return response()->json(['success'=>'Směna v lokaci: '.$data->shift_place.', v čase od: '.$data->shift_start.' do '.$data->shift_end.' byla úspěšně přiřazena těmto zaměstnancům: '.$jmena]);
+            return response()->json(['success'=>'Směna v lokaci: '.$shift->shift_place.', v čase od: '.$shift->shift_start.' do '.$shift->shift_end.' byla úspěšně přiřazena těmto zaměstnancům: '.$jmena]);
         }
     }
 
     public function destroy($id){
         $shift = new Shift();
         $vysledek = Shift::find($id);
-
         $shift->deleteData($id);
-
         DB::table('table_employee_shifts')
             ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
             ->where(['table_employee_shifts.shift_id' => $id])
             ->delete();
-
         return response()->json(['success'=>'Směna byla úspěšně smazána.']);
     }
-
 
     public function getAttendanceOptions($id){
         $user = Auth::user();

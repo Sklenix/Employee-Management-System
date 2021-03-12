@@ -87,12 +87,12 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->get();
     }
 
-    public static function deleteEmployeeAssignedShiftsWithAttendance($employee_id,$tmp_arr){
+    public static function deleteEmployeeAssignedShiftsWithAttendance($employee_id,$shift_ids_collector){
         date_default_timezone_set('Europe/Prague');
          DB::table('table_employee_shifts')
             ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
             ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
-            ->whereNotIn('table_employee_shifts.shift_id',$tmp_arr)
+            ->whereNotIn('table_employee_shifts.shift_id',$shift_ids_collector)
             ->where(['table_employee_shifts.employee_id' => $employee_id])
             ->where('table_shifts.shift_start', '>=',  Carbon::now())
             ->delete();
@@ -101,7 +101,7 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->select('table_attendances.employee_id','table_attendances.shift_id')
             ->join('table_shifts','table_attendances.shift_id','=','table_shifts.shift_id')
             ->where('table_shifts.shift_start', '>=',  Carbon::now())
-            ->whereNotIn('table_attendances.shift_id',$tmp_arr)
+            ->whereNotIn('table_attendances.shift_id',$shift_ids_collector)
             ->where(['table_attendances.employee_id' => $employee_id])
             ->delete();
     }
@@ -122,5 +122,35 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->where('table_shifts.shift_start', '>=',  Carbon::now())
             ->delete();
     }
+
+    public static function deleteAssignedEmployeesShiftWithAttendance($shift_id,$employee_ids_collector){
+        date_default_timezone_set('Europe/Prague');
+        DB::table('table_employee_shifts')
+            ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
+            ->whereNotIn('employee_id',$employee_ids_collector)
+            ->where(['table_employee_shifts.shift_id' => $shift_id])
+            ->delete();
+
+        DB::table('table_attendances')
+            ->select('table_attendances.employee_id','table_attendances.shift_id')
+            ->whereNotIn('table_attendances.shift_id',$employee_ids_collector)
+            ->where(['table_attendances.employee_id' => $shift_id])
+            ->delete();
+    }
+
+    public static function deleteAllAssignedEmployeesShiftWithAttendance($shift_id){
+        date_default_timezone_set('Europe/Prague');
+        DB::table('table_employee_shifts')
+            ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
+            ->where(['table_employee_shifts.shift_id' => $shift_id])
+            ->delete();
+        DB::table('table_attendances')
+            ->select('table_attendances.employee_id','table_attendances.shift_id')
+            ->where(['table_attendances.shift_id' => $shift_id])
+            ->delete();
+    }
+
+
+
 
 }

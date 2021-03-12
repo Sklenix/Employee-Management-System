@@ -18,7 +18,7 @@ class CreateEmployeeDimension extends Migration
             $table->id('employee_id');
             $table->string('employee_name');
             $table->string('employee_surname');
-            $table->string('employee_position');
+            $table->string('employee_position')->nullable();
             $table->string('employee_overall')->nullable();
         });
     }

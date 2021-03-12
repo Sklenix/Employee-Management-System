@@ -28,6 +28,10 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|ShiftInfoDimension whereShiftId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|ShiftInfoDimension whereShiftStart($value)
  * @mixin \Eloquent
+ * @property int $shift_info_id
+ * @property int|null $absence_reason_value
+ * @method static \Illuminate\Database\Eloquent\Builder|ShiftInfoDimension whereAbsenceReasonValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ShiftInfoDimension whereShiftInfoId($value)
  */
 class ShiftInfoDimension extends Model
 {
@@ -36,7 +40,7 @@ class ShiftInfoDimension extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'shift_id','shift_start','shift_end','attendance_came','attendance_check_in','attendance_check_out',
+        'shift_info_id','shift_start','shift_end','attendance_came','attendance_check_in','attendance_check_out',
         'attendance_check_in_company','attendance_check_out_company'
     ];
 }
