@@ -40,7 +40,7 @@ class ShiftInfoDimension extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'shift_info_id','shift_start','shift_end','attendance_came','attendance_check_in','attendance_check_out',
-        'attendance_check_in_company','attendance_check_out_company'
+        'shift_info_id', 'shift_start', 'shift_end','attendance_came', 'attendance_check_in','attendance_check_out',
+        'attendance_check_in_company', 'attendance_check_out_company', 'absence_reason'
     ];
 }

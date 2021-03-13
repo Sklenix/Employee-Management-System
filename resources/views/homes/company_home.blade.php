@@ -25,7 +25,7 @@
                 </div>
                 <div class="col-lg-2 col-md-2 text-center ramecek">
                     <a data-toggle="modal" data-target="#formAddEmployee" style="cursor: pointer;color:black;text-decoration: none;">
-                        <div style="padding-top: 50px;padding-bottom:50px;">
+                        <div style="padding-top: 50px;padding-bottom:75px;">
                         <img src="{{asset("images/employee_add.png")}}" alt="Ikonka přidat zaměstnance" height="128" width="128" title="Přidat zaměstnance" style="margin-bottom:15px;"/>
                         <h4>Přidat zaměstnance</h4>
                     </div>
@@ -34,7 +34,7 @@
 
                 <div class="col-lg-2 col-md-2 text-center ramecek">
                     <a data-toggle="modal" data-target="#formDeleteEmployee" id="getDeleteEmployeeData" style="cursor: pointer;color:black;text-decoration: none;">
-                        <div style="padding-top: 50px;padding-bottom:50px;">
+                        <div style="padding-top: 50px;padding-bottom:75px;">
                             <img src="{{asset("images/employee_delete.png")}}" alt="Ikonka smazat zaměstnance" height="128" width="128" title="Smazat zaměstnance" style="margin-bottom:15px;"/>
                             <h4>Smazat zaměstnance</h4>
                         </div>
@@ -43,7 +43,7 @@
 
                 <div class="col-lg-2 col-md-2 text-center ramecek">
                     <a href="{{route('employees.index')}}" style="cursor: pointer;color:black;text-decoration: none;">
-                        <div style="padding-top: 50px;padding-bottom:50px;">
+                        <div style="padding-top: 50px;padding-bottom:75px;">
                         <img src="{{asset("images/employee_list.png")}}" alt="Seznam zaměstnanců ikonka" height="128" width="128" title="Seznam Zaměstnanců" style="margin-bottom:15px;"/>
                         <h4>Seznam zaměstnanců</h4>
                         </div>

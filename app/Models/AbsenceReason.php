@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\AbsenceReason
@@ -34,4 +35,11 @@ class AbsenceReason extends Model
     protected $fillable = [
         'reason_description','reason_value'
     ];
+
+    public static function getAllReasons(){
+        return DB::table('table_absence_reasons')
+            ->select('table_absence_reasons.reason_description','table_absence_reasons.reason_value')
+            ->get();
+    }
+
 }

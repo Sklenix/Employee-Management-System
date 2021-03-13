@@ -656,6 +656,7 @@ class ShiftDatatableController extends Controller
                 $employee_id_value = explode('=', $employee_id);
                 array_push($employee_ids_collector,$employee_id_value[1]);
             }
+            OlapETL::deleteCancelledPreviouslyAssignedEmployee($shift->shift_start, $shift->shift_end, $employee_ids_collector);
             Employee_Shift::deleteAssignedEmployeesShiftWithAttendance($shift->shift_id, $employee_ids_collector);
             foreach ($employee_id_arr as $employee_id) {
                 $employee_id_value = explode('=', $employee_id);
@@ -681,6 +682,7 @@ class ShiftDatatableController extends Controller
         }
         if($count > 0){
         }else{
+            OlapETL::deleteAllCancelledPreviouslyAssignedEmployee($shift->shift_start, $shift->shift_end);
             Employee_Shift::deleteAllAssignedEmployeesShiftWithAttendance($shift->shift_id);
         }
         substr_replace($jmena, ".", -1);

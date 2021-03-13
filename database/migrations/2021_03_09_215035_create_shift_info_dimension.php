@@ -19,7 +19,7 @@ class CreateShiftInfoDimension extends Migration
             $table->dateTime('shift_start')->nullable();
             $table->dateTime('shift_end')->nullable();
             $table->integer('attendance_came')->nullable();
-            $table->integer('absence_reason_value')->nullable();
+            $table->integer('absence_reason')->nullable();
             $table->dateTime('attendance_check_in')->nullable();
             $table->dateTime('attendance_check_out')->nullable();
             $table->dateTime('attendance_check_in_company')->nullable();

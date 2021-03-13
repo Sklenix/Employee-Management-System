@@ -21,13 +21,16 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InjuriesDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InjuriesDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/OlapETL.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/OlapETL.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/Employee_Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee_Shift.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Models/ShiftFacts.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ShiftFacts.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/AbsenceReason.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/AbsenceReason.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/ShiftInfoDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ShiftInfoDimension.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2021_03_08_215324_create_employee_dimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_03_08_215324_create_employee_dimension.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2021_03_09_215301_create_shift_facts.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_03_09_215301_create_shift_facts.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_03_09_215035_create_shift_info_dimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_03_09_215035_create_shift_info_dimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -377,7 +380,8 @@
       <workItem from="1615473133205" duration="2825000" />
       <workItem from="1615476365578" duration="2599000" />
       <workItem from="1615485656391" duration="9261000" />
-      <workItem from="1615541492482" duration="20524000" />
+      <workItem from="1615541492482" duration="20595000" />
+      <workItem from="1615628158008" duration="25374000" />
     </task>
     <servers />
   </component>
