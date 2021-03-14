@@ -37,6 +37,7 @@ class ShiftInfoDimension extends Model
 {
     use HasFactory;
     protected $table = 'shift_info_dimension';
+    protected $primaryKey = 'shift_info_id';
     public $timestamps = false;
 
     protected $fillable = [

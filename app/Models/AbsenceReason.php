@@ -42,4 +42,12 @@ class AbsenceReason extends Model
             ->get();
     }
 
+    public static function getEmployeeCurrentShiftAbsenceReason($zamestnanec_id, $shift_id){
+       return DB::table('table_attendances')
+            ->join('table_absence_reasons', 'table_attendances.absence_reason_id', '=', 'table_absence_reasons.reason_id')
+            ->select('table_absence_reasons.reason_description')
+            ->where(['table_attendances.shift_id' => $shift_id,'table_attendances.employee_id' => $zamestnanec_id])
+            ->get();
+    }
+
 }

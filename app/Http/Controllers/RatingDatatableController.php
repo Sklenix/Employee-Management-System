@@ -125,7 +125,6 @@ class RatingDatatableController extends Controller
         return response()->json(['html'=>$html]);
     }
 
-
     public function updateRate(Request $request, $id){
         $employee = new Employee;
         $vysledek = Employee::find($id);
@@ -134,9 +133,7 @@ class RatingDatatableController extends Controller
         $skore = ($request->employee_reliability + $request->employee_absence + $request->employee_workindex) / 3;
         Employee::where('employee_id', $id)->update(array('employee_overall' => round($skore,2)));
         $employee->updateData($id, $request->all());
-
+        OlapETL::updateEmployeeScoreOverall($vysledek->employee_id, round($skore,2));
         return response()->json(['success'=>'Hodnocení zaměstnance '.$jmeno.' '.$prijmeni.' bylo úspěšně dokončeno.']);
     }
-
-
 }

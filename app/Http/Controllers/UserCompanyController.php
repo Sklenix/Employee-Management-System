@@ -283,6 +283,7 @@ class UserCompanyController extends Controller
         $user->company_phone = $request->company_phone;
         $user->company_login = $request->company_login;
         $user->save();
+        OlapETL::updateCompanyDimension($user->company_id, $request->company_name, $request->company_city, $request->company_street, $request->company_firstname, $request->company_surname);
         session()->flash('message', 'Vaše údaje byly úspěšně změněny!');
         return redirect()->route('showCompanyProfileData');
     }
@@ -366,7 +367,6 @@ class UserCompanyController extends Controller
         DB::table('table_companies')
             ->where(['table_companies.company_id' => $user->company_id])
             ->delete();
-
         if($user->company_url != NULL){
             $keyFileLocation =storage_path('app/credentials.json');
             /*ID složky, do které chceme soubory nahrávat*/
@@ -392,7 +392,7 @@ class UserCompanyController extends Controller
             }catch (Exception $e){
             }
         }
-
+        OlapETL::deleteRecordFromCompanyDimension($user->company_id);
         session()->flash('success', 'Váš účet byl úspěšně smazán!');
         return redirect()->route('company');
     }
@@ -1115,6 +1115,7 @@ class UserCompanyController extends Controller
                 DB::table('table_employee_shifts')
                     ->where(['table_employee_shifts.employee_id' => $zamestnanec])
                     ->delete();
+                OlapETL::deleteRecordFromEmployeeDimension($zamestnanec);
             }
             if(count($request->zamestnanciDeleteDashboard) == 1){
                 session()->flash('success', 'Zaměstnanec byl úspešně smazán!');

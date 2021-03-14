@@ -17,7 +17,7 @@ class OlapETL extends Controller
 {
     public static function extractDataToShiftInfoDimension($shift){
         $new_shift_info_dimension = ShiftInfoDimension::create(['shift_start' => $shift->shift_start, 'shift_end' => $shift->shift_end, 'attendance_came' => NULL, 'attendance_check_in' => NULL, 'attendance_check_out' => NULL, 'attendance_check_in_company' => NULL, 'attendance_check_out_company' => NULL]);
-        return $new_shift_info_dimension->id;
+        return $new_shift_info_dimension->shift_info_id;
     }
 
     public static function extractDataToTimeDimension($shift_info_id, $shift){
@@ -101,7 +101,29 @@ class OlapETL extends Controller
                 }
             }
         }
-        ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['employee_late_flag' => $late_flag, 'absence_total_hours' => $pocetHodinAbsence]);
+        ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['employee_late_flag' => $late_flag, 'late_total_hours' => $pocetHodinAbsence]);
+    }
+
+    public static function aggregateEmployeeTotalWorkedHours($shift_info_id, $employee_id, $company_id, $companyCheckIn, $companyCheckOut, $checkIn, $checkOut){
+        if($companyCheckIn == NULL || $companyCheckOut == NULL){
+            if($checkIn == NULL || $checkOut == NULL){
+                return NULL;
+            }else{
+                $checkinDate = new DateTime($checkIn);
+                $checkoutDate = new DateTime($checkOut);
+                $pocetHodin = $checkoutDate->diff($checkinDate);
+                $total_worked_hours = 0;
+                $total_worked_hours = $total_worked_hours + $pocetHodin->h + ($pocetHodin->i/60);
+                ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['total_worked_hours' => $total_worked_hours]);
+            }
+        }else{
+            $checkinDate = new DateTime($companyCheckIn);
+            $checkoutDate = new DateTime($companyCheckOut);
+            $pocetHodin = $checkoutDate->diff($checkinDate);
+            $total_worked_hours = 0;
+            $total_worked_hours = $total_worked_hours + $pocetHodin->h + ($pocetHodin->i/60);
+            ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['total_worked_hours' => $total_worked_hours]);
+        }
     }
 
     public static function aggregateEmployeeInjuryFlag($shift_info_id, $employee_id, $company_id, $opt){
@@ -112,20 +134,61 @@ class OlapETL extends Controller
         }
     }
 
-    public static function updateShiftInfoDimension($shift_info_id){
-
+    public static function deleteRecordFromEmployeeDimension($employee_id){
+        $smeny = DB::table('shift_facts')
+            ->select('shift_info_dimension.shift_info_id','shift_info_dimension.shift_start','shift_info_dimension.shift_end')
+            ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
+            ->where(['shift_facts.employee_id' => $employee_id])
+            ->get();
+        foreach ($smeny as $smena){
+            DB::table('shift_info_dimension')
+                ->where(['shift_info_dimension.shift_info_id' => $smena->shift_info_id])
+                ->delete();
+            DB::table('time_dimension')
+                ->where(['time_dimension.time_id' => $smena->shift_info_id])
+                ->delete();
+        }
+        EmployeeDimension::findOrFail($employee_id)->delete();
     }
 
-    public static function updateEmployeeDimension($employee_id){
-
+    public static function deleteRecordFromCompanyDimension($company_id){
+        $zamestnanci = DB::table('shift_facts')
+            ->select('employee_dimension.employee_id','employee_dimension.employee_name','employee_dimension.employee_surname')
+            ->join('employee_dimension','shift_facts.employee_id','=','employee_dimension.employee_id')
+            ->where(['shift_facts.company_id' => $company_id])
+            ->get();
+        foreach ($zamestnanci as $zamestnanec){
+            $smeny = DB::table('shift_facts')
+                ->select('shift_info_dimension.shift_info_id','shift_info_dimension.shift_start','shift_info_dimension.shift_end')
+                ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
+                ->where(['shift_facts.employee_id' => $zamestnanec->employee_id])
+                ->get();
+            foreach ($smeny as $smena){
+                DB::table('shift_info_dimension')
+                    ->where(['shift_info_dimension.shift_info_id' => $smena->shift_info_id])
+                    ->delete();
+                DB::table('time_dimension')
+                    ->where(['time_dimension.time_id' => $smena->shift_info_id])
+                    ->delete();
+            }
+            DB::table('employee_dimension')
+                ->where(['employee_dimension.employee_id' => $zamestnanec->employee_id])
+                ->delete();
+        }
+        CompanyDimension::findOrFail($company_id)->delete();
     }
 
-    public static function updateCompanyDimension($company_id){
-
+    public static function updateEmployeeDimension($employee_id, $employee_name, $employee_surname, $employee_position){
+        EmployeeDimension::where(['employee_id' => $employee_id])->update(['employee_name' => $employee_name, 'employee_surname' => $employee_surname, 'employee_position' => $employee_position]);
     }
 
-    public static function updateTimeDimension($time_id){
+    public static function updateEmployeeScoreOverall($employee_id, $employee_overall){
+        EmployeeDimension::where(['employee_id' => $employee_id])->update(['employee_overall' => $employee_overall]);
+        ShiftFacts::where(['employee_id' => $employee_id])->update(['employee_overall' => $employee_overall]);
+    }
 
+    public static function updateCompanyDimension($company_id, $company_name, $company_city, $company_street, $company_user_name, $company_user_surname){
+        CompanyDimension::where(['company_id' => $company_id])->update(['company_name' => $company_name, 'company_city' => $company_city, 'company_street' => $company_street, 'company_user_name' => $company_user_name, 'company_user_surname' => $company_user_surname]);
     }
 
     public static function aggregateShiftTotalHoursField($shift){
@@ -138,7 +201,7 @@ class OlapETL extends Controller
     public static function extractDataToShiftFact($shift, $employee, $shift_info_id, $time_id, $employee_id, $company_id){
         $total_hours = self::aggregateShiftTotalHoursField($shift);
         ShiftFacts::firstOrCreate(['company_id' => $company_id, 'time_id' => $time_id, 'employee_id' => $employee_id, 'shift_info_id' => $shift_info_id],['company_id' => $company_id, 'time_id' => $time_id, 'employee_id' => $employee_id, 'shift_info_id' => $shift_info_id
-            ,'shift_total_hours' => $total_hours, 'absence_total_hours' => NULL, 'employee_injury_flag' => NULL, 'employee_overall' => $employee->employee_overall, 'employee_late_flag' => NULL, 'absence_reason' => NULL]);
+            ,'shift_total_hours' => $total_hours, 'late_total_hours' => NULL, 'employee_injury_flag' => NULL, 'employee_overall' => $employee->employee_overall, 'employee_late_flag' => NULL, 'absence_reason' => NULL]);
     }
 
     public static function deleteCancelledPreviouslyAssignedShift($employee_id, $shift_starts_arr, $shift_ends_arr){

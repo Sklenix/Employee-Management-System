@@ -21,16 +21,25 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeCurrentShiftsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AdminCompaniesDatatable.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AdminCompaniesDatatable.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/InjuriesDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/InjuriesDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/FileGeneratorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/FileGeneratorController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/OlapETL.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/OlapETL.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/RatingDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/RatingDatatableController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserEmployeeController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserEmployeeController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/AbsenceReason.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/AbsenceReason.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/CompanyDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/CompanyDimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/EmployeeDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EmployeeDimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Employee_Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee_Shift.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/ShiftFacts.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ShiftFacts.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/ShiftInfoDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ShiftInfoDimension.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/migrations/2021_03_09_215035_create_shift_info_dimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_03_09_215035_create_shift_info_dimension.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/TimeDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/TimeDimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_14_000000_create_companies_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_14_000000_create_companies_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2021_03_09_215301_create_shift_facts.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2021_03_09_215301_create_shift_facts.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -209,6 +218,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -381,7 +391,8 @@
       <workItem from="1615476365578" duration="2599000" />
       <workItem from="1615485656391" duration="9261000" />
       <workItem from="1615541492482" duration="20595000" />
-      <workItem from="1615628158008" duration="25374000" />
+      <workItem from="1615628158008" duration="25783000" />
+      <workItem from="1615714939043" duration="17123000" />
     </task>
     <servers />
   </component>

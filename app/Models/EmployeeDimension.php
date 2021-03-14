@@ -27,6 +27,7 @@ class EmployeeDimension extends Model
 {
     use HasFactory;
     protected $table = 'employee_dimension';
+    protected $primaryKey = 'employee_id';
     public $timestamps = false;
 
     protected $fillable = [

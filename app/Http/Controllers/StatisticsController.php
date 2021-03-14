@@ -26,7 +26,6 @@ class StatisticsController extends Controller
         $pocetHistorie = Shift::getHistoricalCompanyShiftsCount($user->company_id);
         $datumVytvoreni = new DateTime($user->created_at);
         $datumZobrazeniVytvoreni = $datumVytvoreni->format('d.m.Y');
-
         return view('company_actions.statistics')
             ->with('profilovka',$user->company_picture)
             ->with('jazyky',$userJazyky)

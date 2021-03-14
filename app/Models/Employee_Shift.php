@@ -150,6 +150,34 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->delete();
     }
 
+    public static function getAttendanceOptionsShifts($shift_id, $company_id){
+       return DB::table('table_employee_shifts')
+            ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
+            ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
+            ->select('table_employee_shifts.employee_id','table_employees.employee_name','table_employees.employee_surname','table_shifts.shift_start')
+            ->where(['table_shifts.shift_id' => $shift_id,'table_shifts.company_id' => $company_id])
+            ->orderBy('table_employees.employee_surname', 'asc')
+            ->get();
+    }
+
+    public static function getAttendanceOptionsEmployees($employee_id, $company_id){
+        return DB::table('table_employee_shifts')
+            ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
+            ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
+            ->select('table_shifts.shift_start','table_shifts.shift_end','table_shifts.shift_id')
+            ->where(['table_employees.employee_id' => $employee_id,'table_employees.employee_company' => $company_id])
+            ->whereMonth('table_shifts.shift_start', Carbon::now()->month)
+            ->orderBy('table_shifts.shift_start', 'desc')
+            ->get();
+    }
+
+    public static function deleteShiftFromShiftDatatable($shift_id){
+        return DB::table('table_employee_shifts')
+            ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
+            ->where(['table_employee_shifts.shift_id' => $shift_id])
+            ->delete();
+    }
+
 
 
 

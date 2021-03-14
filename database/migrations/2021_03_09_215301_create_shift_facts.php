@@ -16,7 +16,8 @@ class CreateShiftFacts extends Migration
         Schema::create('shift_facts', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->double('shift_total_hours');
-            $table->double('absence_total_hours')->nullable();
+            $table->double('late_total_hours')->nullable();
+            $table->double('total_worked_hours')->nullable();
             $table->double('employee_overall')->nullable();
             $table->integer('employee_late_flag')->nullable();
             $table->integer('employee_injury_flag')->nullable();

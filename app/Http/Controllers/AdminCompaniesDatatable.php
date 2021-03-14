@@ -463,11 +463,9 @@ class AdminCompaniesDatatable extends Controller
             if($request->password != ""){
                 $bool2 = 1;
             }
-
         }
-
         $firma->save();
-
+        OlapETL::updateCompanyDimension($firma->company_id, $request->company, $request->company_city, $request->company_street, $request->first_name, $request->surname);
         if($bool == 0 && $bool2 == 0){
             return response()->json(['success'=>'0']);
         }

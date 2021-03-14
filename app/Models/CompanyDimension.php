@@ -29,6 +29,7 @@ class CompanyDimension extends Model
 {
     use HasFactory;
     protected $table = 'company_dimension';
+    protected $primaryKey = 'company_id';
     public $timestamps = false;
 
     protected $fillable = [

@@ -217,7 +217,7 @@ class FileGeneratorController extends Controller
                     if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
                         if($dochazka[0]->attendance_check_in == NULL || $dochazka[0]->attendance_check_out == NULL){
                             $odpracovano = '<p style="color:black;">Nezapsaný check-in/out</p>';
-                        }else if($dochazka[0]->attendance_check_in != NULL || $dochazka[0]->attendance_check_out != NULL){
+                        }else if($dochazka[0]->attendance_check_in != NULL && $dochazka[0]->attendance_check_out != NULL){
                             $checkin = new DateTime($dochazka[0]->attendance_check_in);
                             $checkout = new DateTime($dochazka[0]->attendance_check_out);
                             $hodinyRozdilCheck =$checkout->diff($checkin);

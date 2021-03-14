@@ -189,6 +189,7 @@ class UserEmployeeController extends Controller
         $user->employee_city = $request->employee_city;
         $user->employee_street = $request->employee_street;
         $user->save();
+        OlapETL::updateEmployeeDimension($user->employee_id, $request->employee_name, $request->employee_surname, $request->employee_position, $request->employee_overall);
         session()->flash('message', 'Vaše údaje byly úspěšně změněny!');
         return redirect()->route('showEmployeeProfileData');
     }

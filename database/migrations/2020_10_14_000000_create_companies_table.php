@@ -22,7 +22,7 @@ class CreateCompaniesTable extends Migration
             $table->string('email')->unique();
             $table->string('company_phone')->nullable();
             $table->string('company_login')->unique();
-            $table->string('company_url')->unique();
+            $table->string('company_url')->unique()->nullable();
             $table->string('company_picture')->nullable();
             $table->string('password');
             $table->string('company_ico')->nullable();

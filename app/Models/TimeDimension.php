@@ -27,6 +27,7 @@ class TimeDimension extends Model
 {
     use HasFactory;
     protected $table = 'time_dimension';
+    protected $primaryKey = 'time_id';
     public $timestamps = false;
 
     protected $fillable = [

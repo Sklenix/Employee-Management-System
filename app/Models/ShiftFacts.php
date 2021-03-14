@@ -58,7 +58,7 @@ class ShiftFacts extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'shift_total_hours','employee_late_flag','employee_injury_flag','absence_reason','absence_total_hours','employee_overall','company_id','time_id',
-        'employee_id','shift_info_id'
+        'shift_total_hours', 'total_worked_hours', 'employee_late_flag', 'employee_injury_flag', 'absence_reason', 'late_total_hours',
+        'employee_overall', 'company_id', 'time_id', 'employee_id', 'shift_info_id'
     ];
 }

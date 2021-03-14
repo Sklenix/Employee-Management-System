@@ -131,7 +131,7 @@ class Attendance extends Model
             ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
             ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
             ->select('table_attendances.attendance_check_in_company','table_attendances.attendance_check_out_company',
-                'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out', 'table_attendances.absence_reason_id')
+                'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out', 'table_attendances.absence_reason_id', 'table_attendances.attendance_note')
             ->where(['table_attendances.shift_id' => $shift_id,'table_attendances.employee_id' => $employee_id])
             ->get();
     }
