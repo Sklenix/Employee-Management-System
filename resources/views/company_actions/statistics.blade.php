@@ -28,7 +28,7 @@
                 </div>
                 <div class="col-lg-10">
                     <ul class="list-group">
-                        <li class="list-group-item text-right"><span class="pull-left"><strong>Zaměstnanců</strong></span> {{$pocetZamestnancu}}</li>
+                        <li class="list-group-item text-right"><span class="pull-left"><strong>Zaměstnanců</strong></span> </li>
                         <li class="list-group-item text-right"><span class="pull-left"><strong>Směn celkově</strong></span> {{$pocetSmen}}</li>
                         <li class="list-group-item text-right"><span class="pull-left"><strong>Nadcházejících směn</strong></span> {{$pocetNadchazejicich}}</li>
                         <li class="list-group-item text-right"><span class="pull-left"><strong>Proběhnutých směn</strong></span> {{$pocetHistorie}}</li>
@@ -36,6 +36,73 @@
                     </ul>
                 </div>
             </div>
+            <center>
+                <div class="col-lg-12" style="max-width: 800px;max-height: 500px;">
+                    <canvas id="barChart"></canvas>
+                </div>
+                <div class="col-lg-12" style="max-width: 800px;max-height: 500px;">
+                    <canvas id="smeny"></canvas>
+                </div>
+            </center>
+                <script>
+                    $(function(){
+                        var datas = <?php echo json_encode($datas); ?>;
+                        var barCanvas = $("#barChart");
+                        var barChart = new Chart(barCanvas,{
+                            type:'bar',
+                            data:{
+                                labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                                datasets:[
+                                    {
+                                        label: 'Počet nových zaměstnanců dle měsíců',
+                                        data: datas,
+                                        backgroundColor: ['red', 'orange', 'green', 'blue', 'indigo', 'violet', 'purple', 'pink', 'silver', 'gold', 'brown']
+                                    }
+                                ]
+                            },
+                            options:{
+                                scales:{
+                                    yAxes:[{
+                                        ticks:{
+                                            beginAtZero:true
+                                        }
+                                    }]
+                                }
+                            }
+                        })
+                    })
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                    $(function(){
+                        var data_smeny = <?php echo json_encode($data_shifts); ?>;
+                        var barCanvas = $("#smeny");
+                        barCanvas.width  = 100;
+                        barCanvas.height = 100;
+                        var barChart = new Chart(barCanvas,{
+                            type:'bar',
+                            data:{
+                                labels:['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+                                datasets:[
+                                    {
+                                        label: 'Počet nových směn dle měsíců',
+                                        data: data_smeny,
+                                        backgroundColor: ['red', 'orange', 'green', 'blue', 'indigo', 'violet', 'purple', 'pink', 'silver', 'gold', 'brown']
+                                    }
+                                ]
+                            },
+                            options:{
+                                scales:{
+                                    yAxes:[{
+                                        ticks:{
+                                            beginAtZero:true
+                                        }
+                                    }]
+                                }
+                            }
+                        })
+                    })
+
+                </script>
+
         </div>
     </section>
 @endsection
