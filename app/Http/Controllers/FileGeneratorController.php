@@ -452,21 +452,35 @@ class FileGeneratorController extends Controller
                     ';
         foreach ($zamestnanci as $zamestnanec){
             $pocetAbsenci = Attendance::getEmployeeAbsenceCount($zamestnanec->employee_id);
-             $html .= '<tr>
-                                <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">' . $zamestnanec->employee_name . '</td>
-                                <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">' . $zamestnanec->employee_surname . '</td>
-                                <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">' . $zamestnanec->employee_reliability . '</td>
-                                <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">' . $zamestnanec->employee_absence . '</td>
-                                <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">' . $zamestnanec->employee_workindex . '</td>
-                                <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 20px;">' . $pocetAbsenci . '</td>
-                                <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 20px;"><p>' . $zamestnanec->employee_overall . '</p></td>
-                             </tr>';
+            $html .='<tr>
+                      <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">' . $zamestnanec->employee_name . '</td>
+                      <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">' . $zamestnanec->employee_surname . '</td>';
+             if($zamestnanec->employee_reliability == NULL){
+                 $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">Nezapsáno</td>';
+             }else{
+                 $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">'.$zamestnanec->employee_reliability.'</td>';
+             }
+            if($zamestnanec->employee_absence == NULL){
+                $html .= ' <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">Nezapsáno</td>';
+            }else{
+                $html .= ' <td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">'.$zamestnanec->employee_absence.'</td>';
+            }
+            if($zamestnanec->employee_workindex == NULL){
+                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">Nezapsáno</td>';
+            }else{
+                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 25px;">'.$zamestnanec->employee_workindex.'</td>';
+            }
+            $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 20px;">' . $pocetAbsenci . '</td>';
+            if($zamestnanec->employee_overall == NULL){
+                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 20px;"><p>Nezapsáno</p></td>';
+            }else{
+                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 8px;padding-right: 20px;"><p>'.$zamestnanec->employee_overall.'</p></td>';
+            }
+            $html .= '</tr>';
         }
-
         $html .= '</tbody></table>';
         $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
         return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download('hodnoceni_zamestnanci.pdf', 'UTF-8');
-
     }
 
 }

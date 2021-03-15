@@ -29,36 +29,41 @@ class StatisticsController extends Controller
 
         $zamestnanci = DB::table('table_employees')
             ->select(DB::raw("COUNT(*) as count"))
+            ->where('employee_company', $user->company_id)
             ->whereYear('created_at', Carbon::now()->year)
             ->groupBy(DB::raw("Month(created_at)"))
             ->pluck('count');
 
         $mesice = DB::table('table_employees')
             ->select(DB::raw("Month(created_at) as month"))
+            ->where('employee_company', $user->company_id)
             ->whereYear('created_at', Carbon::now()->year)
             ->groupBy(DB::raw("Month(created_at)"))
             ->pluck('month');
 
         $smeny = DB::table('table_shifts')
             ->select(DB::raw("COUNT(*) as count_shift"))
-            ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(created_at)"))
+            ->where('company_id', $user->company_id)
+            ->whereYear('shift_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(shift_start)"))
             ->pluck('count_shift');
 
         $mesice_smeny = DB::table('table_shifts')
-            ->select(DB::raw("Month(created_at) as month_shift"))
-            ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(created_at)"))
+            ->select(DB::raw("Month(shift_start) as month_shift"))
+            ->where('company_id', $user->company_id)
+            ->whereYear('shift_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(shift_start)"))
             ->pluck('month_shift');
 
-        $datas = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        $datas_shift = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
+
         foreach ($mesice as $index => $month){
-            $datas[$month - 1] = $zamestnanci[$index];
+            $data_employees[$month - 1] = $zamestnanci[$index];
         }
 
         foreach ($mesice_smeny as $index => $month_shift){
-            $datas_shift[$month_shift - 1] = $smeny[$index];
+            $data_shifts[$month_shift - 1] = $smeny[$index];
         }
 
         return view('company_actions.statistics')
@@ -70,8 +75,55 @@ class StatisticsController extends Controller
             ->with('pocetNadchazejicich',$pocetNadchazejicich)
             ->with('pocetHistorie',$pocetHistorie)
             ->with('vytvorenUcet',$datumZobrazeniVytvoreni)
-            ->with('datas',$datas)
-            ->with('data_shifts',$datas_shift);
+            ->with('data_employees',$data_employees)
+            ->with('data_shifts',$data_shifts);
 
     }
+
+    public function changeEmployeeGraphYear($rok){
+        $user = Auth::user();
+        $zamestnanci = DB::table('table_employees')
+            ->select(DB::raw("COUNT(*) as count"))
+            ->where('employee_company', $user->company_id)
+            ->whereYear('created_at', $rok)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('count');
+
+        $mesice = DB::table('table_employees')
+            ->select(DB::raw("Month(created_at) as month"))
+            ->where('employee_company', $user->company_id)
+            ->whereYear('created_at', $rok)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('month');
+
+        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice as $index => $month){
+            $data_employees[$month - 1] = $zamestnanci[$index];
+        }
+        return response()->json(['data_employees'=> $data_employees]);
+    }
+
+    public function changeShiftGraphYear($rok){
+        $user = Auth::user();
+        $smeny = DB::table('table_shifts')
+            ->select(DB::raw("COUNT(*) as count_shift"))
+            ->where('company_id', $user->company_id)
+            ->whereYear('created_at', $rok)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('count_shift');
+
+        $mesice_smeny = DB::table('table_shifts')
+            ->select(DB::raw("Month(created_at) as month_shift"))
+            ->where('company_id', $user->company_id)
+            ->whereYear('created_at', $rok)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('month_shift');
+
+        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_smeny as $index => $month_shift){
+            $data_shifts[$month_shift - 1] = $smeny[$index];
+        }
+        return response()->json(['data_shifts'=> $data_shifts]);
+    }
+
 }

@@ -177,6 +177,12 @@ Route::group(['middleware' => 'auth:company'], function () {
     /* Smazani uctu firmy */
     Route::post('/company/profile/delete', [App\Http\Controllers\UserCompanyController::class, 'deleteCompanyProfile'])->name('deleteCompanyProfile');
 
+    /* Statistiky */
+    /* Zmena roku u grafu novych zamestnancu dle mesicu */
+    Route::get('/company/statistics/employee/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeEmployeeGraphYear'])->name('changeEmployeeGraphYear');
+    /* Zmena roku u grafu zapsanych smen dle mesicu*/
+    Route::get('/company/statistics/shift/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftGraphYear'])->name('changeShiftGraphYear');
+
     Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
     Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');
     Route::post('/company/profile/deleteFile', [App\Http\Controllers\UserCompanyController::class, 'deleteFileGoogleDrive'])->name('deleteFile');
