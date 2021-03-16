@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Notifications\VerifyEmailNotification;
+use DateTime;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -90,6 +91,109 @@ class Company extends Authenticatable implements  MustVerifyEmail
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmailNotification());
+    }
+
+    public static function getAverageEmployeeScore($company_id){
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $skore = array();
+        foreach ($zamestnanci as $zamestnanec){
+            if($zamestnanec->employee_overall != NULL){
+                array_push($skore,$zamestnanec->employee_overall);
+            }
+        }
+        $sum = 0;
+        for ($i = 0; $i < sizeof($skore);$i++){
+            $sum += $skore[$i];
+        }
+        return round($sum/sizeof($skore),2);
+    }
+
+    public static function getAverageEmployeeReliabilityScore($company_id){
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $skore = array();
+        foreach ($zamestnanci as $zamestnanec){
+            if($zamestnanec->employee_reliability != NULL){
+                array_push($skore,$zamestnanec->employee_reliability);
+            }
+        }
+        $sum = 0;
+        for ($i = 0; $i < sizeof($skore);$i++){
+            $sum += $skore[$i];
+        }
+        return round($sum/sizeof($skore),2);
+    }
+
+    public static function getAverageEmployeeAbsenceScore($company_id){
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $skore = array();
+        foreach ($zamestnanci as $zamestnanec){
+            if($zamestnanec->employee_absence != NULL){
+                array_push($skore,$zamestnanec->employee_absence);
+            }
+        }
+        $sum = 0;
+        for ($i = 0; $i < sizeof($skore);$i++){
+            $sum += $skore[$i];
+        }
+        return round($sum/sizeof($skore),2);
+    }
+
+    public static function getAverageEmployeeWorkScore($company_id){
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $skore = array();
+        foreach ($zamestnanci as $zamestnanec){
+            if($zamestnanec->employee_workindex != NULL){
+                array_push($skore,$zamestnanec->employee_workindex);
+            }
+        }
+        $sum = 0;
+        for ($i = 0; $i < sizeof($skore);$i++){
+            $sum += $skore[$i];
+        }
+        return round($sum/sizeof($skore),2);
+    }
+
+    public static function getAverageShiftHour($company_id){
+        $smeny = Shift::getCompanyShifts($company_id);
+        $delka = array();
+        foreach ($smeny as $smena){
+            $shift_start = new DateTime($smena->shift_start);
+            $shift_end = new DateTime($smena->shift_end);
+            $hodinyRozdil = $shift_end->diff($shift_start);
+            $celkove = $hodinyRozdil->h + ($hodinyRozdil->i/60);
+            array_push($delka,$celkove);
+        }
+        $sum = 0;
+        for ($i = 0; $i < sizeof($delka);$i++){
+            $sum += $delka[$i];
+        }
+        return round($sum/sizeof($delka),2);
+    }
+
+    public static function getMaxShiftHour($company_id){
+        $smeny = Shift::getCompanyShifts($company_id);
+        $delka = array();
+        foreach ($smeny as $smena){
+            $shift_start = new DateTime($smena->shift_start);
+            $shift_end = new DateTime($smena->shift_end);
+            $hodinyRozdil = $shift_end->diff($shift_start);
+            $celkove = $hodinyRozdil->h + ($hodinyRozdil->i/60);
+            array_push($delka,$celkove);
+        }
+        return round(max($delka),2);
+    }
+
+    public static function getMinShiftHour($company_id){
+        $smeny = Shift::getCompanyShifts($company_id);
+        $delka = array();
+        foreach ($smeny as $smena){
+            $shift_start = new DateTime($smena->shift_start);
+            $shift_end = new DateTime($smena->shift_end);
+            $hodinyRozdil = $shift_end->diff($shift_start);
+            $celkove = $hodinyRozdil->h + ($hodinyRozdil->i/60);
+            array_push($delka,$celkove);
+        }
+        return round(min($delka),2);
     }
 
 

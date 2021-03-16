@@ -62,6 +62,250 @@ class Attendance extends Model
         }
     }
 
+    public static function getCompanyAbsenceCount($company_id){
+        $zamestnanci = Employee::where(['employee_company' => $company_id])->get();
+        $seznam_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($seznam_zamestnancu,$zamestnanec->employee_id);
+        }
+        if (DB::table('table_attendances')->whereIn('table_attendances.employee_id', $seznam_zamestnancu)->exists()) {
+            return DB::table('table_attendances')
+                ->select('table_shifts.shift_id')
+                ->join('table_employees','table_attendances.employee_id','=','table_employees.employee_id')
+                ->whereIn('table_attendances.employee_id', $seznam_zamestnancu)
+                ->whereIn('table_attendances.absence_reason_id' , [1,2,3])
+                ->count();
+        }else{
+            return 0;
+        }
+    }
+
+    public static function getCompanyAbsenceLateCount($company_id){
+        $zamestnanci = Employee::where(['employee_company' => $company_id])->get();
+        $seznam_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($seznam_zamestnancu,$zamestnanec->employee_id);
+        }
+        if (DB::table('table_attendances')->whereIn('table_attendances.employee_id', $seznam_zamestnancu)->exists()) {
+            return DB::table('table_attendances')
+                ->select('table_shifts.shift_id')
+                ->join('table_employees','table_attendances.employee_id','=','table_employees.employee_id')
+                ->whereIn('table_attendances.employee_id', $seznam_zamestnancu)
+                ->whereIn('table_attendances.absence_reason_id' , [4])
+                ->count();
+        }else{
+            return 0;
+        }
+    }
+
+    public static function getCompanyAbsenceDiseaseCount($company_id){
+        $zamestnanci = Employee::where(['employee_company' => $company_id])->get();
+        $seznam_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($seznam_zamestnancu,$zamestnanec->employee_id);
+        }
+        if (DB::table('table_attendances')->whereIn('table_attendances.employee_id', $seznam_zamestnancu)->exists()) {
+            return DB::table('table_attendances')
+                ->select('table_shifts.shift_id')
+                ->join('table_employees','table_attendances.employee_id','=','table_employees.employee_id')
+                ->whereIn('table_attendances.employee_id', $seznam_zamestnancu)
+                ->whereIn('table_attendances.absence_reason_id' , [1])
+                ->count();
+        }else{
+            return 0;
+        }
+    }
+
+    public static function getCompanyAbsenceNotCameCount($company_id){
+        $zamestnanci = Employee::where(['employee_company' => $company_id])->get();
+        $seznam_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($seznam_zamestnancu,$zamestnanec->employee_id);
+        }
+        if (DB::table('table_attendances')->whereIn('table_attendances.employee_id', $seznam_zamestnancu)->exists()) {
+            return DB::table('table_attendances')
+                ->select('table_shifts.shift_id')
+                ->join('table_employees','table_attendances.employee_id','=','table_employees.employee_id')
+                ->whereIn('table_attendances.employee_id', $seznam_zamestnancu)
+                ->whereIn('table_attendances.absence_reason_id' , [2])
+                ->count();
+        }else{
+            return 0;
+        }
+    }
+
+    public static function getCompanyAbsenceDeniedCount($company_id){
+        $zamestnanci = Employee::where(['employee_company' => $company_id])->get();
+        $seznam_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($seznam_zamestnancu,$zamestnanec->employee_id);
+        }
+        if (DB::table('table_attendances')->whereIn('table_attendances.employee_id', $seznam_zamestnancu)->exists()) {
+            return DB::table('table_attendances')
+                ->select('table_shifts.shift_id')
+                ->join('table_employees','table_attendances.employee_id','=','table_employees.employee_id')
+                ->whereIn('table_attendances.employee_id', $seznam_zamestnancu)
+                ->whereIn('table_attendances.absence_reason_id' , [3])
+                ->count();
+        }else{
+            return 0;
+        }
+    }
+
+    public static function getAttendanceAbsenceDiseaseByMonths($company_id, $rok){
+        $dochazka = DB::table('table_attendances')
+            ->select(DB::raw("COUNT(*) as count_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [1])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('count_attendance');
+
+        $mesice_dochazka = DB::table('table_attendances')
+            ->select(DB::raw("Month(shift_start) as month_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [1])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('month_attendance');
+
+        $data_attendance = array(0,0,0,0,0,0,0,0,0,0,0,0);
+
+        foreach ($mesice_dochazka as $index => $month_attendance){
+            $data_attendance[$month_attendance - 1] = $dochazka[$index];
+        }
+        return $data_attendance;
+    }
+
+    public static function getAttendanceAbsenceNotComeByMonths($company_id, $rok){
+        $dochazka = DB::table('table_attendances')
+            ->select(DB::raw("COUNT(*) as count_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [2])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('count_attendance');
+
+        $mesice_dochazka = DB::table('table_attendances')
+            ->select(DB::raw("Month(shift_start) as month_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [2])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('month_attendance');
+
+        $data_attendance = array(0,0,0,0,0,0,0,0,0,0,0,0);
+
+        foreach ($mesice_dochazka as $index => $month_attendance){
+            $data_attendance[$month_attendance - 1] = $dochazka[$index];
+        }
+        return $data_attendance;
+    }
+
+    public static function getAttendanceAbsenceDeniedByMonths($company_id, $rok){
+        $dochazka = DB::table('table_attendances')
+            ->select(DB::raw("COUNT(*) as count_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [3])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('count_attendance');
+
+        $mesice_dochazka = DB::table('table_attendances')
+            ->select(DB::raw("Month(shift_start) as month_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [3])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('month_attendance');
+
+        $data_attendance = array(0,0,0,0,0,0,0,0,0,0,0,0);
+
+        foreach ($mesice_dochazka as $index => $month_attendance){
+            $data_attendance[$month_attendance - 1] = $dochazka[$index];
+        }
+        return $data_attendance;
+    }
+
+    public static function getAttendanceAbsenceDelayByMonths($company_id,$rok){
+        $dochazka = DB::table('table_attendances')
+            ->select(DB::raw("COUNT(*) as count_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [4])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('count_attendance');
+
+        $mesice_dochazka = DB::table('table_attendances')
+            ->select(DB::raw("Month(shift_start) as month_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [4])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('month_attendance');
+
+        $data_attendance = array(0,0,0,0,0,0,0,0,0,0,0,0);
+
+        foreach ($mesice_dochazka as $index => $month_attendance){
+            $data_attendance[$month_attendance - 1] = $dochazka[$index];
+        }
+        return $data_attendance;
+    }
+
+
+    public static function getAttendanceOkByMonths($company_id, $rok){
+        $dochazka = DB::table('table_attendances')
+            ->select(DB::raw("COUNT(*) as count_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [5])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('count_attendance');
+
+        $mesice_dochazka = DB::table('table_attendances')
+            ->select(DB::raw("Month(shift_start) as month_attendance"))
+            ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->whereIn('table_attendances.absence_reason_id' , [5])
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('month_attendance');
+
+        $data_attendance = array(0,0,0,0,0,0,0,0,0,0,0,0);
+
+        foreach ($mesice_dochazka as $index => $month_attendance){
+            $data_attendance[$month_attendance - 1] = $dochazka[$index];
+        }
+        return $data_attendance;
+    }
+
+    public static function getCompanyAbsenceOKCount($company_id){
+        $zamestnanci = Employee::where(['employee_company' => $company_id])->get();
+        $seznam_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($seznam_zamestnancu,$zamestnanec->employee_id);
+        }
+        if (DB::table('table_attendances')->whereIn('table_attendances.employee_id', $seznam_zamestnancu)->exists()) {
+            return DB::table('table_attendances')
+                ->select('table_shifts.shift_id')
+                ->join('table_employees','table_attendances.employee_id','=','table_employees.employee_id')
+                ->whereIn('table_attendances.employee_id', $seznam_zamestnancu)
+                ->whereIn('table_attendances.absence_reason_id' , [5])
+                ->count();
+        }else{
+            return 0;
+        }
+    }
+
     public static function getEmployeeShiftsCount($employee_id){
         if (DB::table('table_attendances')->where('table_attendances.employee_id', $employee_id)->exists()) {
             return DB::table('table_attendances')

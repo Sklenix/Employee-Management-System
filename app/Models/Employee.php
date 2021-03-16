@@ -115,9 +115,7 @@ class Employee extends Authenticatable
               'table_employees.employee_absence','table_employees.employee_workindex','table_employees.employee_street','table_employees.employee_city','table_employees.employee_reliability',
               'table_employees.employee_absence','table_employees.employee_workindex','table_employees.employee_overall')
           ->where(['table_employees.employee_company' => $company_id])
-          ->orderBy('table_employees.employee_name', 'asc')
           ->orderBy('table_employees.employee_surname', 'asc')
-          ->orderBy('table_employees.employee_position', 'asc')
           ->get();
     }
 

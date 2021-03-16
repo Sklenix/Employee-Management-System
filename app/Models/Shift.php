@@ -69,8 +69,6 @@ class Shift extends Authenticatable
                 'table_shifts.shift_importance_id')
             ->where(['table_shifts.shift_id' => $shift_id])
             ->orderBy('table_shifts.shift_start', 'asc')
-            ->orderBy('table_shifts.shift_end', 'asc')
-            ->orderBy('table_shifts.shift_place', 'asc')
             ->get();
     }
 
@@ -81,8 +79,6 @@ class Shift extends Authenticatable
                 'table_shifts.shift_importance_id')
             ->where(['table_shifts.company_id' => $company_id])
             ->orderBy('table_shifts.shift_start', 'asc')
-            ->orderBy('table_shifts.shift_end', 'asc')
-            ->orderBy('table_shifts.shift_place', 'asc')
             ->get();
     }
 
@@ -104,7 +100,6 @@ class Shift extends Authenticatable
             ->where(['table_shifts.company_id' => $company_id])
             ->count();
     }
-
 
     public static function getUpcomingCompanyShiftsCount($company_id){
         return DB::table('table_shifts')
