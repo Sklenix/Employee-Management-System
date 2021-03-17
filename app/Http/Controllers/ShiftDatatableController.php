@@ -8,6 +8,7 @@ use App\Models\Attendance;
 use App\Models\Company;
 use App\Models\Employee_Language;
 use App\Models\Employee_Shift;
+use App\Models\ImportancesShifts;
 use App\Models\Languages;
 use DateTime;
 use Google_Client;
@@ -156,24 +157,13 @@ class ShiftDatatableController extends Controller
         $datumEnd = date('Y-m-d\TH:i', strtotime($data->shift_end));
         $shift_start = new DateTime($data->shift_start);
         $shift_end = new DateTime($data->shift_end);
-
         $hodinyRozdil = $shift_end->diff($shift_start);
         $pocetHodin = $hodinyRozdil->h;
         $pocetMinut = $hodinyRozdil->i;
 
-        $moznostiDulezitosti = DB::table('table_importances_shifts')
-            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
-            ->get();
-
-        $aktualniDulezitost = DB::table('table_importances_shifts')
-            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
-            ->join('table_shifts','table_shifts.shift_importance_id','=','table_importances_shifts.importance_id')
-            ->where(['table_shifts.shift_importance_id' => $data->shift_importance_id])
-            ->distinct()
-            ->get();
-
+        $moznostiDulezitosti = ImportancesShifts::getAllImportances();
+        $aktualniDulezitost = ImportancesShifts::getParticularImportance($data->shift_importance_id);
         $vypisDulezitosti = "";
-
         $tabulka = '
                     <table class="table table-dark" id="show_table" style="font-size: 16px;">
                     <thead>
@@ -187,32 +177,10 @@ class ShiftDatatableController extends Controller
                         </tr>
                     </thead>
                     <tbody>';
-
-        $zamestnanci = DB::table('table_employee_shifts')
-                            ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
-                            ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
-                            ->select('table_employees.employee_name','table_employees.employee_surname',
-                                'table_employees.employee_id','table_employees.employee_position','table_employees.employee_reliability',
-                                'table_employees.employee_absence','table_employees.employee_workindex')
-                            ->where(['table_shifts.shift_id' => $id])
-                            ->orderBy('table_employees.employee_name', 'asc')
-                            ->orderBy('table_employees.employee_surname', 'asc')
-                            ->orderBy('table_employees.employee_position', 'asc')
-                            ->get();
-
+        $zamestnanci = Shift::getAllEmployeesAtShift($id);
         foreach ($zamestnanci as $zamestnanec){
-            $dochazka = DB::table('table_attendances')
-                ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
-                ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-                ->select('table_attendances.attendance_came','table_attendances.absence_reason_id',
-                    'table_attendances.attendance_check_in','table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                    'table_attendances.attendance_check_out_company')
-                ->where(['table_attendances.shift_id' => $id,'table_attendances.employee_id' => $zamestnanec->employee_id])
-                ->get();
-
+            $dochazka = Attendance::getEmployeeShiftParticularAttendance($id, $zamestnanec->employee_id);
             $skore = ($zamestnanec->employee_reliability + $zamestnanec->employee_absence + $zamestnanec->employee_workindex) / 3;
-
             if($dochazka->isEmpty()){
                 $tabulka .= '<tr>
                                 <td class="text-center"> '.$zamestnanec->employee_name.' '.$zamestnanec->employee_surname.'</td>
@@ -221,10 +189,7 @@ class ShiftDatatableController extends Controller
                                 <td class="text-center"><p style="color:yellow;">Neznámý</p></td>
                                 <td class="text-center"><p style="color:yellow;">Nezapsaný check-in/out</p></td>';
             }else{
-                $status = DB::table('table_absence_reasons')
-                    ->select('table_absence_reasons.reason_description')
-                    ->where(['table_absence_reasons.reason_id' => $dochazka[0]->absence_reason_id])
-                    ->get();
+                $status = AbsenceReason::getParticularReason( $dochazka[0]->absence_reason_id);
                 $statView = "";
                 if($status->isEmpty() || $dochazka[0]->absence_reason_id == NULL){
                     $statView = '<p style="color:yellow;">Neznámý</p>';
@@ -235,7 +200,6 @@ class ShiftDatatableController extends Controller
                         $statView = '<p style="color:orangered;">'.$status[0]->reason_description.'</p>';
                     }
                 }
-
                 $odpracovano = '';
                 if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
                     if($dochazka[0]->attendance_check_in == NULL || $dochazka[0]->attendance_check_out == NULL){
@@ -252,7 +216,6 @@ class ShiftDatatableController extends Controller
                     $hodinyRozdilCheck =$checkout->diff($checkin);
                     $odpracovano = '<p style="color:white;">'.$hodinyRozdilCheck->h.'h'.$hodinyRozdilCheck->i.'m</p>';
                 }
-
                 if($dochazka[0]->attendance_came == NULL || $dochazka[0]->attendance_came == 0){
                     $tabulka .= '<tr>
                                     <td class="text-center"> '.$zamestnanec->employee_name.' '.$zamestnanec->employee_surname.'</td>
@@ -276,7 +239,6 @@ class ShiftDatatableController extends Controller
         foreach ($aktualniDulezitost as $dulezitost) {
             $vypisDulezitosti .= ' <option value="'.$dulezitost->importance_id.'">'.$dulezitost->importance_description.'</option>';
         }
-
         for($i = 0;$i < count($moznostiDulezitosti);$i++){
                 if($aktualniDulezitost[0]->importance_id != $moznostiDulezitosti[$i]->importance_id){
                     $vypisDulezitosti .= ' <option value="'.$moznostiDulezitosti[$i]->importance_id.'">'.$moznostiDulezitosti[$i]->importance_description.'</option>';
@@ -456,10 +418,6 @@ class ShiftDatatableController extends Controller
         ]);
         $shift_start = new DateTime($request->shift_start);
         $shift_end = new DateTime($request->shift_end);
-        $now = new DateTime();
-
-       // $difference_start = $shift_start->format('U') - $now->format('U');
-       // $difference_end = $shift_end->format('U') - $now->format('U');
         $difference_shifts = $shift_end->format('U') - $shift_start->format('U');
         $chybaDatumy = array();
         $bool_datumy = 0;
@@ -468,13 +426,16 @@ class ShiftDatatableController extends Controller
             array_push($chybaDatumy,'Konec směny je stejný, nebo je dříve než její začátek!');
             $bool_datumy = 1;
         }
-
         foreach ($validator->errors()->all() as $valid){
             array_push($chybaDatumy,$valid);
         }
-
         if ($validator->fails() || $bool_datumy == 1) {
             return response()->json(['errors' => $chybaDatumy]);
+        }
+        $zamestnanci = Shift::getAllEmployeesAtShift($id);
+        $employee_ids = array();
+        foreach ($zamestnanci as $zamestnanec) {
+            array_push($employee_ids, $zamestnanec->employee_id);
         }
         $bool = 0;
         $shift_db_start = new DateTime($vysledek->shift_start);
@@ -488,7 +449,7 @@ class ShiftDatatableController extends Controller
         }else{
             $bool = 1;
         }
-        $user = Auth::user();
+        OlapETL::updateShiftInfoDimension($employee_ids, $user->company_id,$vysledek->shift_start, $vysledek->shift_end ,$request->shift_start,  $request->shift_end);
         $vysledek->shift_start = $request->shift_start;
         $vysledek->shift_end = $request->shift_end;
         $vysledek->shift_place = $request->shift_place;
@@ -496,6 +457,7 @@ class ShiftDatatableController extends Controller
         $vysledek->shift_note = $request->shift_note;
         $vysledek->company_id = $user->company_id;
         $vysledek->save();
+        OlapETL::updateShiftTotalHoursField($vysledek, $employee_ids, $user->company_id);
         if($bool != 1 ){
             return response()->json(['success'=>'0']);
         }else{
@@ -673,8 +635,17 @@ class ShiftDatatableController extends Controller
     }
 
     public function destroy($id){
+        $user = Auth::user();
+        $smena = Shift::findOrFail($id);
+        $zamestnanci = Shift::getAllEmployeesAtShift($id);
+        $employee_ids = array();
+        foreach ($zamestnanci as $zamestnanec) {
+            array_push($employee_ids, $zamestnanec->employee_id);
+        }
+        OlapETL::deleteRecordFromShiftInfoDimension($employee_ids, $user->company_id, $smena->shift_start, $smena->shift_end);
         Shift::findOrFail($id)->delete();
         Employee_Shift::deleteShiftFromShiftDatatable($id);
+
         return response()->json(['success'=>'Směna byla úspěšně smazána.']);
     }
 
@@ -764,9 +735,15 @@ class ShiftDatatableController extends Controller
         }
         $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena_id, $zamestnanec_id);
         $zamestnanec = Employee::find($zamestnanec_id);
-        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $user->company_id, $smena->shift_start, $smena->shift_end);
+        $company_check_in_date = new DateTime($request->attendance_check_in_company);
+        $shift_start_date = new DateTime($smena->shift_start);
         if($dochazka->isEmpty()){
-            Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_in_company' => $request->attendance_check_in_company, 'attendance_came' => 1]);
+            if($company_check_in_date > $shift_start_date){
+                Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_in_company' => $request->attendance_check_in_company, 'attendance_came' => 1, 'absence_reason_id' => 4]);
+            }else{
+                Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_in_company' => $request->attendance_check_in_company, 'attendance_came' => 1, 'absence_reason_id' => 5]);
+            }
         }else{
             if($dochazka[0]->attendance_check_out_company != NULL){
                 $shift_checkout = new DateTime($dochazka[0]->attendance_check_out_company);
@@ -777,7 +754,11 @@ class ShiftDatatableController extends Controller
                 }
                 OlapETL::aggregateEmployeeTotalWorkedHours($shift_info_id, $zamestnanec->employee_id, $user->company_id, $request->attendance_check_in_company, $dochazka[0]->attendance_check_out_company, NULL, NULL);
             }
-            Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['attendance_check_in_company' => $request->attendance_check_in_company,'attendance_came' => 1]);
+            if($company_check_in_date > $shift_start_date){
+                Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['attendance_check_in_company' => $request->attendance_check_in_company,'attendance_came' => 1, 'absence_reason_id' => 4]);
+            }else{
+                Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['attendance_check_in_company' => $request->attendance_check_in_company,'attendance_came' => 1, 'absence_reason_id' => 5]);
+            }
         }
         OlapETL::aggregateEmployeeAbsenceTotalHoursAndLateFlag($shift_info_id, $zamestnanec->employee_id, $user->company_id, $smena->shift_start, $request->attendance_check_in_company, NULL);
         OlapETL::extractAttendanceCheckInCompanyToShiftInfoDimension($shift_info_id, $request->attendance_check_in_company);
@@ -839,7 +820,7 @@ class ShiftDatatableController extends Controller
         }
         $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena_id, $zamestnanec_id);
         $zamestnanec = Employee::find($zamestnanec_id);
-        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $user->company_id, $smena->shift_start, $smena->shift_end);
         if($dochazka->isEmpty()){
             Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_out_company' => $request->attendance_check_out_company, 'attendance_came' => 1]);
         }else{
@@ -920,7 +901,7 @@ class ShiftDatatableController extends Controller
         if($request->attendance_absence_reason_id == 4 || $request->attendance_absence_reason_id == 5){
             $bool = 1;
         }
-        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $user->company_id, $smena->shift_start, $smena->shift_end);
         if($dochazka->isEmpty()){
             if($bool == 1){
                 Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'absence_reason_id' => $request->attendance_absence_reason_id, 'attendance_came' => 1]);

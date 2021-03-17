@@ -106,7 +106,7 @@
                 </div>
                 <div class="modal-footer">
                     <div class="col-md-12 text-center">
-                        <input type="submit" name="button_action" id="SubmitCreateInjury" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalSuccess" value="Přidat směnu" />
+                        <input type="submit" name="button_action" id="SubmitCreateInjury" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalSuccess" value="Přidat zranění" />
                         <button type="button" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalClose" data-dismiss="modal">Zavřít</button>
                     </div>
                 </div>
@@ -371,6 +371,7 @@
             });
 
             $('.ziskatZamestnance').change(function(){
+                    $("#injury_date_add").val('');
                     var zamestnanec_id = $(this).val();
                     var smeny_select = $(this).data('dependent');
                     $.ajaxSetup({
@@ -389,6 +390,21 @@
                             $('#'+smeny_select).html(result.html);
                         }
                     })
+            });
+
+            $('#shift_id_add').change(function(){
+                var shift_id = $("#shift_id_add").val();
+                $.ajax({
+                    url: '/company/injuries/get/shift/start/' + shift_id,
+                    type: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    dataType: 'json',
+                    success: function (response) {
+                        $("#injury_date_add").val(response.shift_start);
+                    },
+                });
             });
         });
         </script>

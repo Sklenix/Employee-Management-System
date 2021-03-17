@@ -102,6 +102,7 @@ class Shift extends Authenticatable
     }
 
     public static function getUpcomingCompanyShiftsCount($company_id){
+        date_default_timezone_set('Europe/Prague');
         return DB::table('table_shifts')
             ->select('table_shifts.shift_id')
             ->where(['table_shifts.company_id' => $company_id])
@@ -110,6 +111,7 @@ class Shift extends Authenticatable
     }
 
     public static function getHistoricalCompanyShiftsCount($company_id){
+        date_default_timezone_set('Europe/Prague');
         return DB::table('table_shifts')
             ->select('table_shifts.shift_id')
             ->where(['table_shifts.company_id' => $company_id])
@@ -164,6 +166,18 @@ class Shift extends Authenticatable
             ->join('table_shifts','table_employee_shifts.shift_id','=','table_shifts.shift_id')
             ->where(['table_employee_shifts.employee_id' => $employee_id])
             ->count();
+    }
+
+    public static function getAllEmployeesAtShift($shift_id){
+        return DB::table('table_employee_shifts')
+            ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
+            ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
+            ->select('table_employees.employee_name','table_employees.employee_surname',
+                'table_employees.employee_id','table_employees.employee_position','table_employees.employee_reliability',
+                'table_employees.employee_absence','table_employees.employee_workindex')
+            ->where(['table_shifts.shift_id' => $shift_id])
+            ->orderBy('table_employees.employee_surname', 'asc')
+            ->get();
     }
 
     public static function getEmployeeUpcomingShiftsCount($employee_id){

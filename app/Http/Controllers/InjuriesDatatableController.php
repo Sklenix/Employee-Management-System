@@ -63,6 +63,12 @@ class InjuriesDatatableController extends Controller
         return response()->json(['html'=>$html]);
     }
 
+    public function getShiftStart($shift_id){
+        $smena = Shift::findOrFail($shift_id);
+        $datumStart = date('Y-m-d\TH:i', strtotime($smena->shift_start));
+        return response()->json(['shift_start'=> $datumStart]);
+    }
+
     public function store(Request $request){
         $user = Auth::user();
         $validator = Validator::make($request->all(), [
@@ -92,7 +98,7 @@ class InjuriesDatatableController extends Controller
             return response()->json(['errors' => $chybaDatumy]);
         }
         Injury::create(['injury_description' => $request->injury_note_add, 'injury_date' => $request->injury_date_add, 'employee_id' => $request->employee_id_add, 'shift_id' => $request->shift_id_add]);
-        $shift_info_id = OlapETL::getShiftInfoId($request->employee_id_add, $smenaUdaje[0]->shift_start, $smenaUdaje[0]->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($request->employee_id_add, $user->company_id, $smenaUdaje[0]->shift_start, $smenaUdaje[0]->shift_end);
         OlapETL::aggregateEmployeeInjuryFlag($shift_info_id, $request->employee_id_add, $user->company_id, 1);
         return response()->json(['success'=>'Zranění bylo úspešně vytvořeno.']);
     }
@@ -177,7 +183,7 @@ class InjuriesDatatableController extends Controller
         $user = Auth::user();
         $zraneni = Injury::findOrFail($id);
         $smena = Shift::findOrFail($zraneni->shift_id);
-        $shift_info_id = OlapETL::getShiftInfoId($zraneni->employee_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($zraneni->employee_id, $user->company_id, $smena->shift_start, $smena->shift_end);
         OlapETL::aggregateEmployeeInjuryFlag($shift_info_id, $zraneni->employee_id, $user->company_id, 0);
         Injury::findOrFail($id)->delete();
         return response()->json(['success'=>'Zranění bylo úspěšně smazáno.']);

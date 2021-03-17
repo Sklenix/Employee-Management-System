@@ -35,14 +35,26 @@ class OlapETL extends Controller
         return $new_company_dimension->company_id;
     }
 
-    public static function getShiftInfoId($employee_id, $shift_start, $shift_end){
-        $smena = DB::table('shift_facts')
-            ->select('shift_info_dimension.shift_info_id')
-            ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
-            ->where(['shift_info_dimension.shift_start' => $shift_start])
-            ->where(['shift_info_dimension.shift_end' => $shift_end])
-            ->where(['shift_facts.employee_id' => $employee_id])
-            ->first();
+    public static function getShiftInfoId($employee_id, $company_id, $shift_start, $shift_end){
+        $smena = '';
+        if($company_id == NULL){
+            $smena = DB::table('shift_facts')
+                ->select('shift_info_dimension.shift_info_id')
+                ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
+                ->where(['shift_info_dimension.shift_start' => $shift_start])
+                ->where(['shift_info_dimension.shift_end' => $shift_end])
+                ->where(['shift_facts.employee_id' => $employee_id])
+                ->first();
+        }else{
+            $smena = DB::table('shift_facts')
+                ->select('shift_info_dimension.shift_info_id')
+                ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
+                ->where(['shift_info_dimension.shift_start' => $shift_start])
+                ->where(['shift_info_dimension.shift_end' => $shift_end])
+                ->where(['shift_facts.employee_id' => $employee_id])
+                ->where(['shift_facts.company_id' => $company_id])
+                ->first();
+        }
         return $smena->shift_info_id;
     }
 
@@ -85,9 +97,11 @@ class OlapETL extends Controller
                 $hodinyRozdil = $company_check_in_date->diff($shift_start_date);
                 $pocetHodinAbsence = $pocetHodinAbsence + $hodinyRozdil->h + ($hodinyRozdil->i/60);
                 $late_flag = 1;
+                ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['employee_late_flag' => $late_flag, 'late_total_hours' => $pocetHodinAbsence, 'absence_reason' => 4]);
             }else{
                 $late_flag = 0;
                 $pocetHodinAbsence = 0;
+                ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['employee_late_flag' => $late_flag, 'late_total_hours' => $pocetHodinAbsence, 'absence_reason' => 5]);
             }
         }else{
             if($checkIn != NULL){
@@ -95,13 +109,14 @@ class OlapETL extends Controller
                     $hodinyRozdil = $check_in_date->diff($shift_start_date);
                     $pocetHodinAbsence = $pocetHodinAbsence + $hodinyRozdil->h + ($hodinyRozdil->i/60);
                     $late_flag = 1;
+                    ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['employee_late_flag' => $late_flag, 'late_total_hours' => $pocetHodinAbsence, 'absence_reason' => 4]);
                 }else{
                     $late_flag = 0;
                     $pocetHodinAbsence = 0;
+                    ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['employee_late_flag' => $late_flag, 'late_total_hours' => $pocetHodinAbsence, 'absence_reason' => 5]);
                 }
             }
         }
-        ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_id, 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['employee_late_flag' => $late_flag, 'late_total_hours' => $pocetHodinAbsence]);
     }
 
     public static function aggregateEmployeeTotalWorkedHours($shift_info_id, $employee_id, $company_id, $companyCheckIn, $companyCheckOut, $checkIn, $checkOut){
@@ -187,6 +202,30 @@ class OlapETL extends Controller
         ShiftFacts::where(['employee_id' => $employee_id])->update(['employee_overall' => $employee_overall]);
     }
 
+    public static function updateShiftInfoDimension($employee_ids, $company_id, $shift_start_old, $shift_end_old ,$shift_start, $shift_end){
+        $shift_day = Carbon::parse($shift_start)->day;
+        $shift_month = Carbon::parse($shift_start)->month;
+        $shift_quarter = Carbon::parse($shift_start)->quarter;
+        $shift_year = Carbon::parse($shift_start)->year;
+        for ($i = 0; $i < sizeof($employee_ids);$i++){
+           $shift_info_id = self::getShiftInfoId($employee_ids[$i], $company_id, $shift_start_old, $shift_end_old);
+           ShiftInfoDimension::where(['shift_info_id' => $shift_info_id])->update(['shift_start' => $shift_start, 'shift_end' => $shift_end]);
+           TimeDimension::where(['time_id' => $shift_info_id])->update(['day' => $shift_day, 'month' => $shift_month, 'quarter' => $shift_quarter, 'year' => $shift_year]);
+        }
+    }
+
+    public static function deleteRecordFromShiftInfoDimension($employee_ids, $company_id, $shift_start, $shift_end){
+        $shift_day = Carbon::parse($shift_start)->day;
+        $shift_month = Carbon::parse($shift_start)->month;
+        $shift_quarter = Carbon::parse($shift_start)->quarter;
+        $shift_year = Carbon::parse($shift_start)->year;
+        for ($i = 0; $i < sizeof($employee_ids);$i++){
+            $shift_info_id = self::getShiftInfoId($employee_ids[$i], $company_id, $shift_start, $shift_end);
+            ShiftInfoDimension::where(['shift_info_id' => $shift_info_id])->delete();
+            TimeDimension::where(['time_id' => $shift_info_id])->delete();
+        }
+    }
+
     public static function updateCompanyDimension($company_id, $company_name, $company_city, $company_street, $company_user_name, $company_user_surname){
         CompanyDimension::where(['company_id' => $company_id])->update(['company_name' => $company_name, 'company_city' => $company_city, 'company_street' => $company_street, 'company_user_name' => $company_user_name, 'company_user_surname' => $company_user_surname]);
     }
@@ -196,6 +235,17 @@ class OlapETL extends Controller
         $shift_end = new DateTime($shift->shift_end);
         $hodinyRozdil = $shift_end->diff($shift_start);
         return ($hodinyRozdil->h + ($hodinyRozdil->i/60));
+    }
+
+    public static function updateShiftTotalHoursField($shift, $employee_ids, $company_id){
+        $shift_start = new DateTime($shift->shift_start);
+        $shift_end = new DateTime($shift->shift_end);
+        $hodinyRozdil = $shift_end->diff($shift_start);
+        $celkove = $hodinyRozdil->h + ($hodinyRozdil->i/60);
+        for ($i = 0; $i < sizeof($employee_ids);$i++){
+            $shift_info_id = self::getShiftInfoId($employee_ids[$i], $company_id, $shift->shift_start, $shift->shift_end);
+            ShiftFacts::where(['shift_info_id' => $shift_info_id, 'employee_id' => $employee_ids[$i], 'company_id' => $company_id, 'time_id' => $shift_info_id])->update(['shift_total_hours' => $celkove]);
+        }
     }
 
     public static function extractDataToShiftFact($shift, $employee, $shift_info_id, $time_id, $employee_id, $company_id){

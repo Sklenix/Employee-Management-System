@@ -113,6 +113,7 @@ Route::group(['middleware' => 'auth:company'], function () {
     Route::get('/company/injuries', [\App\Http\Controllers\InjuriesDatatableController::class, 'index'])->name('injuries.index');
     Route::get('/company/injuries/list', [\App\Http\Controllers\InjuriesDatatableController::class, 'getInjuries'])->name('injuries.list');
     Route::post('/company/injuries/options/shift', [\App\Http\Controllers\InjuriesDatatableController::class, 'getEmployeeShiftsSelect'])->name('injuries.selectShift');
+    Route::get('/company/injuries/get/shift/start/{shift_id}', [\App\Http\Controllers\InjuriesDatatableController::class, 'getShiftStart'])->name('injuries.getShiftStart');
     Route::resource('/company/injuriesactions', \App\Http\Controllers\InjuriesDatatableController::class);
 
     /* Datatable akce k zamestnancum */

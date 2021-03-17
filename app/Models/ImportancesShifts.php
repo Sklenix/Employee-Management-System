@@ -43,6 +43,13 @@ class ImportancesShifts extends Model
             ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
             ->join('table_shifts','table_shifts.shift_importance_id','=','table_importances_shifts.importance_id')
             ->where(['table_shifts.shift_importance_id' => $importance_id])
+            ->distinct()
+            ->get();
+    }
+
+    public static function getAllImportances(){
+       return DB::table('table_importances_shifts')
+            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
             ->get();
     }
 }

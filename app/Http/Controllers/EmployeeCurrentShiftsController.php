@@ -107,6 +107,7 @@ class EmployeeCurrentShiftsController extends Controller
         $smena = Shift::find($shift_id);
         $now = Carbon::now();
         $now->second(0);
+        $now->microsecond(0);
         $shift_start = new DateTime($smena->shift_start);
         $shift_end = new DateTime($smena->shift_end);
         $sekundy = 1200; // 20 minut
@@ -115,11 +116,20 @@ class EmployeeCurrentShiftsController extends Controller
         if($difference_start < 0 || $difference_end < 0){
             return response()->json(['fail'=>'Příchod je možný nejdříve 15 minut před startem směny, nebo po konec směny.']);
         }
-        $shift_info_id = OlapETL::getShiftInfoId($user->employee_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($user->employee_id, NULL, $smena->shift_start, $smena->shift_end);
+        $shift_start_date = Carbon::parse($smena->shift_start);
         if($dochazka->isEmpty()){
-            Attendance::create(['employee_id' => $user->employee_id, 'shift_id' => $shift_id, 'attendance_check_in' => $now, 'attendance_came' => 1]);
+            if($now->gt($shift_start_date)){
+                Attendance::create(['employee_id' => $user->employee_id, 'shift_id' => $shift_id, 'attendance_check_in' => $now, 'attendance_came' => 1, 'absence_reason_id' => 4]);
+            }else{
+                Attendance::create(['employee_id' => $user->employee_id, 'shift_id' => $shift_id, 'attendance_check_in' => $now, 'attendance_came' => 1, 'absence_reason_id' => 5]);
+            }
         }else{
-            Attendance::where(['employee_id' => $user->employee_id, 'shift_id' => $shift_id])->update(['attendance_check_in' => $now,'attendance_came' => 1]);
+            if($now->gt($shift_start_date)){
+                Attendance::where(['employee_id' => $user->employee_id, 'shift_id' => $shift_id])->update(['attendance_check_in' => $now,'attendance_came' => 1, 'absence_reason_id' => 4]);
+            }else{
+                Attendance::where(['employee_id' => $user->employee_id, 'shift_id' => $shift_id])->update(['attendance_check_in' => $now,'attendance_came' => 1, 'absence_reason_id' => 5]);
+            }
         }
         OlapETL::extractAttendanceCheckInToShiftInfoDimension($shift_info_id, $now);
         OlapETL::aggregateEmployeeAbsenceTotalHoursAndLateFlag($shift_info_id, $user->employee_id, $user->employee_company, $smena->shift_start, NULL, $now);
@@ -133,12 +143,13 @@ class EmployeeCurrentShiftsController extends Controller
         $smena = Shift::find($shift_id);
         $now = Carbon::now();
         $now->second(0);
+        $now->microsecond(0);
         $shift_start = new DateTime($smena->shift_start);
         $difference_start = $now->format('U') - $shift_start->format('U');
         if($difference_start < 0){
             return response()->json(['fail'=>'Zapsat odchod před startem směny není možné.']);
         }
-        $shift_info_id = OlapETL::getShiftInfoId($user->employee_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($user->employee_id, NULL,  $smena->shift_start, $smena->shift_end);
         if($dochazka->isEmpty()){
             Attendance::create(['employee_id' => $user->employee_id, 'shift_id' => $shift_id, 'attendance_check_out' => $now, 'attendance_came' => 1]);
         }else{

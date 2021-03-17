@@ -77,6 +77,11 @@ class StatisticsController extends Controller
         $max_shift_hour = Company::getMaxShiftHour($user->company_id);
         $min_shift_hour = Company::getMinShiftHour($user->company_id);
 
+        $total_worked_hours = OlapAnalyzator::getTotalShiftWorkedHours($user->company_id);
+        $shifts_assigned_count = OlapAnalyzator::getCountOfShiftFacts($user->company_id);
+
+
+
         $pocet_absenci_firmy = Attendance::getCompanyAbsenceCount($user->company_id);
         $pocet_absenci_zpozdeni_firmy = Attendance::getCompanyAbsenceLateCount($user->company_id);
         $pocet_absenci_nemoc_firmy = Attendance::getCompanyAbsenceDiseaseCount($user->company_id);

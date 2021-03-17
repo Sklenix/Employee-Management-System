@@ -823,7 +823,7 @@ class EmployeeDatatableController extends Controller
         $skore = ($request->employee_reliability + $request->employee_absence + $request->employee_workindex) / 3;
         Employee::where('employee_id', $id)->update(array('employee_overall' => round($skore,2)));
         $employee->updateData($id, $request->all());
-        OlapETL::updateEmployeeScoreOverall($vysledek->employee_id, round($skore,2));
+       // OlapETL::updateEmployeeScoreOverall($vysledek->employee_id, round($skore,2));
         return response()->json(['success'=>'Hodnocení zaměstnance '.$jmeno.' '.$prijmeni.' bylo úspěšně dokončeno.']);
     }
 
@@ -1346,9 +1346,15 @@ class EmployeeDatatableController extends Controller
         }
         $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena_id, $zamestnanec_id);
         $zamestnanec = Employee::find($zamestnanec_id);
-        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $user->company_id, $smena->shift_start, $smena->shift_end);
+        $company_check_in_date = new DateTime($request->attendance_check_in_company);
+        $shift_start_date = new DateTime($smena->shift_start);
         if($dochazka->isEmpty()){
-            Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_in_company' => $request->attendance_check_in_company, 'attendance_came' => 1]);
+            if($company_check_in_date > $shift_start_date){
+                Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_in_company' => $request->attendance_check_in_company, 'attendance_came' => 1, 'absence_reason_id' => 4]);
+            }else{
+                Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_in_company' => $request->attendance_check_in_company, 'attendance_came' => 1, 'absence_reason_id' => 5]);
+            }
         }else{
             if($dochazka[0]->attendance_check_out_company != NULL){
                 $shift_checkout = new DateTime($dochazka[0]->attendance_check_out_company);
@@ -1359,7 +1365,11 @@ class EmployeeDatatableController extends Controller
                 }
                 OlapETL::aggregateEmployeeTotalWorkedHours($shift_info_id, $zamestnanec->employee_id, $user->company_id, $dochazka[0]->attendance_check_out_company, $request->attendance_check_in_company, NULL, NULL);
             }
-            Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['attendance_check_in_company' => $request->attendance_check_in_company,'attendance_came' => 1]);
+            if($company_check_in_date > $shift_start_date){
+                Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['attendance_check_in_company' => $request->attendance_check_in_company,'attendance_came' => 1, 'absence_reason_id' => 4]);
+            }else{
+                Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['attendance_check_in_company' => $request->attendance_check_in_company,'attendance_came' => 1, 'absence_reason_id' => 5]);
+            }
         }
         OlapETL::aggregateEmployeeAbsenceTotalHoursAndLateFlag($shift_info_id, $zamestnanec->employee_id, $user->company_id, $smena->shift_start, $request->attendance_check_in_company, NULL);
         OlapETL::extractAttendanceCheckInCompanyToShiftInfoDimension($shift_info_id, $request->attendance_check_in_company);
@@ -1422,7 +1432,7 @@ class EmployeeDatatableController extends Controller
         }
         $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena_id, $zamestnanec_id);
         $zamestnanec = Employee::find($zamestnanec_id);
-        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $user->company_id, $smena->shift_start, $smena->shift_end);
         if($dochazka->isEmpty()){
             Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'attendance_check_out_company' => $request->attendance_check_out_company, 'attendance_came' => 1]);
         }else{
@@ -1503,7 +1513,7 @@ class EmployeeDatatableController extends Controller
         if($request->attendance_absence_reason_id == 4 || $request->attendance_absence_reason_id == 5){
             $bool = 1;
         }
-        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $smena->shift_start, $smena->shift_end);
+        $shift_info_id = OlapETL::getShiftInfoId($zamestnanec_id, $user->company_id, $smena->shift_start, $smena->shift_end);
         if($dochazka->isEmpty()){
             if($bool == 1){
                 Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'absence_reason_id' => $request->attendance_absence_reason_id, 'attendance_came' => 1]);

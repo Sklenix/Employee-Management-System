@@ -105,6 +105,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         for ($i = 0; $i < sizeof($skore);$i++){
             $sum += $skore[$i];
         }
+        if(sizeof($skore) == 0){
+            return 0;
+        }
         return round($sum/sizeof($skore),2);
     }
 
@@ -119,6 +122,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         $sum = 0;
         for ($i = 0; $i < sizeof($skore);$i++){
             $sum += $skore[$i];
+        }
+        if(sizeof($skore) == 0){
+            return 0;
         }
         return round($sum/sizeof($skore),2);
     }
@@ -135,6 +141,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         for ($i = 0; $i < sizeof($skore);$i++){
             $sum += $skore[$i];
         }
+        if(sizeof($skore) == 0){
+            return 0;
+        }
         return round($sum/sizeof($skore),2);
     }
 
@@ -149,6 +158,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         $sum = 0;
         for ($i = 0; $i < sizeof($skore);$i++){
             $sum += $skore[$i];
+        }
+        if(sizeof($skore) == 0){
+            return 0;
         }
         return round($sum/sizeof($skore),2);
     }
@@ -167,6 +179,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         for ($i = 0; $i < sizeof($delka);$i++){
             $sum += $delka[$i];
         }
+        if(sizeof($delka) == 0){
+            return 0;
+        }
         return round($sum/sizeof($delka),2);
     }
 
@@ -180,6 +195,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
             $celkove = $hodinyRozdil->h + ($hodinyRozdil->i/60);
             array_push($delka,$celkove);
         }
+        if(sizeof($delka) == 0){
+            return 0;
+        }
         return round(max($delka),2);
     }
 
@@ -192,6 +210,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
             $hodinyRozdil = $shift_end->diff($shift_start);
             $celkove = $hodinyRozdil->h + ($hodinyRozdil->i/60);
             array_push($delka,$celkove);
+        }
+        if(sizeof($delka) == 0){
+            return 0;
         }
         return round(min($delka),2);
     }
