@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 class StatisticsController extends Controller
 {
     public function index(){
+        date_default_timezone_set('Europe/Prague');
         $user = Auth::user();
         $userJazyky = Languages::where('company_id', '=', $user->company_id)->get();
         $moznostiImportance = DB::table('table_importances_shifts')
@@ -77,10 +78,13 @@ class StatisticsController extends Controller
         $max_shift_hour = Company::getMaxShiftHour($user->company_id);
         $min_shift_hour = Company::getMinShiftHour($user->company_id);
 
-        $total_worked_hours = OlapAnalyzator::getTotalShiftWorkedHours($user->company_id);
+        $total_shifts_hours = OlapAnalyzator::getTotalShiftsHours($user->company_id);
         $shifts_assigned_count = OlapAnalyzator::getCountOfShiftFacts($user->company_id);
+        $shifts_assigned_count_future = OlapAnalyzator::getCountUpcomingShiftFacts($user->company_id);
+        $shifts_assigned_count_historical = OlapAnalyzator::getCountHistoricalShiftFacts($user->company_id);
 
-
+        $shifts_assigned_count_by_months = OlapAnalyzator::getCountOfShiftFactsByMonths($user->company_id);
+        $shifts_employee_assigned_count_by_months = OlapAnalyzator::getCountOfEmployeeShiftFactsByMonths(8);
 
         $pocet_absenci_firmy = Attendance::getCompanyAbsenceCount($user->company_id);
         $pocet_absenci_zpozdeni_firmy = Attendance::getCompanyAbsenceLateCount($user->company_id);
