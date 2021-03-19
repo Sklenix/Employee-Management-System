@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -56,14 +57,73 @@ class Vacation extends Model
             ->get();
     }
 
+    public static function getCompanyVacationsCount($company_id){
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $id_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($id_zamestnancu,$zamestnanec->employee_id);
+        }
+        return DB::table('table_vacations')
+            ->join('table_employees','table_vacations.employee_id','=','table_employees.employee_id')
+            ->whereIn('table_vacations.employee_id',$id_zamestnancu)
+            ->count();
+    }
+
     public static function getEmployeeVacationsCount($employee_id){
         return DB::table('table_vacations')
-            ->select('table_vacations.vacation_id','table_vacations.vacation_start',
-                'table_vacations.vacation_end','table_vacations.vacation_note','table_vacations.vacation_state',
-                'table_vacations.created_at','table_vacations.updated_at')
             ->where(['table_vacations.employee_id' => $employee_id])
-            ->orderBy('table_vacations.vacation_start', 'asc')
             ->count();
+    }
+
+    public static function getCompanyVacationsByMonths($company_id){
+        date_default_timezone_set('Europe/Prague');
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $id_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($id_zamestnancu,$zamestnanec->employee_id);
+        }
+        $dovolene = DB::table('table_vacations')
+            ->select(DB::raw("COUNT(*) as count_vacations"))
+            ->join('table_employees','table_vacations.employee_id','=','table_employees.employee_id')
+            ->whereIn('table_vacations.employee_id',$id_zamestnancu)
+            ->whereYear('table_vacations.vacation_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
+            ->pluck('count_vacations');
+
+        $mesice_dovolene = DB::table('table_vacations')
+            ->select(DB::raw("Month(table_vacations.vacation_start) as month_vacation"))
+            ->whereIn('table_vacations.employee_id',$id_zamestnancu)
+            ->whereYear('table_vacations.vacation_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
+            ->pluck('month_vacation');
+        $data_vacations = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_dovolene as $index => $month_shift){
+            $data_vacations[$month_shift - 1] = $dovolene[$index];
+        }
+        return $data_vacations;
+    }
+
+    public static function getEmployeeVacationsByMonths($employee_id){
+        date_default_timezone_set('Europe/Prague');
+        $dovolene = DB::table('table_vacations')
+            ->select(DB::raw("COUNT(*) as count_vacations"))
+            ->join('table_employees','table_vacations.employee_id','=','table_employees.employee_id')
+            ->where(['table_vacations.employee_id' => $employee_id])
+            ->whereYear('table_vacations.vacation_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
+            ->pluck('count_vacations');
+
+        $mesice_dovolene = DB::table('table_vacations')
+            ->select(DB::raw("Month(table_vacations.vacation_start) as month_vacation"))
+            ->where(['table_vacations.employee_id' => $employee_id])
+            ->whereYear('table_vacations.vacation_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
+            ->pluck('month_vacation');
+        $data_vacations = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_dovolene as $index => $month_shift){
+            $data_vacations[$month_shift - 1] = $dovolene[$index];
+        }
+        return $data_vacations;
     }
 
     public static function getCompanyEmployeesVacations($company_id){

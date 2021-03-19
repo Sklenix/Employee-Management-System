@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -58,6 +59,76 @@ class Injury extends Model
             ->orderBy('table_shifts.shift_end', 'asc')
             ->distinct()
             ->get();
+    }
+
+    public static function getCompanyInjuriesCount($company_id){
+        return DB::table('table_injuries')
+            ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
+            ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
+            ->where(['table_shifts.company_id' => $company_id])
+            ->count();
+    }
+
+    public static function getEmployeeInjuriesCount($employee_id){
+        return DB::table('table_injuries')
+            ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
+            ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
+            ->where(['table_employees.employee_id' => $employee_id])
+            ->count();
+    }
+
+    public static function getCompanyInjuriesByMonths($company_id){
+        date_default_timezone_set('Europe/Prague');
+        $zraneni = DB::table('table_injuries')
+            ->select(DB::raw("COUNT(*) as count_injuries"))
+            ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
+            ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
+            ->where(['table_employees.employee_company' => $company_id])
+            ->whereYear('table_injuries.injury_date', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
+            ->pluck('count_injuries');
+
+        $mesice_zraneni = DB::table('table_injuries')
+            ->select(DB::raw("Month(table_injuries.injury_date) as month_injury"))
+            ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
+            ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
+            ->where(['table_employees.employee_company' => $company_id])
+            ->whereYear('table_injuries.injury_date', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
+            ->pluck('month_injury');
+
+        $data_injuries = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_zraneni as $index => $month_shift){
+            $data_injuries[$month_shift - 1] = $zraneni[$index];
+        }
+        return $data_injuries;
+    }
+
+    public static function getEmployeeInjuriesByMonths($employee_id){
+        date_default_timezone_set('Europe/Prague');
+        $zraneni = DB::table('table_injuries')
+            ->select(DB::raw("COUNT(*) as count_injuries"))
+            ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
+            ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
+            ->where(['table_employees.employee_id' => $employee_id])
+            ->whereYear('table_injuries.injury_date', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
+            ->pluck('count_injuries');
+
+        $mesice_zraneni = DB::table('table_injuries')
+            ->select(DB::raw("Month(table_injuries.injury_date) as month_injury"))
+            ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
+            ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
+            ->where(['table_employees.employee_id' => $employee_id])
+            ->whereYear('table_injuries.injury_date', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
+            ->pluck('month_injury');
+
+        $data_injuries = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_zraneni as $index => $month_shift){
+            $data_injuries[$month_shift - 1] = $zraneni[$index];
+        }
+        return $data_injuries;
     }
 
     public static function getEmployeeInjuries($company_id,$employee_id,$shift_id){

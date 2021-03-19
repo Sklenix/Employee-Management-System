@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -59,17 +60,6 @@ class Report extends Model
             ->get();
     }
 
-    public static function getEmployeeReportsCount($employee_id){
-        return DB::table('table_reports')
-            ->select('table_reports.report_title','table_reports.report_description','table_reports.report_importance_id',
-                'table_reports.report_note','table_reports.report_state','table_reports_importances.importance_report_value', 'table_reports.report_id',
-                'table_reports_importances.importance_report_description','table_reports.created_at','table_reports.updated_at')
-            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
-            ->where(['table_reports.employee_id' => $employee_id])
-            ->orderBy('table_reports.report_importance_id', 'asc')
-            ->count();
-    }
-
     public static function getCompanyEmployeesReports($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $id_zamestnancu = array();
@@ -88,4 +78,79 @@ class Report extends Model
             ->orderBy('table_reports.report_importance_id', 'asc')
             ->get();
     }
+
+    public static function getCompanyReportsCount($company_id){
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $id_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($id_zamestnancu,$zamestnanec->employee_id);
+        }
+        return DB::table('table_reports')
+            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
+            ->whereIn('table_reports.employee_id',$id_zamestnancu)
+            ->count();
+    }
+
+    public static function getEmployeeReportsCount($employee_id){
+        return DB::table('table_reports')
+            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
+            ->where(['table_reports.employee_id' => $employee_id])
+            ->count();
+    }
+
+    public static function getCompanyReportsByMonths($company_id){
+        date_default_timezone_set('Europe/Prague');
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $id_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($id_zamestnancu,$zamestnanec->employee_id);
+        }
+        $nahlaseni = DB::table('table_reports')
+            ->select(DB::raw("COUNT(*) as count_reports"))
+            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
+            ->whereIn('table_reports.employee_id',$id_zamestnancu)
+            ->whereYear('table_reports.created_at', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_reports.created_at)"))
+            ->pluck('count_reports');
+
+        $mesice_nahlaseni = DB::table('table_reports')
+            ->select(DB::raw("Month(table_reports.created_at) as month_report"))
+            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
+            ->whereIn('table_reports.employee_id',$id_zamestnancu)
+            ->whereYear('table_reports.created_at', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_reports.created_at)"))
+            ->pluck('month_report');
+
+        $data_reports = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_nahlaseni as $index => $month_shift){
+            $data_reports[$month_shift - 1] = $nahlaseni[$index];
+        }
+        return $data_reports;
+    }
+
+    public static function getEmployeeReportsByMonths($employee_id){
+        date_default_timezone_set('Europe/Prague');
+        $nahlaseni = DB::table('table_reports')
+            ->select(DB::raw("COUNT(*) as count_reports"))
+            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
+            ->where(['table_reports.employee_id' => $employee_id])
+            ->whereYear('table_reports.created_at', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_reports.created_at)"))
+            ->pluck('count_reports');
+
+        $mesice_nahlaseni = DB::table('table_reports')
+            ->select(DB::raw("Month(table_reports.created_at) as month_report"))
+            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
+            ->where(['table_reports.employee_id' => $employee_id])
+            ->whereYear('table_reports.created_at', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_reports.created_at)"))
+            ->pluck('month_report');
+
+        $data_reports = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_nahlaseni as $index => $month_shift){
+            $data_reports[$month_shift - 1] = $nahlaseni[$index];
+        }
+        return $data_reports;
+    }
+
 }

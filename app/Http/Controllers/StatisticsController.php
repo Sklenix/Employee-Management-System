@@ -7,8 +7,11 @@ use App\Models\Company;
 use App\Models\Disease;
 use App\Models\Employee;
 use App\Models\ImportancesShifts;
+use App\Models\Injury;
 use App\Models\Languages;
+use App\Models\Report;
 use App\Models\Shift;
+use App\Models\Vacation;
 use Carbon\Carbon;
 use DateTime;
 use Illuminate\Http\Request;
@@ -78,12 +81,25 @@ class StatisticsController extends Controller
         $average_employees_scores_by_months = OlapAnalyzator::getAverageEmployeesScoresByMonths($user->company_id);
         $average_employee_score_by_months = OlapAnalyzator::getAverageEmployeeScoreByMonths(4);
 
-        $company_disease_count = Disease::getCompanyDiseasesCount($user->company_id);
-        $employee_disease_count = Disease::getEmployeeDiseasesCount(8);
+        $company_diseases_count = Disease::getCompanyDiseasesCount($user->company_id);
+        $employee_diseases_count = Disease::getEmployeeDiseasesCount(8);
         $company_diseases_by_months = Disease::getCompanyDiseasesByMonths($user->company_id);
         $employee_diseases_by_months = Disease::getEmployeeDiseasesByMonths(2);
 
+        $company_injuries_count = Injury::getCompanyInjuriesCount($user->company_id);
+        $employee_injuries_count = Injury::getEmployeeInjuriesCount(8);
+        $company_injuries_count_by_months = Injury::getCompanyInjuriesByMonths($user->company_id);
+        $employee_injuries_count_by_months = Injury::getEmployeeInjuriesByMonths(8);
 
+        $company_reports_count = Report::getCompanyReportsCount($user->company_id);
+        $employee_reports_count = Report::getEmployeeReportsCount(15);
+        $company_reports_count_by_months = Report::getCompanyReportsByMonths($user->company_id);
+        $employee_reports_count_by_months = Report::getEmployeeReportsByMonths(8);
+
+        $company_vacations_count = Vacation::getCompanyVacationsCount($user->company_id);
+        $employee_vacations_count = Vacation::getEmployeeVacationsCount(8);
+        $company_vacations_count_by_months = Vacation::getCompanyVacationsByMonths($user->company_id);
+        $employee_vacations_count_by_months = Vacation::getEmployeeVacationsByMonths(4);
 
         $pocet_absenci_firmy = Attendance::getCompanyAbsenceCount($user->company_id);
         $pocet_absenci_zpozdeni_firmy = Attendance::getCompanyAbsenceLateCount($user->company_id);
