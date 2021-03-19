@@ -23,6 +23,10 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/OlapAnalyzator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/OlapAnalyzator.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Company.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Company.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Disease.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Disease.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/ImportancesShifts.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ImportancesShifts.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -383,7 +387,9 @@
       <workItem from="1615798312993" duration="1399000" />
       <workItem from="1615885817609" duration="594000" />
       <workItem from="1615886518459" duration="7293000" />
-      <workItem from="1615972932350" duration="22490000" />
+      <workItem from="1615972932350" duration="22547000" />
+      <workItem from="1616057818746" duration="622000" />
+      <workItem from="1616087158760" duration="9982000" />
     </task>
     <servers />
   </component>

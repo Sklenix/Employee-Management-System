@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -66,6 +67,71 @@ class Disease extends Model
             ->where(['table_diseases.employee_id' => $employee_id])
             ->orderBy('table_diseases.disease_from', 'asc')
             ->count();
+    }
+
+    public static function getCompanyDiseasesCount($company_id){
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $id_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($id_zamestnancu,$zamestnanec->employee_id);
+        }
+        return DB::table('table_diseases')
+            ->select('table_diseases.disease_id','table_diseases.disease_name',
+                'table_diseases.disease_from','table_diseases.disease_to','table_diseases.disease_state',
+                'table_diseases.disease_note','table_diseases.created_at','table_diseases.updated_at')
+            ->join('table_employees','table_diseases.employee_id','=','table_employees.employee_id')
+            ->whereIn('table_diseases.employee_id',$id_zamestnancu)
+            ->orderBy('table_diseases.disease_from', 'asc')
+            ->count();
+    }
+
+    public static function getCompanyDiseasesByMonths($company_id){
+        date_default_timezone_set('Europe/Prague');
+        $zamestnanci = Employee::getCompanyEmployees($company_id);
+        $id_zamestnancu = array();
+        foreach ($zamestnanci as $zamestnanec){
+            array_push($id_zamestnancu,$zamestnanec->employee_id);
+        }
+        $nemocenske = DB::table('table_diseases')
+            ->select(DB::raw("COUNT(*) as count_disease"))
+            ->whereIn('table_diseases.employee_id',$id_zamestnancu)
+            ->whereYear('table_diseases.disease_from', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
+            ->pluck('count_disease');
+
+        $mesice_nemocenske = DB::table('table_diseases')
+            ->select(DB::raw("Month(table_diseases.disease_from) as month_disease"))
+            ->whereIn('table_diseases.employee_id',$id_zamestnancu)
+            ->whereYear('table_diseases.disease_from', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
+            ->pluck('month_disease');
+        $data_diseases = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_nemocenske as $index => $month_shift){
+            $data_diseases[$month_shift - 1] = $nemocenske[$index];
+        }
+        return $data_diseases;
+    }
+
+    public static function getEmployeeDiseasesByMonths($employee_id){
+        date_default_timezone_set('Europe/Prague');
+        $nemocenske = DB::table('table_diseases')
+            ->select(DB::raw("COUNT(*) as count_disease"))
+            ->where(['table_diseases.employee_id' => $employee_id])
+            ->whereYear('table_diseases.disease_from', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
+            ->pluck('count_disease');
+
+        $mesice_nemocenske = DB::table('table_diseases')
+            ->select(DB::raw("Month(table_diseases.disease_from) as month_disease"))
+            ->where(['table_diseases.employee_id' => $employee_id])
+            ->whereYear('table_diseases.disease_from', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
+            ->pluck('month_disease');
+        $data_diseases = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_nemocenske as $index => $month_shift){
+            $data_diseases[$month_shift - 1] = $nemocenske[$index];
+        }
+        return $data_diseases;
     }
 
     public static function getCompanyEmployeesDiseases($company_id){

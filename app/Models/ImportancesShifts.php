@@ -52,4 +52,12 @@ class ImportancesShifts extends Model
             ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
             ->get();
     }
+
+    public static function getAllImportancesExceptUnspecified(){
+       return DB::table('table_importances_shifts')
+            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
+            ->whereIn('table_importances_shifts.importance_id',[1,2,3,4,5])
+            ->get();
+    }
+
 }

@@ -2,12 +2,14 @@
 
 namespace App\Models;
 use App\Notifications\VerifyEmailNotification;
+use Carbon\Carbon;
 use DateTime;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Notifications\VerifyEmail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 /**
@@ -217,5 +219,91 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round(min($delka),2);
     }
 
+    public static function getNewEmployeesCountByMonths($company_id){
+        $zamestnanci = DB::table('table_employees')
+            ->select(DB::raw("COUNT(*) as count"))
+            ->where('employee_company', $company_id)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('count');
+
+        $mesice = DB::table('table_employees')
+            ->select(DB::raw("Month(created_at) as month"))
+            ->where('employee_company', $company_id)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('month');
+
+        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice as $index => $month){
+            $data_employees[$month - 1] = $zamestnanci[$index];
+        }
+        return $data_employees;
+    }
+
+    public static function getNewShiftsCountByMonths($company_id){
+        $smeny = DB::table('table_shifts')
+            ->select(DB::raw("COUNT(*) as count_shift"))
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('count_shift');
+
+        $mesice_smeny = DB::table('table_shifts')
+            ->select(DB::raw("Month(shift_start) as month_shift"))
+            ->where('company_id',$company_id)
+            ->whereYear('shift_start', Carbon::now()->year)
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('month_shift');
+
+        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_smeny as $index => $month_shift){
+            $data_shifts[$month_shift - 1] = $smeny[$index];
+        }
+        return $data_shifts;
+    }
+
+    public static function changeShiftsYear($company_id, $rok){
+        $smeny = DB::table('table_shifts')
+            ->select(DB::raw("COUNT(*) as count_shift"))
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('count_shift');
+
+        $mesice_smeny = DB::table('table_shifts')
+            ->select(DB::raw("Month(shift_start) as month_shift"))
+            ->where('company_id', $company_id)
+            ->whereYear('shift_start', $rok)
+            ->groupBy(DB::raw("Month(shift_start)"))
+            ->pluck('month_shift');
+        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_smeny as $index => $month_shift){
+            $data_shifts[$month_shift - 1] = $smeny[$index];
+        }
+        return $data_shifts;
+    }
+
+    public static function changeEmployeesYear($company_id, $rok){
+        $zamestnanci = DB::table('table_employees')
+            ->select(DB::raw("COUNT(*) as count"))
+            ->where('employee_company', $company_id)
+            ->whereYear('created_at', $rok)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('count');
+
+        $mesice = DB::table('table_employees')
+            ->select(DB::raw("Month(created_at) as month"))
+            ->where('employee_company', $company_id)
+            ->whereYear('created_at', $rok)
+            ->groupBy(DB::raw("Month(created_at)"))
+            ->pluck('month');
+
+        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice as $index => $month){
+            $data_employees[$month - 1] = $zamestnanci[$index];
+        }
+        return $data_employees;
+    }
 
 }

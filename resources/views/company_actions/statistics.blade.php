@@ -105,7 +105,6 @@
 
                 </div>
 
-
                 <div class="col-5" style="margin-top: 50px;">
                     <li class="list-group-item text-right"><span class="pull-left"><strong>Účet vytvořen</strong></span> {{$vytvorenUcet}}</li>
                 </div>

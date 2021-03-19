@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Company;
+use App\Models\Disease;
 use App\Models\Employee;
+use App\Models\ImportancesShifts;
 use App\Models\Languages;
 use App\Models\Shift;
 use Carbon\Carbon;
@@ -19,10 +21,7 @@ class StatisticsController extends Controller
         date_default_timezone_set('Europe/Prague');
         $user = Auth::user();
         $userJazyky = Languages::where('company_id', '=', $user->company_id)->get();
-        $moznostiImportance = DB::table('table_importances_shifts')
-            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
-            ->whereIn('table_importances_shifts.importance_id',[1,2,3,4,5])
-            ->get();
+        $moznostiImportance = ImportancesShifts::getAllImportancesExceptUnspecified();
         $pocetZamestnancu = Employee::getCompanyEmployeesCount($user->company_id);
         $pocetSmen = Shift::getCompanyTotalShiftCount($user->company_id);
         $pocetNadchazejicich = Shift::getUpcomingCompanyShiftsCount($user->company_id);
@@ -30,45 +29,8 @@ class StatisticsController extends Controller
         $datumVytvoreni = new DateTime($user->created_at);
         $datumZobrazeniVytvoreni = $datumVytvoreni->format('d.m.Y');
 
-        $zamestnanci = DB::table('table_employees')
-            ->select(DB::raw("COUNT(*) as count"))
-            ->where('employee_company', $user->company_id)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('count');
-
-        $mesice = DB::table('table_employees')
-            ->select(DB::raw("Month(created_at) as month"))
-            ->where('employee_company', $user->company_id)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('month');
-
-        $smeny = DB::table('table_shifts')
-            ->select(DB::raw("COUNT(*) as count_shift"))
-            ->where('company_id', $user->company_id)
-            ->whereYear('shift_start', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(shift_start)"))
-            ->pluck('count_shift');
-
-        $mesice_smeny = DB::table('table_shifts')
-            ->select(DB::raw("Month(shift_start) as month_shift"))
-            ->where('company_id', $user->company_id)
-            ->whereYear('shift_start', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(shift_start)"))
-            ->pluck('month_shift');
-
-        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-
-        foreach ($mesice as $index => $month){
-            $data_employees[$month - 1] = $zamestnanci[$index];
-        }
-
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny[$index];
-        }
-
+        $data_employees = Company::getNewEmployeesCountByMonths($user->company_id);
+        $data_shifts = Company::getNewShiftsCountByMonths($user->company_id);
         $average_overall_score = Company::getAverageEmployeeScore($user->company_id);
         $average_reliability_score = Company::getAverageEmployeeReliabilityScore($user->company_id);
         $average_absence_score = Company::getAverageEmployeeAbsenceScore($user->company_id);
@@ -78,13 +40,50 @@ class StatisticsController extends Controller
         $max_shift_hour = Company::getMaxShiftHour($user->company_id);
         $min_shift_hour = Company::getMinShiftHour($user->company_id);
 
-        $total_shifts_hours = OlapAnalyzator::getTotalShiftsHours($user->company_id);
         $shifts_assigned_count = OlapAnalyzator::getCountOfShiftFacts($user->company_id);
+        $shifts_employee_assigned = OlapAnalyzator::getCountOfEmployeeShiftFacts(8);
         $shifts_assigned_count_future = OlapAnalyzator::getCountUpcomingShiftFacts($user->company_id);
         $shifts_assigned_count_historical = OlapAnalyzator::getCountHistoricalShiftFacts($user->company_id);
 
         $shifts_assigned_count_by_months = OlapAnalyzator::getCountOfShiftFactsByMonths($user->company_id);
         $shifts_employee_assigned_count_by_months = OlapAnalyzator::getCountOfEmployeeShiftFactsByMonths(8);
+
+        $total_shifts_hours = OlapAnalyzator::getTotalShiftsHours($user->company_id);
+        $total_employee_shifts_hours = OlapAnalyzator::getTotalEmployeeShiftsHours(8);
+        $shift_total_hours_by_months = OlapAnalyzator::getTotalShiftsHoursByMonths($user->company_id);
+        $shift_total_employee_hours_by_months = OlapAnalyzator::getTotalEmployeeShiftsHoursByMonths(8);
+
+        $shift_total_worked_hours = OlapAnalyzator::getTotalShiftsWorkedHours($user->company_id);
+        $shift_total_employee_worked_hours = OlapAnalyzator::getTotalEmployeeShiftsWorkedHours(8);
+        $shift_total_worked_hours_by_months = OlapAnalyzator::getTotalWorkedShiftsHoursByMonths($user->company_id);
+        $shift_employee_total_worked_hours_by_months = OlapAnalyzator::getTotalEmployeeShiftsWorkedHoursByMonths(5);
+
+        $shift_total_late_hours = OlapAnalyzator::getTotalLateShiftHours($user->company_id);
+        $shift_total_employee_late_hours = OlapAnalyzator::getTotalEmployeeLateShiftHours(6);
+        $shift_total_late_hours_by_months = OlapAnalyzator::getTotalLateShiftsHoursByMonths($user->company_id);
+        $shift_total_employee_late_hours_by_months = OlapAnalyzator::getTotalEmployeeLateShiftsHoursByMonths(5);
+
+        $total_late_flags_count = OlapAnalyzator::getTotalLateFlagsCount($user->company_id);
+        $total_late_employee_flags_count = OlapAnalyzator::getTotalEmployeeLateFlagsCount(4);
+        $total_late_flags_count_by_months = OlapAnalyzator::getTotalLateFlagsCountByMonths($user->company_id);
+        $total_late_flags_count_employee_by_months = OlapAnalyzator::getTotalEmployeeLateFlagsCountByMonths(4);
+
+        $total_injury_flags_count = OlapAnalyzator::getTotalInjuryFlagsCount($user->company_id);
+        $total_injury_employee_flags_count = OlapAnalyzator::getTotalEmployeeInjuryFlagsCount(8);
+        $total_injury_flags_count_by_months = OlapAnalyzator::getTotalInjuryFlagsCountByMonths($user->company_id);
+        $total_injury_flags_count_employee_by_months = OlapAnalyzator::getTotalEmployeeInjuryFlagsCountByMonths(8);
+
+        $average_employees_scores = OlapAnalyzator::getAverageEmployeesScores($user->company_id);
+        $average_employee_score = OlapAnalyzator::getAverageEmployeeScore(20);
+        $average_employees_scores_by_months = OlapAnalyzator::getAverageEmployeesScoresByMonths($user->company_id);
+        $average_employee_score_by_months = OlapAnalyzator::getAverageEmployeeScoreByMonths(4);
+
+        $company_disease_count = Disease::getCompanyDiseasesCount($user->company_id);
+        $employee_disease_count = Disease::getEmployeeDiseasesCount(8);
+        $company_diseases_by_months = Disease::getCompanyDiseasesByMonths($user->company_id);
+        $employee_diseases_by_months = Disease::getEmployeeDiseasesByMonths(2);
+
+
 
         $pocet_absenci_firmy = Attendance::getCompanyAbsenceCount($user->company_id);
         $pocet_absenci_zpozdeni_firmy = Attendance::getCompanyAbsenceLateCount($user->company_id);
@@ -126,47 +125,13 @@ class StatisticsController extends Controller
 
     public function changeEmployeeGraphYear($rok){
         $user = Auth::user();
-        $zamestnanci = DB::table('table_employees')
-            ->select(DB::raw("COUNT(*) as count"))
-            ->where('employee_company', $user->company_id)
-            ->whereYear('created_at', $rok)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('count');
-
-        $mesice = DB::table('table_employees')
-            ->select(DB::raw("Month(created_at) as month"))
-            ->where('employee_company', $user->company_id)
-            ->whereYear('created_at', $rok)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('month');
-
-        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice as $index => $month){
-            $data_employees[$month - 1] = $zamestnanci[$index];
-        }
+        $data_employees = Company::changeEmployeesYear($user->company_id, $rok);
         return response()->json(['data_employees'=> $data_employees]);
     }
 
     public function changeShiftGraphYear($rok){
         $user = Auth::user();
-        $smeny = DB::table('table_shifts')
-            ->select(DB::raw("COUNT(*) as count_shift"))
-            ->where('company_id', $user->company_id)
-            ->whereYear('created_at', $rok)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('count_shift');
-
-        $mesice_smeny = DB::table('table_shifts')
-            ->select(DB::raw("Month(created_at) as month_shift"))
-            ->where('company_id', $user->company_id)
-            ->whereYear('created_at', $rok)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny[$index];
-        }
+        $data_shifts = Company::changeShiftsYear($user->company_id, $rok);
         return response()->json(['data_shifts'=> $data_shifts]);
     }
 
