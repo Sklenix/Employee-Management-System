@@ -44,9 +44,10 @@ class StatisticsController extends Controller
         $min_shift_hour = Company::getMinShiftHour($user->company_id);
 
         $shifts_assigned_count = OlapAnalyzator::getCountOfShiftFacts($user->company_id);
-        $shifts_employee_assigned = OlapAnalyzator::getCountOfEmployeeShiftFacts(8);
-        $shifts_assigned_count_future = OlapAnalyzator::getCountUpcomingShiftFacts($user->company_id);
-        $shifts_assigned_count_historical = OlapAnalyzator::getCountHistoricalShiftFacts($user->company_id);
+        $shifts_employee_assigned_count = OlapAnalyzator::getCountOfEmployeeShiftFacts(8);
+
+        $shifts_assigned_count_future_count = OlapAnalyzator::getCountUpcomingShiftFacts($user->company_id);
+        $shifts_assigned_count_historical_count = OlapAnalyzator::getCountHistoricalShiftFacts($user->company_id);
 
         $shifts_assigned_count_by_months = OlapAnalyzator::getCountOfShiftFactsByMonths($user->company_id);
         $shifts_employee_assigned_count_by_months = OlapAnalyzator::getCountOfEmployeeShiftFactsByMonths(8);
@@ -107,7 +108,7 @@ class StatisticsController extends Controller
         $pocet_neprichodu_firmy = Attendance::getCompanyAbsenceNotCameCount($user->company_id);
         $pocet_odmitnuti_smen = Attendance::getCompanyAbsenceDeniedCount($user->company_id);
         $pocet_ok_smen = Attendance::getCompanyAbsenceOKCount($user->company_id);
-
+        $pocet_nezapsanych = $shifts_assigned_count - ($pocet_absenci_firmy + $pocet_absenci_zpozdeni_firmy + $pocet_absenci_nemoc_firmy + $pocet_odmitnuti_smen + $pocet_ok_smen);
         $dochazka_absence_neprichod = Attendance::getAttendanceAbsenceNotComeByMonths($user->company_id, Carbon::now()->year);
         $dochazka_absence_nemoc = Attendance::getAttendanceAbsenceDiseaseByMonths($user->company_id, Carbon::now()->year);
         $dochazka_absence_odmitl = Attendance::getAttendanceAbsenceDeniedByMonths($user->company_id, Carbon::now()->year);
@@ -135,8 +136,36 @@ class StatisticsController extends Controller
             ->with('data_attendances_absence_not_come',$dochazka_absence_neprichod)
             ->with('data_attendances_absence_denied',$dochazka_absence_odmitl)
             ->with('data_attendances_delay',$dochazka_zpozdeni)
-            ->with('data_attendances_ok',$dochazka_ok);
-
+            ->with('data_attendances_ok',$dochazka_ok)
+            ->with('data_assigned_shifts_count', $shifts_assigned_count)
+            ->with('data_unregistered_absence_shifts', $pocet_nezapsanych)
+            ->with('data_average_overall_score', $average_overall_score)
+            ->with('data_average_reliability_score', $average_reliability_score)
+            ->with('data_average_absence_score', $average_absence_score)
+            ->with('data_average_work_score', $average_work_score)
+            ->with('data_average_shift_hour', $average_shift_hour)
+            ->with('data_max_shift_hour', $max_shift_hour)
+            ->with('data_min_shift_hour', $min_shift_hour)
+            ->with('data_shifts_assigned_by_months', $shifts_assigned_count_by_months)
+            ->with('data_shifts_total_hours_by_months', $shift_total_hours_by_months)
+            ->with('data_shifts_total_hours', $total_shifts_hours)
+            ->with('data_shifts_total_worked_hours', $shift_total_worked_hours)
+            ->with('data_shifts_total_late_hours', $shift_total_late_hours)
+            ->with('data_shifts_total_late_count', $total_late_flags_count)
+            ->with('data_shifts_total_injury_count', $total_injury_flags_count)
+            ->with('data_employees_average_employee_score_by_time', $average_employees_scores) //tady
+            ->with('data_shifts_total_worked_hours_by_months', $shift_total_worked_hours_by_months)
+            ->with('data_shifts_total_late_hours_by_months', $shift_total_late_hours_by_months)
+            ->with('data_shifts_total_late_flags_count_by_months', $total_late_flags_count_by_months)
+            ->with('data_shifts_total_injury_flags_count_by_months', $total_injury_flags_count_by_months)
+            ->with('data_vacations_total_count', $company_vacations_count)
+            ->with('data_injuries_total_count', $company_injuries_count)
+            ->with('data_reports_total_count', $company_reports_count)
+            ->with('data_diseases_total_count', $company_diseases_count)
+            ->with('data_diseases_count_by_month', $company_diseases_by_months)
+            ->with('data_injuries_count_by_month', $company_injuries_count_by_months)
+            ->with('data_reports_count_by_month', $company_reports_count_by_months)
+            ->with('data_vacations_count_by_month', $company_vacations_count_by_months);
     }
 
     public function changeEmployeeGraphYear($rok){
@@ -160,6 +189,60 @@ class StatisticsController extends Controller
         $dochazka_zpozdeni = Attendance::getAttendanceAbsenceDelayByMonths($user->company_id,$rok);
         return response()->json(['absence_not_come'=> $dochazka_absence_neprichod, 'absence_disease' => $dochazka_absence_nemoc,
         'absence_denied' => $dochazka_absence_odmitl, 'absence_ok' => $dochazka_ok, 'absence_delay' => $dochazka_zpozdeni]);
+    }
+
+    public function changeShiftsAssignedGraphYear($rok){
+        $user=Auth::user();
+        $shifts_assigned_count_by_months = Company::changeShiftsAssignedYear($user->company_id, $rok);
+        return response()->json(['data_shifts_assigned' => $shifts_assigned_count_by_months]);
+    }
+
+    public function changeShiftsTotalHoursGraphYear($rok){
+        $user=Auth::user();
+        $shift_total_hours_by_months = Company::changeShiftsTotalHoursYear($user->company_id, $rok);
+        return response()->json(['data_shifts_total_hours' => $shift_total_hours_by_months]);
+    }
+
+    public function changeShiftsTotalWorkedHoursGraphYear($rok){
+        $user=Auth::user();
+        $shift_total_worked_hours_by_months = Company::changeShiftsTotalWorkedHoursYear($user->company_id, $rok);
+        return response()->json(['data_shifts_total_worked_hours' => $shift_total_worked_hours_by_months]);
+    }
+
+    public function changeShiftsTotalLateHoursGraphYear($rok){
+        $user=Auth::user();
+        $shift_total_late_hours_by_months = Company::changeShiftsTotalLateHoursYear($user->company_id, $rok);
+        return response()->json(['data_shifts_total_late_hours' => $shift_total_late_hours_by_months]);
+    }
+
+    public function changeShiftsLateFlagsCountGraphYear($rok){
+        $user=Auth::user();
+        $total_late_flags_count_by_months = Company::changeShiftsTotalLateFlagsCountYear($user->company_id, $rok);
+        return response()->json(['data_shifts_late_flags_count' => $total_late_flags_count_by_months]);
+    }
+
+    public function changeShiftsInjuriesFlagsCountGraphYear($rok){
+        $user=Auth::user();
+        $total_injury_flags_count_by_months = Company::changeShiftsTotalInjuriesFlagsCountYear($user->company_id, $rok);
+        return response()->json(['data_shifts_injuries_flags_count' => $total_injury_flags_count_by_months]);
+    }
+
+    public function changeVacationsGraphYear($rok){
+        $user=Auth::user();
+        $company_vacations_count_by_months = Company::changeVacationsYear($user->company_id, $rok);
+        return response()->json(['data_vacations' => $company_vacations_count_by_months]);
+    }
+
+    public function changeDiseasesGraphYear($rok){
+        $user=Auth::user();
+        $company_diseases_by_months = Company::changeDiseasesYear($user->company_id, $rok);
+        return response()->json(['data_diseases' => $company_diseases_by_months]);
+    }
+
+    public function changeReportsGraphYear($rok){
+        $user=Auth::user();
+        $company_reports_count_by_months = Company::changeReportsYear($user->company_id, $rok);
+        return response()->json(['data_reports' => $company_reports_count_by_months]);
     }
 
 }

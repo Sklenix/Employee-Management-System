@@ -183,8 +183,26 @@ Route::group(['middleware' => 'auth:company'], function () {
     Route::get('/company/statistics/employee/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeEmployeeGraphYear'])->name('changeEmployeeGraphYear');
     /* Zmena roku u grafu zapsanych smen dle mesicu*/
     Route::get('/company/statistics/shift/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftGraphYear'])->name('changeShiftGraphYear');
-    /* Zmena grafu u analyzy dochazky */
+    /* Zmena roku u grafu analyzy dochazky */
     Route::get('/company/statistics/attendances/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeAttendanceGraphYear'])->name('changeAttendanceGraphYear');
+    /* Zmena roku u grafu prirazenych smen */
+    Route::get('/company/statistics/shiftsassigned/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftsAssignedGraphYear'])->name('changeShiftsAssignedGraphYear');
+    /* Zmena roku u grafu celkovych hodin smen dle mesicu */
+    Route::get('/company/statistics/shiftstotalhours/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftsTotalHoursGraphYear'])->name('changeShiftsTotalHoursGraphYear');
+    /* Zmena roku u grafu celkove odpracovanych hodin v ramci smen dle mesicu */
+    Route::get('/company/statistics/shiftstotalworkedhours/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftsTotalWorkedHoursGraphYear'])->name('changeShiftsTotalWorkedHoursGraphYear');
+    /* Zmena roku u grafu celkovych zpozdenich v hodinach v ramci smen dle mesicu */
+    Route::get('/company/statistics/shiftstotallatehours/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftsTotalLateHoursGraphYear'])->name('changeShiftsTotalLateHoursGraphYear');
+    /* Zmena roku u grafu poctu zpozdenich v ramci smen dle mesicu */
+    Route::get('/company/statistics/lateflagscount/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftsLateFlagsCountGraphYear'])->name('changeShiftsLateFlagsCountGraphYear');
+    /* Zmena roku u grafu poctu zraneni v ramci smen dle mesicu */
+    Route::get('/company/statistics/injuriesflagscount/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeShiftsInjuriesFlagsCountGraphYear'])->name('changeShiftsInjuriesFlagsCountGraphYear');
+    /* Zmena roku u grafu poctu dovolenych v ramci smen dle mesicu */
+    Route::get('/company/statistics/vacations/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeVacationsGraphYear'])->name('changeVacationsGraphYear');
+    /* Zmena roku u grafu poctu nemocenskych v ramci smen dle mesicu */
+    Route::get('/company/statistics/diseases/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeDiseasesGraphYear'])->name('changeDiseasesGraphYear');
+    /* Zmena roku u grafu poctu nahlasenich v ramci smen dle mesicu */
+    Route::get('/company/statistics/reports/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeReportsGraphYear'])->name('changeReportsGraphYear');
 
     Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
     Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');

@@ -68,12 +68,17 @@
 
                 <div class="row justify-content-center" style="margin-top: 70px;">
                         <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                            <canvas id="doughNutChartAssignedShiftsCount"></canvas>
+                        </div>
+                        <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                            <canvas id="doughNutChartUnregisteredAttendanceCount"></canvas>
+                        </div>
+                        <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
                             <canvas id="doughNutChartOKCount"></canvas>
                         </div>
                         <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
                             <canvas id="doughNutChartAbsenceCount"></canvas>
                         </div>
-
                 </div>
 
                 <div class="row justify-content-center" style="margin-top: 70px;">
@@ -89,7 +94,6 @@
                     <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
                         <canvas id="doughNutChartAbsenceDiseaseCount"></canvas>
                     </div>
-
                 </div>
 
                 <div class="row justify-content-center" style="margin-top: 15px;">
@@ -102,7 +106,166 @@
                         </select>
                         <canvas id="barChartAttendances"></canvas>
                     </div>
+                </div>
 
+                <div class="row justify-content-center" style="margin-top: 85px;">
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartAverageEmployeeOverallScore"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartAverageEmployeeReliabilityScore"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartAverageEmployeeAbsenceScore"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartAverageEmployeeWorkScore"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="margin-top: 70px;">
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartTotalShiftHours"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartAverageShiftHour"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartMaxShiftHour"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartMinShiftHour"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="year_shifts_assigned">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartShiftsAssigned"></canvas>
+                    </div>
+
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="year_shifts_total">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartShiftsTotalHours"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="margin-top: 70px;">
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartTotalWorkedShiftHours"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartTotalLateShiftHours"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartLateShiftsCount"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartAverageEmployeeScoreByTime"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="year_total_worked_hours">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartShiftsTotalWorkedHours"></canvas>
+                    </div>
+
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="year_total_late_hours">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartShiftsTotalLateHours"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="margin-top: 75px;">
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="year_late_flags_count">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartShiftsTotalLateFlagsCount"></canvas>
+                    </div>
+
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="year_injuries_flags_count">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartShiftsTotalInjuriesFlagsCount"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="margin-top: 70px;">
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartTotalInjuriesCount"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartTotalReportsCount"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartTotalVacationsCount"></canvas>
+                    </div>
+                    <div class="col-lg-2" style="max-width: 500px;max-height: 500px;margin-top: 15px;">
+                        <canvas id="doughNutChartTotalDiseasesCount"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="vacations_year">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartVacationsByMonths"></canvas>
+                    </div>
+
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="diseases_year">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartDiseasesByMonths"></canvas>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center" style="margin-top: 75px;">
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="reports_year">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartReportsByMonths"></canvas>
+                    </div>
                 </div>
 
                 <div class="col-5" style="margin-top: 50px;">
@@ -127,6 +290,1760 @@
 
                     var doughNutChartAbsenceDeniedCount;
                     var doughNutChartAbsenceDiseaseCount;
+
+                    var doughNutChartAssignedShiftsCount;
+                    var doughNutChartUnregisteredAttendanceCount;
+
+                    var doughNutChartAverageEmployeeOverallScore;
+                    var doughNutChartAverageEmployeeReliabilityScore;
+                    var doughNutChartAverageEmployeeAbsenceScore;
+                    var doughNutChartAverageEmployeeWorkScore;
+
+                    var doughNutChartAverageShiftHour;
+                    var doughNutChartMaxShiftHour;
+                    var doughNutChartMinShiftHour;
+                    var doughNutChartTotalShiftHours;
+
+                    var barChartShiftsAssigned;
+                    var barChartShiftsTotalHours;
+
+                    var doughNutChartTotalWorkedShiftHours;
+                    var doughNutChartTotalLateShiftHours;
+                    var doughNutChartLateShiftsCount;
+                    var doughNutChartAverageEmployeeScoreByTime;
+///////////////////////
+                    var barChartShiftsTotalWorkedHours;
+                    var barChartShiftsTotalLateHours;
+                    var barChartShiftsTotalLateFlagsCount;
+                    var barChartShiftsTotalInjuriesFlagsCount;
+//////////////////////////////
+                    var doughNutChartTotalInjuriesCount;
+                    var doughNutChartTotalReportsCount;
+                    var doughNutChartTotalVacationsCount;
+                    var doughNutChartTotalDiseasesCount;
+
+                    var barChartVacationsByMonths;
+                    var barChartDiseasesByMonths;
+                    var barChartReportsByMonths;
+
+                    function renderBarGraphReportsByMonths(data_values, title, label_value){
+                        var barChartReportsByMonthsCanvas = $("#barChartReportsByMonths");
+                        barChartReportsByMonths = new Chart(barChartReportsByMonthsCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderBarGraphDiseasesByMonths(data_values, title, label_value){
+                        var barChartDiseasesByMonthsCanvas = $("#barChartDiseasesByMonths");
+                        barChartDiseasesByMonths = new Chart(barChartDiseasesByMonthsCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderBarGraphVacationsByMonths(data_values, title, label_value){
+                        var barChartVacationsByMonthsCanvas = $("#barChartVacationsByMonths");
+                        barChartVacationsByMonths = new Chart(barChartVacationsByMonthsCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderDoughnutReportsCountGraph(data_values, title, label_value){
+                        var doughNutChartTotalReportsCountCanvas = $("#doughNutChartTotalReportsCount");
+                        doughNutChartTotalReportsCount = new Chart(doughNutChartTotalReportsCountCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'nahlášení celkově',
+                                                font: {
+                                                    size: 11
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutInjuriesCountGraph(data_values, title, label_value){
+                        var doughNutChartTotalInjuriesCountCanvas = $("#doughNutChartTotalInjuriesCount");
+                        doughNutChartTotalInjuriesCount = new Chart(doughNutChartTotalInjuriesCountCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'zranění celkově',
+                                                font: {
+                                                    size: 11
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutDiseasesCountGraph(data_values, title, label_value){
+                        var doughNutChartTotalDiseasesCountCanvas = $("#doughNutChartTotalDiseasesCount");
+                        doughNutChartTotalDiseasesCount = new Chart(doughNutChartTotalDiseasesCountCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'nemocenských celkově',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutVacationsCountGraph(data_values, title, label_value){
+                        var doughNutChartTotalVacationsCountCanvas = $("#doughNutChartTotalVacationsCount");
+                        doughNutChartTotalVacationsCount = new Chart(doughNutChartTotalVacationsCountCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'dovolených celkově',
+                                                font: {
+                                                    size: 11
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderBarGraphShiftsTotalInjuriesFlagsCount(data_values, title, label_value){
+                        var barChartShiftsTotalInjuriesFlagsCountCanvas = $("#barChartShiftsTotalInjuriesFlagsCount");
+                        barChartShiftsTotalInjuriesFlagsCount = new Chart(barChartShiftsTotalInjuriesFlagsCountCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderBarGraphShiftsTotalLateFlagsCount(data_values, title, label_value){
+                        var barChartShiftsTotalLateFlagsCountCanvas = $("#barChartShiftsTotalLateFlagsCount");
+                        barChartShiftsTotalLateFlagsCount = new Chart(barChartShiftsTotalLateFlagsCountCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderBarGraphShiftsTotalLateHours(data_values, title, label_value){
+                        var barChartShiftsTotalLateHoursCanvas = $("#barChartShiftsTotalLateHours");
+                        barChartShiftsTotalLateHours = new Chart(barChartShiftsTotalLateHoursCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderBarGraphShiftsTotalWorkedHours(data_values, title, label_value){
+                        var barChartShiftsTotalWorkedHoursCanvas = $("#barChartShiftsTotalWorkedHours");
+                        barChartShiftsTotalWorkedHours = new Chart(barChartShiftsTotalWorkedHoursCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderDoughnutAverageEmployeeScoreByTimeCountGraph(data_values, title, label_value){
+                        var doughNutChartAverageEmployeeScoreByTimeCanvas = $("#doughNutChartAverageEmployeeScoreByTime");
+                        doughNutChartAverageEmployeeScoreByTime = new Chart(doughNutChartAverageEmployeeScoreByTimeCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'průměrné skóre ze všech směn',
+                                                font: {
+                                                    size: 8
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutTotalLateShiftCountGraph(data_values, title, label_value){
+                        var doughNutChartLateShiftsCountCanvas = $("#doughNutChartLateShiftsCount");
+                        doughNutChartLateShiftsCount = new Chart(doughNutChartLateShiftsCountCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values+"x",
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'zpoždění celkově',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutTotalLateShiftHoursGraph(data_values, title, label_value){
+                        var doughNutChartTotalLateShiftHoursCanvas = $("#doughNutChartTotalLateShiftHours");
+                        doughNutChartTotalLateShiftHours = new Chart(doughNutChartTotalLateShiftHoursCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values+"h",
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'zpoždění',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutTotalWorkedShiftHoursGraph(data_values, title, label_value){
+                        var doughNutChartTotalWorkedShiftHoursCanvas = $("#doughNutChartTotalWorkedShiftHours");
+                        doughNutChartTotalWorkedShiftHours = new Chart(doughNutChartTotalWorkedShiftHoursCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values+"h",
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'celkově odpracováno',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutTotalShiftHoursGraph(data_values, title, label_value){
+                        var doughNutChartTotalShiftHoursCanvas = $("#doughNutChartTotalShiftHours");
+                        doughNutChartTotalShiftHours = new Chart(doughNutChartTotalShiftHoursCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values+"h",
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'směny celkově',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderBarGraphShiftsTotalHours(data_values, title, label_value){
+                        var barChartShiftsTotalHoursCanvas = $("#barChartShiftsTotalHours");
+                        barChartShiftsTotalHours = new Chart(barChartShiftsTotalHoursCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderBarGraphShiftsAssigned(data_values, title, label_value){
+                        var barChartShiftsAssignedCanvas = $("#barChartShiftsAssigned");
+                        barChartShiftsAssigned = new Chart(barChartShiftsAssignedCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        formatter: Math.round,
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
+
+                    function renderDoughnutMaxShiftHourGraph(data_values, title, label_value){
+                        var doughNutChartMaxShiftHourCanvas = $("#doughNutChartMaxShiftHour");
+                        doughNutChartMaxShiftHour = new Chart(doughNutChartMaxShiftHourCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values+"h",
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'nejdelší směna',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutMinShiftHourGraph(data_values, title, label_value){
+                        var doughNutChartMinShiftHourCanvas = $("#doughNutChartMinShiftHour");
+                        doughNutChartMinShiftHour = new Chart(doughNutChartMinShiftHourCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values+"h",
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'nejkratší směna',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutAverageShiftHourGraph(data_values, title, label_value){
+                        var doughNutChartAverageShiftHourCanvas = $("#doughNutChartAverageShiftHour");
+                        doughNutChartAverageShiftHour = new Chart(doughNutChartAverageShiftHourCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values+"h",
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'průměrná délka směny',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutAverageEmployeeWorkScoreGraph(data_values, title, label_value){
+                        var doughNutChartAverageEmployeeWorkScoreCanvas = $("#doughNutChartAverageEmployeeWorkScore");
+                        doughNutChartAverageEmployeeWorkScore = new Chart(doughNutChartAverageEmployeeWorkScoreCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'průměrná pracovitost',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutAverageEmployeeAbsenceScoreGraph(data_values, title, label_value){
+                        var doughNutChartAverageEmployeeAbsenceScoreCanvas = $("#doughNutChartAverageEmployeeAbsenceScore");
+                        doughNutChartAverageEmployeeAbsenceScore = new Chart(doughNutChartAverageEmployeeAbsenceScoreCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'průměrná dochvilnost',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutAverageEmployeeReliabilityScoreGraph(data_values, title, label_value){
+                        var doughNutChartAverageEmployeeReliabilityScoreCanvas = $("#doughNutChartAverageEmployeeReliabilityScore");
+                        doughNutChartAverageEmployeeReliabilityScore = new Chart(doughNutChartAverageEmployeeReliabilityScoreCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'průměrná spolehlivost',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutAverageEmployeeOverallScoreGraph(data_values, title, label_value){
+                        var doughNutChartAverageEmployeeOverallScoreCanvas = $("#doughNutChartAverageEmployeeOverallScore");
+                        doughNutChartAverageEmployeeOverallScore = new Chart(doughNutChartAverageEmployeeOverallScoreCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'průměrné skóre zaměst. ',
+                                                font: {
+                                                    size: 10
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutUnregisteredAttendanceCountGraph(data_values, title, label_value){
+                        var doughNutChartUnregisteredAttendanceCountCanvas = $("#doughNutChartUnregisteredAttendanceCount");
+                        doughNutChartUnregisteredAttendanceCount = new Chart(doughNutChartUnregisteredAttendanceCountCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 22,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'nezapsaných docházek',
+                                                font: {
+                                                    size: 12
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
+
+                    function renderDoughnutShiftsAssignedCountGraph(data_values, title, label_value){
+                        var doughNutChartAssignedShiftsCountCanvas = $("#doughNutChartAssignedShiftsCount");
+                        doughNutChartAssignedShiftsCount = new Chart(doughNutChartAssignedShiftsCountCanvas, {
+                            type:'doughnut',
+                            data:{
+                                labels: [label_value],
+                                datasets:[{
+                                    data: [data_values],
+                                    backgroundColor: ['#665191'],
+                                    borderWidth: [0]
+                                }]
+                            },
+                            options: {
+                                cutoutPercentage: 80,
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                            display: false
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display: false,
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        display:false,
+                                    },
+                                    doughnutlabel: {
+                                        labels: [{
+                                            text: data_values,
+                                            font: {
+                                                size: 24,
+                                                color:'black',
+                                                weight: 'bold'
+                                            }
+                                        },
+                                            {
+                                                text:  'obsazení směn',
+                                                font: {
+                                                    size: 12
+                                                },
+                                                color: 'grey'
+                                            }]
+                                    },
+                                },
+
+                            }
+                        })
+                    }
 
                     function renderBarGraphAttendances(data_values, data_values_two, data_values_three, data_values_four, data_values_five, title, label_value,label_value_two, label_value_three, label_value_four, label_value_five){
                         var barChartAttendancesCanvas = $("#barChartAttendances");
@@ -677,7 +2594,7 @@
                                 labels: [label_value],
                                 datasets:[{
                                     data: [data_values],
-                                    backgroundColor: ['#a05195'],
+                                    backgroundColor: ['#665191'],
                                     borderWidth: [0]
                                 }]
                             },
@@ -742,7 +2659,7 @@
                                 labels: [label_value],
                                 datasets:[{
                                     data: [data_values],
-                                    backgroundColor: ['#de425b'],
+                                    backgroundColor: ['#665191'],
                                     borderWidth: [0]
                                 }]
                             },
@@ -807,7 +2724,7 @@
                                 labels: [label_value],
                                 datasets:[{
                                     data: [data_values],
-                                    backgroundColor: ['#ff7c43'],
+                                    backgroundColor: ['#665191'],
                                     borderWidth: [0]
                                 }]
                             },
@@ -873,7 +2790,7 @@
                                 datasets:[{
                                         label: label_value,
                                         data: data_values,
-                                        backgroundColor: ['#488f31', '#83af70', '#488f31', '#83af70', '#488f31', '#83af70', '#488f31', '#83af70', '#488f31', '#83af70', '#488f31']
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
                                     }]
                             },
                             options: {
@@ -1034,41 +2951,237 @@
                         });
                     });
 
+                    $('#year_shifts_assigned').change(function(){
+                        var rok = $("#year_shifts_assigned").val();
+                        $.ajax({
+                            url: '/company/statistics/shiftsassigned/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartShiftsAssigned.destroy();
+                                renderBarGraphShiftsAssigned(response.data_shifts_assigned,"Počet směn zaměstnanců dle měsíců","Počet směn zaměstnanců dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#year_shifts_total').change(function(){
+                        var rok = $("#year_shifts_total").val();
+                        $.ajax({
+                            url: '/company/statistics/shiftstotalhours/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartShiftsTotalHours.destroy();
+                                renderBarGraphShiftsTotalHours(response.data_shifts_total_hours,"Celkový počet hodin směn dle měsíců","Celkový počet hodin směn dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#year_total_worked_hours').change(function(){
+                        var rok = $("#year_total_worked_hours").val();
+                        $.ajax({
+                            url: '/company/statistics/shiftstotalworkedhours/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartShiftsTotalWorkedHours.destroy();
+                                renderBarGraphShiftsTotalWorkedHours(response.data_shifts_total_worked_hours, "Počet odpracovaných hodin na směnách dle měsíců", "Počet odpracovaných hodin na směnách dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#year_total_late_hours').change(function(){
+                        var rok = $("#year_total_late_hours").val();
+                        $.ajax({
+                            url: '/company/statistics/shiftstotallatehours/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartShiftsTotalLateHours.destroy();
+                                renderBarGraphShiftsTotalLateHours(response.data_shifts_total_late_hours, "Počet celkových hodin zpoždění dle měsíců", "Počet celkových hodin zpoždění dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#year_late_flags_count').change(function(){
+                        var rok = $("#year_late_flags_count").val();
+                        $.ajax({
+                            url: '/company/statistics/lateflagscount/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartShiftsTotalLateFlagsCount.destroy();
+                                renderBarGraphShiftsTotalLateFlagsCount(response.data_shifts_late_flags_count, "Počet zpoždění dle měsíců", "Počet zpoždění dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#year_injuries_flags_count').change(function(){
+                        var rok = $("#year_injuries_flags_count").val();
+                        $.ajax({
+                            url: '/company/statistics/injuriesflagscount/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartShiftsTotalInjuriesFlagsCount.destroy();
+                                renderBarGraphShiftsTotalInjuriesFlagsCount(response.data_shifts_injuries_flags_count, "Počet zranění na směnách dle měsíců", "Počet zranění na směnách dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#vacations_year').change(function(){
+                        var rok = $("#vacations_year").val();
+                        $.ajax({
+                            url: '/company/statistics/vacations/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartVacationsByMonths.destroy();
+                                renderBarGraphVacationsByMonths(response.data_vacations,"Počet dovolených dle měsíců","Počet dovolených dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#diseases_year').change(function(){
+                        var rok = $("#diseases_year").val();
+                        $.ajax({
+                            url: '/company/statistics/diseases/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartDiseasesByMonths.destroy();
+                                renderBarGraphDiseasesByMonths(response.data_diseases,"Počet nemocenských dle měsíců","Počet nemocenských dle měsíců");
+                            },
+                        });
+                    });
+
+                    $('#reports_year').change(function(){
+                        var rok = $("#reports_year").val();
+                        $.ajax({
+                            url: '/company/statistics/reports/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartReportsByMonths.destroy();
+                                renderBarGraphReportsByMonths(response.data_reports,"Počet nahlášení dle měsíců","Počet nahlášení dle měsíců");
+                            },
+                        });
+                    });
+
                     var data_employees_count = <?php echo $pocetZamestnancu; ?>;
                     renderDoughnutEmployeesCountGraph(data_employees_count,"Počet zaměstnanců","Počet zaměstnanců");
                     var data_employees = <?php echo json_encode($data_employees); ?>;
                     renderBarGraphEmployees(data_employees,"Počet nových zaměstnanců dle měsíců","Počet nových zaměstnanců");
                     var data_shifts = <?php echo json_encode($data_shifts); ?>;
                     renderBarGraphShifts(data_shifts,"Počet vypsaných směn dle měsíců","Počet vypsaných směn");
-                    var data_shifts_count = <?php echo json_encode($pocetSmen); ?>;
+                    var data_shifts_count = <?php echo $pocetSmen; ?>;
                     renderDoughnutShiftsCountGraph(data_shifts_count,"Počet směn", "Počet směn");
-                    var data_shifts_upcoming_count = <?php echo json_encode($pocetNadchazejicich); ?>;
+                    var data_shifts_upcoming_count = <?php echo $pocetNadchazejicich; ?>;
                     renderDoughnutUpcomingShiftsCountGraph(data_shifts_upcoming_count, "Počet budoucích směn", "Počet budoucích směn");
-                    var data_shifts_historical_count = <?php echo json_encode($pocetHistorie); ?>;
+                    var data_shifts_historical_count = <?php echo $pocetHistorie; ?>;
                     renderDoughnutHistoricalShiftsCountGraph(data_shifts_historical_count, "Počet odpracovaných směn", "Počet odpracovaných směn");
-                    var attendance_ok_count = <?php echo json_encode($company_ok_count); ?>;
+                    var attendance_ok_count = <?php echo $company_ok_count; ?>;
                     renderDoughnutOKCountGraph(attendance_ok_count, "Počet směn bez absence či zpoždění", "Počet směn bez absence či zpoždění");
-                    var attendance_absence_count = <?php echo json_encode($company_absences_count); ?>;
+                    var attendance_absence_count = <?php echo $company_absences_count; ?>;
                     renderDoughnutAbsenceCountGraph(attendance_absence_count, "Celkový počet absencí", "Celkový počet absencí");
-                    var attendance_absence_late_count = <?php echo json_encode($company_late_count); ?>;
+                    var attendance_absence_late_count = <?php echo $company_late_count; ?>;
                     renderDoughnutAbsenceLateCountGraph(attendance_absence_late_count,"Celkový počet zpoždění na směnách", "Celkový počet zpoždění na směnách");
-                    var attendance_absence_not_came_count = <?php echo json_encode($company_not_came_count); ?>;
+                    var attendance_absence_not_came_count = <?php echo $company_not_came_count; ?>;
                     renderDoughnutAbsenceNotCameCountGraph(attendance_absence_not_came_count,"Celkový počet nepříchodů na směnu","Celkový počet nepříchodů na směnu");
-                    var attendance_absence_disease_count = <?php echo json_encode($company_disease_count); ?>;
+                    var attendance_absence_disease_count = <?php echo $company_disease_count; ?>;
                     renderDoughnutAbsenceDiseaseCountGraph(attendance_absence_disease_count,"Celkový počet nepříchodů kvůli nemoci","Celkový počet nepříchodů kvůli nemoci");
-                    var attendance_absence_denied_count = <?php echo json_encode($company_denied_count); ?>;
+                    var attendance_absence_denied_count = <?php echo $company_denied_count; ?>;
                     renderDoughnutAbsenceDeniedCountGraph(attendance_absence_denied_count,"Celkový počet odmítnutí směn","Celkový počet odmítnutí směn");
                     var data_attendances_absence_disease = <?php echo json_encode($data_attendances_absence_disease); ?>;
                     var data_attendances_absence_not_come = <?php echo json_encode($data_attendances_absence_not_come); ?>;
                     var data_attendances_absence_denied = <?php echo json_encode($data_attendances_absence_denied); ?>;
                     var data_attendances_delay = <?php echo json_encode($data_attendances_delay); ?>;
                     var data_attendances_ok = <?php echo json_encode($data_attendances_ok); ?>;
-
                     renderBarGraphAttendances(data_attendances_ok, data_attendances_absence_not_come, data_attendances_delay,
                                                        data_attendances_absence_disease, data_attendances_absence_denied,"Analýza docházky dle měsíců", "V pořádku","Nepříchody", "Zpoždění", "Nemoci", "Odmítnutí");
+                    var shifts_assigned_count = <?php echo $data_assigned_shifts_count; ?>;
+                    renderDoughnutShiftsAssignedCountGraph(shifts_assigned_count,"Celkový počet obsazení směn","Celkový počet obsazení směn");
+                    var unregistered_attendance_count = <?php echo $data_unregistered_absence_shifts; ?>;
+                    renderDoughnutUnregisteredAttendanceCountGraph(unregistered_attendance_count, "Celkový počet směn s nezapsanou docházkou", "Celkový počet směn s nezapsanou docházkou");
+                    var data_average_employee_overall_score = <?php echo $data_average_overall_score; ?>;
+                    renderDoughnutAverageEmployeeOverallScoreGraph(data_average_employee_overall_score, "Průměrné celkové skóre zaměstnance","Průměrné celkové skóre zaměstnance");
+                    var data_average_employee_realibility_score = <?php echo $data_average_reliability_score; ?>;
+                    renderDoughnutAverageEmployeeReliabilityScoreGraph(data_average_employee_realibility_score,"Průměrná spolehlivost zaměstnance","Průměrná spolehlivost zaměstnance");
+                    var data_average_employee_absence_score = <?php echo $data_average_absence_score; ?>;
+                    renderDoughnutAverageEmployeeAbsenceScoreGraph(data_average_employee_absence_score,"Průměrná dochvilnost zaměstnance","Průměrná dochvilnost zaměstnance");
+                    var data_average_employee_work_score = <?php echo $data_average_work_score; ?>;
+                    renderDoughnutAverageEmployeeWorkScoreGraph(data_average_employee_work_score,"Průměrná pracovitost zaměstnance","Průměrná pracovitost zaměstnance");
+                    var data_average_shift_hour = <?php echo $data_average_shift_hour; ?>;
+                    renderDoughnutAverageShiftHourGraph(data_average_shift_hour,"Průměrná délka směny","Průměrná délka směny");
+                    var data_average_min_hour = <?php echo $data_min_shift_hour; ?>;
+                    renderDoughnutMinShiftHourGraph(data_average_min_hour,"Nejkratší směna","Nejkratší směna");
+                    var data_average_max_hour = <?php echo $data_max_shift_hour; ?>;
+                    renderDoughnutMaxShiftHourGraph(data_average_max_hour,"Nejdelší směna","Nejdelší směna");
+                    var data_assigned_shifts_by_month = <?php echo json_encode($data_shifts_assigned_by_months); ?>;
+                    renderBarGraphShiftsAssigned(data_assigned_shifts_by_month,"Počet směn zaměstnanců dle měsíců","Počet směn zaměstnanců dle měsíců");
+                    var data_shifts_total_hours_by_month = <?php echo json_encode($data_shifts_total_hours_by_months); ?>;
+                    renderBarGraphShiftsTotalHours(data_shifts_total_hours_by_month,"Celkový počet hodin směn dle měsíců","Celkový počet hodin směn dle měsíců");
+                    var data_shifts_total_hours = <?php echo $data_shifts_total_hours; ?>;
+                    renderDoughnutTotalShiftHoursGraph(data_shifts_total_hours, "Počet celkových hodin směn", "Počet celkových hodin směn");
+                    var data_shifts_total_worked_hours = <?php echo $data_shifts_total_worked_hours; ?>;
+                    renderDoughnutTotalWorkedShiftHoursGraph(data_shifts_total_worked_hours, "Počet celkově odpracovaných hodin na směnách", "Počet celkově odpracovaných hodin na směnách");
+                    var data_shifts_total_late_hours = <?php echo $data_shifts_total_late_hours; ?>;
+                    renderDoughnutTotalLateShiftHoursGraph(data_shifts_total_late_hours,"Počet celkových hodin zpoždění zaměstnanců", "Počet celkových hodin zpoždění zaměstnanců");
+                    var data_shifts_total_late_count = <?php echo $data_shifts_total_late_count; ?>;
+                    renderDoughnutTotalLateShiftCountGraph(data_shifts_total_late_count, "Celkový počet zpoždění na směnách", "Celkový počet zpoždění na směnách");
+                    var data_employees_average_score_by_time = <?php echo $data_employees_average_employee_score_by_time; ?>;
+                    renderDoughnutAverageEmployeeScoreByTimeCountGraph(data_employees_average_score_by_time, "Průměrné skóre zaměstnanců v čase ze všech směn", "Průměrné skóre zaměstnanců v čase ze všech směn");
+                    var data_shifts_total_worked_hours_by_month = <?php echo json_encode($data_shifts_total_worked_hours_by_months); ?>;
+                    renderBarGraphShiftsTotalWorkedHours(data_shifts_total_worked_hours_by_month, "Počet odpracovaných hodin na směnách dle měsíců", "Počet odpracovaných hodin na směnách dle měsíců");
+                    var data_shifts_total_late_hours_by_month = <?php echo json_encode($data_shifts_total_late_hours_by_months); ?>;
+                    renderBarGraphShiftsTotalLateHours(data_shifts_total_late_hours_by_month, "Počet celkových hodin zpoždění dle měsíců", "Počet celkových hodin zpoždění dle měsíců");
+                    var data_shifts_total_late_flags_count = <?php echo json_encode($data_shifts_total_late_flags_count_by_months); ?>;
+                    renderBarGraphShiftsTotalLateFlagsCount(data_shifts_total_late_flags_count, "Počet zpoždění dle měsíců", "Počet zpoždění dle měsíců");
+                    var data_shift_total_injuries_flags_count = <?php echo json_encode($data_injuries_count_by_month); ?>;
+                    renderBarGraphShiftsTotalInjuriesFlagsCount(data_shift_total_injuries_flags_count, "Počet zranění na směnách dle měsíců", "Počet zranění na směnách dle měsíců");
+                    var data_vacations_count = <?php echo $data_vacations_total_count; ?>;
+                    renderDoughnutVacationsCountGraph(data_vacations_count, "Celkový počet dovolených", "Celkový počet dovolených");
+                    var data_diseases_count = <?php echo $data_diseases_total_count; ?>;
+                    renderDoughnutDiseasesCountGraph(data_diseases_count, "Celkový počet nemocenských", "Celkový počet nemocenských");
+                    var data_injuries_count = <?php echo $data_injuries_total_count; ?>;
+                    renderDoughnutInjuriesCountGraph(data_injuries_count, "Celkový počet zranění", "Celkový počet zranění");
+                    var data_reports_count = <?php echo $data_reports_total_count; ?>;
+                    renderDoughnutReportsCountGraph(data_reports_count, "Celkový počet nahlášení", "Celkový počet nahlášení");
 
+                    var data_vacations_by_months = <?php echo json_encode($data_vacations_count_by_month); ?>;
+                    renderBarGraphVacationsByMonths(data_vacations_by_months,"Počet dovolených dle měsíců","Počet dovolených dle měsíců");
+                    var data_diseases_by_months = <?php echo json_encode($data_diseases_count_by_month); ?>;
+                    renderBarGraphDiseasesByMonths(data_diseases_by_months,"Počet nemocenských dle měsíců","Počet nemocenských dle měsíců");
+                    var data_reports_by_months = <?php echo json_encode($data_reports_count_by_month); ?>;
+                    renderBarGraphReportsByMonths(data_reports_by_months,"Počet nahlášení dle měsíců","Počet nahlášení dle měsíců");
                 </script>
-
         </div>
     </section>
 @endsection

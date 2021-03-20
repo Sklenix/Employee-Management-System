@@ -241,7 +241,7 @@ class OlapAnalyzator extends Controller
         if($late_hours == NULL){
             return 0;
         }else{
-            return $late_hours;
+            return round($late_hours, 3);
         }
     }
 
@@ -277,6 +277,9 @@ class OlapAnalyzator extends Controller
         $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
         foreach ($mesice_smeny as $index => $month_shift){
             $data_shifts[$month_shift - 1] = $smeny_zpozdeni_hodiny[$index];
+        }
+        for ($i = 0; $i < sizeof($data_shifts); $i++){
+            $data_shifts[$i] = round($data_shifts[$i],3);
         }
         return $data_shifts;
     }
