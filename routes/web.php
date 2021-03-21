@@ -203,6 +203,8 @@ Route::group(['middleware' => 'auth:company'], function () {
     Route::get('/company/statistics/diseases/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeDiseasesGraphYear'])->name('changeDiseasesGraphYear');
     /* Zmena roku u grafu poctu nahlasenich v ramci smen dle mesicu */
     Route::get('/company/statistics/reports/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeReportsGraphYear'])->name('changeReportsGraphYear');
+    /* Zmena roku u grafu prumerneho skore zamestnancu v case v ramci smen dle mesicu */
+    Route::get('/company/statistics/averagescorebytime/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeAverageScoreYear'])->name('changeAverageScoreYear');
 
     Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
     Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');

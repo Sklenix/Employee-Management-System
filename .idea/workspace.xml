@@ -21,10 +21,19 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeStatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeStatisticsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/FileGeneratorController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/FileGeneratorController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/OlapAnalyzator.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/OlapAnalyzator.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/Company.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Company.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Employee.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Employee_Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee_Shift.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/file_generator.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/file_generator.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/employee_actions/statistics.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/employee_actions/statistics.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/layouts/employee_dashboard.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/employee_dashboard.blade.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routes/web.php" beforeDir="false" afterPath="$PROJECT_DIR$/routes/web.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -394,7 +403,8 @@
       <workItem from="1616169821476" duration="441000" />
       <workItem from="1616235519723" duration="6300000" />
       <workItem from="1616245239292" duration="7024000" />
-      <workItem from="1616256351761" duration="9515000" />
+      <workItem from="1616256427817" duration="1193000" />
+      <workItem from="1616325271550" duration="21164000" />
     </task>
     <servers />
   </component>

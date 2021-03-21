@@ -262,7 +262,11 @@ class FileGeneratorController extends Controller
             $cas_odpracovano_arr = explode(".", $celkove_odpracovano);
             if(sizeof($cas_arr) > 1){
                 $cas_arr[1] = substr( $cas_arr[1],0,2);
-                $cas_arr[1]= round(($cas_arr[1]/100)*60,0);
+                $scale = 1;
+                for($i = 0; $i < strlen($cas_arr[1]); $i++){
+                    $scale *= 10;
+                }
+                $cas_arr[1]= round(($cas_arr[1]/$scale)*60,0);
                 $html .= '<center><p class="text-center" style="font-family: DejaVu Sans;font-size: 13px;">Celkový počet hodin: <b>'.$cas_arr[0].'h'.$cas_arr[1].'m</b>.</p></center>';
             }else{
                 $html .= '<center><p class="text-center" style="font-family: DejaVu Sans;font-size: 13px;">Celkový počet hodin: <b>'.$cas_arr[0].'h0m</b>.</p></center>';
@@ -270,7 +274,11 @@ class FileGeneratorController extends Controller
 
             if(sizeof($cas_odpracovano_arr) > 1){
                 $cas_odpracovano_arr[1] = substr($cas_odpracovano_arr[1],0,2);
-                $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/100)*60,0);
+                $scale = 1;
+                for($i = 0; $i < strlen($cas_odpracovano_arr[1]); $i++){
+                    $scale *= 10;
+                }
+                $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/$scale)*60,0);
                 $html .= '<center><p class="text-center" style="font-family: DejaVu Sans;font-size: 13px;">Celkový počet odpracovaných hodin: <b>'.$cas_odpracovano_arr[0].'h'.$cas_odpracovano_arr[1].'m</b>.</p></center>';
             }else{
                 $html .= '<center><p class="text-center" style="font-family: DejaVu Sans;font-size: 13px;">Celkový počet odpracovaných hodin: <b>'.$cas_odpracovano_arr[0].'h0m</b>.</p></center>';
@@ -325,7 +333,12 @@ class FileGeneratorController extends Controller
             $html .= '</tbody></table>';
             $cas_arr = explode(".", $celkove);
             if(sizeof($cas_arr) > 1){
-                $cas_arr[1]= ($cas_arr[1]/100)*60;
+                $cas_arr[1] = substr( $cas_arr[1],0,2);
+                $scale = 1;
+                for($i = 0; $i < strlen($cas_arr[1]); $i++){
+                    $scale *= 10;
+                }
+                $cas_arr[1]= round(($cas_arr[1]/$scale)*60,0);
                 $html .= '<center><p class="text-center" style="font-family: DejaVu Sans;font-size: 13px;">Celkový počet hodin: <b>'.$cas_arr[0].'h'.$cas_arr[1].'m</b>.</p></center>';
             }else{
                 $html .= '<center><p class="text-center" style="font-family: DejaVu Sans;font-size: 13px;">Celkový počet hodin: <b>'.$cas_arr[0].'h0m</b>.</p></center>';

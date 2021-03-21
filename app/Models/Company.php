@@ -548,4 +548,30 @@ class Company extends Authenticatable implements  MustVerifyEmail
         }
         return $data_reports;
     }
+
+    public static function changeAverageEmployeesScoresYear($company_id, $rok){
+        date_default_timezone_set('Europe/Prague');
+        $zamestnanci_skore = DB::table('shift_info_dimension')
+            ->select(DB::raw("IFNULL(SUM(IFNULL(employee_overall,0)) / COUNT(employee_overall),0) as avg_employee_overall"))
+            ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
+            ->where(['shift_facts.company_id' => $company_id])
+            ->whereYear('shift_info_dimension.shift_start', $rok)
+            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
+            ->pluck('avg_employee_overall');
+
+        $mesice_smeny = DB::table('shift_info_dimension')
+            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
+            ->where('shift_facts.company_id', $company_id)
+            ->whereYear('shift_info_dimension.shift_start', $rok)
+            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
+            ->pluck('month_shift');
+
+        $data_skore = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        foreach ($mesice_smeny as $index => $month_shift){
+            $data_skore[$month_shift - 1] = $zamestnanci_skore[$index];
+        }
+        return $data_skore;
+    }
+
 }

@@ -133,8 +133,8 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
 
         DB::table('table_attendances')
             ->select('table_attendances.employee_id','table_attendances.shift_id')
-            ->whereNotIn('table_attendances.shift_id',$employee_ids_collector)
-            ->where(['table_attendances.employee_id' => $shift_id])
+            ->whereNotIn('table_attendances.employee_id',$employee_ids_collector)
+            ->where(['table_attendances.shift_id' => $shift_id])
             ->delete();
     }
 
@@ -177,8 +177,5 @@ class Employee_Shift extends Authenticatable implements  MustVerifyEmail
             ->where(['table_employee_shifts.shift_id' => $shift_id])
             ->delete();
     }
-
-
-
 
 }

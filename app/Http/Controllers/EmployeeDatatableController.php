@@ -14,6 +14,7 @@ use App\Models\EmployeeDimension;
 use App\Models\ImportancesShifts;
 use App\Models\Injury;
 use App\Models\Languages;
+use App\Models\Report;
 use App\Models\Shift;
 use App\Models\ShiftFacts;
 use App\Models\ShiftInfoDimension;
@@ -267,6 +268,18 @@ class EmployeeDatatableController extends Controller
         $mesicniPocetOdpracovanychHodin = Employee::getEmployeeWorkedMonthShiftsHour($id);
         $tydenniPocetOdpracovanychHodin = Employee::getEmployeeWorkedWeekShiftsHour($id);
         $celkovyPocetOdpracovanychHodin = Employee::getEmployeeWorkedTotalShiftsHour($id);
+        $shift_total_employee_late_hours = OlapAnalyzator::getTotalEmployeeLateShiftHours($id);
+        $average_employee_score_by_time = OlapAnalyzator::getAverageEmployeeScore($id);
+        $total_late_employee_flags_count = OlapAnalyzator::getTotalEmployeeLateFlagsCount($id);
+
+        $shifts_employee_assigned_count_by_months = OlapAnalyzator::getCountOfEmployeeShiftFactsByMonths($id);
+        $shift_total_employee_hours_by_months = OlapAnalyzator::getTotalEmployeeShiftsHoursByMonths($id);
+        $shift_employee_total_worked_hours_by_months = OlapAnalyzator::getTotalEmployeeShiftsWorkedHoursByMonths($id);
+        $shift_total_employee_late_hours_by_months = OlapAnalyzator::getTotalEmployeeLateShiftsHoursByMonths($id);
+        $total_late_flags_count_employee_by_months = OlapAnalyzator::getTotalEmployeeLateFlagsCountByMonths($id);
+        $employee_injuries_count_by_months = Injury::getEmployeeInjuriesByMonths($id);
+        $average_employee_score_by_months = OlapAnalyzator::getAverageEmployeeScoreByMonths($id);
+
         $skore = ($data->employee_reliability + $data->employee_absence + $data->employee_workindex) / 3;
 
         if($pocetSmenDochazka == 0){
@@ -755,6 +768,13 @@ class EmployeeDatatableController extends Controller
                           <div class="col-sm-12" style="margin-top:35px;margin-bottom: 25px;">
                              <span style="background-color: #333333;margin-top:15px;padding:14px 20px;font-size: 16px;border-radius: 10px;">Počet odpracovaných hodin celkově: '.$celkovyPocetOdpracovanychHodin.'</span>
                           </div>
+                            <div class="col-sm-12" style="margin-top:35px;margin-bottom: 25px;">
+                             <span style="background-color: #d9534f;margin-top:15px;padding:14px 20px;font-size: 16px;border-radius: 10px;">Celkové zpoždění ze všech směn: '.$shift_total_employee_late_hours.'h</span>
+                             <span style="background-color: #d9534f;margin-top:15px;padding:14px 20px;font-size: 16px;border-radius: 10px;">Počet zpoždění ze všech směn : '.$total_late_employee_flags_count.'x</span>
+                          </div>
+                           <div class="col-sm-12" style="margin-top:35px;margin-bottom: 25px;">
+                             <span style="background-color: #333333;margin-top:15px;padding:14px 20px;font-size: 16px;border-radius: 10px;">Průměrné skóre zaměstnance ze všech jeho směn: '.$average_employee_score_by_time.'b</span>
+                          </div>
                            <div class="col-sm-12"></div>
                          <ul class="list-group col-md-5" style="margin-top:12px;margin-bottom: 15px;">
                             <li class="list-group-item list-group-item text-right" style="color:white;background-color: #333;font-size: 16px;"><span class="pull-left">Počet směn celkově</span> '.$pocetSmen.'</li>
@@ -765,6 +785,134 @@ class EmployeeDatatableController extends Controller
                             <li class="list-group-item list-group-item-primary text-right" style="color:white;background-color: #333;font-size: 16px;"><span class="pull-left">Celkový počet dovolených</span> '.$pocetDovolenych  .'</li>
                             <li class="list-group-item list-group-item-primary text-right" style="color:white;background-color: #333;font-size: 16px;"><span class="pull-left">Celkový počet nemocenských</span> '.$pocetNemocenskych  .'</li>
                         </ul>
+                        <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-doughnutlabel/2.0.3/chartjs-plugin-doughnutlabel.js"></script>
+                        <div class="row justify-content-center" style="margin-bottom: 60px;">
+                            <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 15px;">
+                                &nbsp;<canvas id="barChartShiftsAssigned"></canvas>
+                            </div>
+                            <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 15px;">
+                                &nbsp;<canvas id="barChartShiftsTotalHours"></canvas>
+                            </div>
+                      </div>
+                     <div class="row justify-content-center" style="margin-bottom: 60px;">
+                        <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 15px;">
+                            &nbsp;<canvas id="barChartShiftsTotalWorkedHours"></canvas>
+                        </div>
+
+                        <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 15px;">
+                            &nbsp;<canvas id="barChartShiftsTotalLateHours"></canvas>
+                        </div>
+                     </div>
+                     <div class="row justify-content-center" style="margin-bottom: 60px;">
+                        <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 15px;">
+                            &nbsp;<canvas id="barChartShiftsTotalLateFlagsCount"></canvas>
+                        </div>
+
+                        <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 15px;">
+                            &nbsp;<canvas id="barChartShiftsTotalInjuriesFlagsCount"></canvas>
+                        </div>
+                    </div>
+                     <div class="row justify-content-center" style="margin-bottom: 60px;">
+                        <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 15px;">
+                            &nbsp;<canvas id="barChartAverageEmployeesScoreByTime"></canvas>
+                        </div>
+                    </div>
+                <script>
+                var barChartShiftsAssigned;
+                var barChartShiftsAssignedCanvas;
+                var barChartShiftsTotalHours;
+                var barChartShiftsTotalHoursCanvas;
+                var barChartShiftsTotalWorkedHours;
+                var barChartShiftsTotalWorkedHoursCanvas;
+                var barChartShiftsTotalLateHours;
+                var barChartShiftsTotalLateHoursCanvas;
+
+                var barChartShiftsTotalLateFlagsCount;
+                var barChartShiftsTotalLateFlagsCountCanvas;
+                var barChartShiftsTotalInjuriesFlagsCount;
+                var barChartShiftsTotalInjuriesFlagsCountCanvas;
+                var barChartAverageEmployeesScoreByTime;
+                var barChartAverageEmployeesScoreByTimeCanvas;
+
+                function renderBarGraph(data_values, title, label_value, element, canvas_element, element_id){
+                                       canvas_element = $(element_id);
+                                       element = new Chart(canvas_element, {
+                                           type:"bar",
+                                           data:{
+                                               labels:["Leden","Únor","Březen","Duben","Květen","Červen","Červenec","Srpen","Září","Říjen","Listopad","Prosinec"],
+                                               datasets:[
+                                                   {
+                                                       label: label_value,
+                                                       data: data_values,
+                                                       backgroundColor: ["#d9534f","#d9534f","#d9534f","#d9534f","#d9534f","#d9534f","#d9534f","#d9534f","#d9534f","#d9534f","#d9534f","#d9534f"]
+                                                   }
+                                               ]
+                                           },
+                                           options: {
+                                               responsive: true,
+                                               maintainAspectRatio: false,
+                                               title: {
+                                                   display: true,
+                                                   fontColor: "white",
+                                                   text: title,
+                                                   fontSize: 20,
+                                                   position: "top",
+                                                   padding: 25,
+                                                   fontStyle:"normal"
+                                               },
+                                               legend: {
+                                                   display: false,
+                                               },
+                                               scales: {
+                                                   xAxes: [{
+                                                       ticks: {
+                                                           fontColor: "white",
+                                                       },
+                                                       gridLines: {
+                                                           display:false,
+                                                       },
+                                                   }],
+                                                   yAxes: [{
+                                                       ticks: {
+                                                           display:false,
+                                                           beginAtZero: true,
+                                                           precision: 0,
+                                                       },
+                                                         gridLines: {
+                                                           display:false,
+                                                           color: "white",
+                                                           zeroLineColor: "white"
+                                                       },
+                                                   }]
+                                               },
+                                               plugins: {
+                                                   datalabels: {
+                                                       color: "white",
+                                                       align: "top",
+                                                       font: {
+                                                           weight: "bold",
+                                                           size:16
+                                                       },
+                                                   }
+                                               }
+                                           }
+                                       })
+                                   }
+                               var data_assigned_shifts_by_months = '.json_encode($shifts_employee_assigned_count_by_months).';
+                               renderBarGraph(data_assigned_shifts_by_months,"Počet směn dle měsíců","Počet směn dle měsíců",barChartShiftsAssigned, barChartShiftsAssignedCanvas, "#barChartShiftsAssigned");
+                               var data_total_hours_shifts_by_months = '.json_encode($shift_total_employee_hours_by_months).';
+                               renderBarGraph(data_total_hours_shifts_by_months,"Celkový počet hodin směn dle měsíců", "Celkový počet hodin směn dle měsíců", barChartShiftsTotalHours, barChartShiftsTotalHoursCanvas, "#barChartShiftsTotalHours");
+                               var data_total_worked_hours_by_months = '.json_encode($shift_employee_total_worked_hours_by_months).';
+                               renderBarGraph(data_total_worked_hours_by_months,"Počet celkově odpracovaných hodin na směnách", "Počet celkově odpracovaných hodin na směnách", barChartShiftsTotalWorkedHours, barChartShiftsTotalWorkedHoursCanvas, "#barChartShiftsTotalWorkedHours");
+                               var data_total_late_hours_by_months = '.json_encode($shift_total_employee_late_hours_by_months).';
+                               renderBarGraph(data_total_late_hours_by_months,"Počet celkových hodin zpoždění", "Počet celkových hodin zpoždění", barChartShiftsTotalLateHours, barChartShiftsTotalLateHoursCanvas, "#barChartShiftsTotalLateHours");
+                               var data_total_late_flags_count_by_months = '.json_encode($total_late_flags_count_employee_by_months).';
+                               renderBarGraph(data_total_late_flags_count_by_months, "Počet zpoždění dle měsíců", "Počet zpoždění dle měsíců", barChartShiftsTotalLateFlagsCount, barChartShiftsTotalLateFlagsCountCanvas, "#barChartShiftsTotalLateFlagsCount");
+                               var data_total_injury_flags_count_by_months = '.json_encode($employee_injuries_count_by_months).';
+                               renderBarGraph(data_total_injury_flags_count_by_months,"Počet zranění na směnách dle měsíců", "Počet zranění na směnách dle měsíců", barChartShiftsTotalInjuriesFlagsCount, barChartShiftsTotalInjuriesFlagsCountCanvas, "#barChartShiftsTotalInjuriesFlagsCount");
+                               var data_average_employee_score_by_months = '.json_encode($average_employee_score_by_months).';
+                               renderBarGraph(data_average_employee_score_by_months,"Vývoj průměrného skóre zaměstnance v čase", "Vývoj průměrného skóre zaměstnance v čase", barChartAverageEmployeesScoreByTime, barChartAverageEmployeesScoreByTimeCanvas, "#barChartAverageEmployeesScoreByTime");
+                </script>
                          </center>
                      </div>
                      <div class="tab-pane" id="jazykyTab">

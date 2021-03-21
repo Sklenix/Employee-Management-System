@@ -169,7 +169,7 @@ class OlapAnalyzator extends Controller
         if($shifts_hours == NULL){
             return 0;
         }else{
-            return $shifts_hours;
+            return round($shifts_hours, 2);
         }
     }
 
@@ -204,7 +204,7 @@ class OlapAnalyzator extends Controller
 
         $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
         foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_odpracovane_hodiny[$index];
+            $data_shifts[$month_shift - 1] = round($smeny_odpracovane_hodiny[$index],2);
         }
         return $data_shifts;
     }
@@ -488,7 +488,7 @@ class OlapAnalyzator extends Controller
         if($skore == NULL){
             return 0;
         }else{
-            return $skore;
+            return round($skore, 2);
         }
     }
 
@@ -499,14 +499,14 @@ class OlapAnalyzator extends Controller
        if($skore == NULL){
            return 0;
        }else{
-           return $skore;
+           return round($skore, 2);
        }
     }
 
     public static function getAverageEmployeesScoresByMonths($company_id){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci_skore = DB::table('shift_info_dimension')
-            ->select(DB::raw("AVG(IFNULL(employee_overall,0)) as avg_employee_overall"))
+            ->select(DB::raw("IFNULL(SUM(IFNULL(employee_overall,0)) / COUNT(employee_overall),0) as avg_employee_overall"))
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.company_id' => $company_id])
             ->whereYear('shift_info_dimension.shift_start', Carbon::now()->year)
@@ -523,7 +523,7 @@ class OlapAnalyzator extends Controller
 
         $data_skore = array(0,0,0,0,0,0,0,0,0,0,0,0);
         foreach ($mesice_smeny as $index => $month_shift){
-            $data_skore[$month_shift - 1] = $zamestnanci_skore[$index];
+            $data_skore[$month_shift - 1] = round($zamestnanci_skore[$index], 2);
         }
         return $data_skore;
     }
@@ -531,7 +531,7 @@ class OlapAnalyzator extends Controller
     public static function getAverageEmployeeScoreByMonths($employee_id){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci_skore = DB::table('shift_info_dimension')
-            ->select(DB::raw("AVG(IFNULL(employee_overall,0)) as avg_employee_overall"))
+            ->select(DB::raw("IFNULL(SUM(IFNULL(employee_overall,0)) / COUNT(employee_overall),0) as avg_employee_overall"))
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.employee_id' => $employee_id])
             ->whereYear('shift_info_dimension.shift_start', Carbon::now()->year)

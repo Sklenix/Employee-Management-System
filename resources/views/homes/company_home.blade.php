@@ -58,13 +58,13 @@
                     </div>
                     </a>
                 </div>
-                <div class="col-lg-1 col-md-1 text-center">
+            <!-- <div class="col-lg-1 col-md-1 text-center">
                     <i class="fa fa-info-circle" style="font-size: 30px;" data-toggle="tooltip" data-placement="left" title="
                     Právě se nacházíte na hlavním menu informačního systému Tozondo.
                      Vámi požadovanou akci lze realizovat buďto přes tlačítka v menu, nebo přes možnosti postranního menu nalevo.
                     Některé možnosti vyvolají pouze modální okno (přidání, smazání zaměstnance, směny nebo jazyka či vytvoření, nahrání, nebo smazání souborů/složek na Google Drive). V
                     postranním menu se některé možnosti dají dále rozkliknout, takovéto možnosti mají napravo od sebe speciální ikonku." aria-hidden="true"></i>
-                </div>
+                </div>-->
                 <div class="col-lg-2 col-md-2 text-center">
                 </div>
                 <div class="col-lg-2 col-md-2 text-center ramecek">

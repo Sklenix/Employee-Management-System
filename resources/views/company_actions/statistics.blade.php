@@ -266,6 +266,15 @@
                         </select>
                         <canvas id="barChartReportsByMonths"></canvas>
                     </div>
+                    <div class="col-lg-6" style="max-width: 700px;max-height: 500px;margin-top: 40px;">
+                        <select class="form-control" id="average_score_by_time_year">
+                            <option value="2021">Vyberte rok (defaultně je nastaven rok 2021)</option>
+                            <option value="2021">2021</option>
+                            <option value="2022">2022</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <canvas id="barChartAverageEmployeesScoreByTime"></canvas>
+                    </div>
                 </div>
 
                 <div class="col-5" style="margin-top: 50px;">
@@ -325,6 +334,67 @@
                     var barChartVacationsByMonths;
                     var barChartDiseasesByMonths;
                     var barChartReportsByMonths;
+                    var barChartAverageEmployeesScoreByTime;
+
+                    function renderBarGraphAverageEmployeesScoreByTime(data_values, title, label_value){
+                        var barChartAverageEmployeesScoreByTimeCanvas = $("#barChartAverageEmployeesScoreByTime");
+                        barChartAverageEmployeesScoreByTime = new Chart(barChartAverageEmployeesScoreByTimeCanvas, {
+                            type:'bar',
+                            data:{
+                                labels:['Leden','Únor','Březen','Duben','Květen','Červen','Červenec','Srpen','Září','Říjen','Listopad','Prosinec'],
+                                datasets:[
+                                    {
+                                        label: label_value,
+                                        data: data_values,
+                                        backgroundColor: ['#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5', '#7aa6c2', '#5886a5']
+                                    }
+                                ]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                title: {
+                                    display: true,
+                                    fontColor: "black",
+                                    text: title,
+                                    fontSize: 20,
+                                    position: "top",
+                                    padding: 25,
+                                    fontStyle:"normal"
+                                },
+                                legend: {
+                                    display: false,
+                                },
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            fontColor: "black",
+                                        },
+                                        gridLines: {
+                                            display:false
+                                        },
+                                    }],
+                                    yAxes: [{
+                                        ticks: {
+                                            display:false,
+                                            beginAtZero: true,
+                                            precision: 0,
+                                        },
+                                    }]
+                                },
+                                plugins: {
+                                    datalabels: {
+                                        color: 'black',
+                                        align: 'top',
+                                        font: {
+                                            weight: 'bold',
+                                            size:16
+                                        },
+                                    }
+                                }
+                            }
+                        })
+                    }
 
                     function renderBarGraphReportsByMonths(data_values, title, label_value){
                         var barChartReportsByMonthsCanvas = $("#barChartReportsByMonths");
@@ -941,7 +1011,6 @@
                                     datalabels: {
                                         color: 'black',
                                         align: 'top',
-                                        formatter: Math.round,
                                         font: {
                                             weight: 'bold',
                                             size:16
@@ -1002,7 +1071,6 @@
                                     datalabels: {
                                         color: 'black',
                                         align: 'top',
-                                        formatter: Math.round,
                                         font: {
                                             weight: 'bold',
                                             size:16
@@ -1057,7 +1125,7 @@
                                     },
                                     doughnutlabel: {
                                         labels: [{
-                                            text: data_values,
+                                            text: data_values+"b",
                                             font: {
                                                 size: 22,
                                                 color:'black',
@@ -1388,7 +1456,6 @@
                                     datalabels: {
                                         color: 'black',
                                         align: 'top',
-                                        formatter: Math.round,
                                         font: {
                                             weight: 'bold',
                                             size:16
@@ -1699,7 +1766,7 @@
                                     },
                                     doughnutlabel: {
                                         labels: [{
-                                            text: data_values,
+                                            text: data_values+"b",
                                             font: {
                                                 size: 22,
                                                 color:'black',
@@ -1764,7 +1831,7 @@
                                     },
                                     doughnutlabel: {
                                         labels: [{
-                                            text: data_values,
+                                            text: data_values+"b",
                                             font: {
                                                 size: 22,
                                                 color:'black',
@@ -1829,7 +1896,7 @@
                                     },
                                     doughnutlabel: {
                                         labels: [{
-                                            text: data_values,
+                                            text: data_values+"b",
                                             font: {
                                                 size: 22,
                                                 color:'black',
@@ -1894,7 +1961,7 @@
                                     },
                                     doughnutlabel: {
                                         labels: [{
-                                            text: data_values,
+                                            text: data_values+"b",
                                             font: {
                                                 size: 22,
                                                 color:'black',
@@ -3095,6 +3162,22 @@
                         });
                     });
 
+                    $('#average_score_by_time_year').change(function(){
+                        var rok = $("#average_score_by_time_year").val();
+                        $.ajax({
+                            url: '/company/statistics/averagescorebytime/chart/year/'+rok,
+                            type: 'GET',
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                barChartAverageEmployeesScoreByTime.destroy();
+                                renderBarGraphAverageEmployeesScoreByTime(response.data_score, "Vývoj průměrného skóre zaměstnanců v čase", "Vývoj průměrného skóre zaměstnanců v čase");
+                            },
+                        });
+                    });
+
                     var data_employees_count = <?php echo $pocetZamestnancu; ?>;
                     renderDoughnutEmployeesCountGraph(data_employees_count,"Počet zaměstnanců","Počet zaměstnanců");
                     var data_employees = <?php echo json_encode($data_employees); ?>;
@@ -3181,6 +3264,9 @@
                     renderBarGraphDiseasesByMonths(data_diseases_by_months,"Počet nemocenských dle měsíců","Počet nemocenských dle měsíců");
                     var data_reports_by_months = <?php echo json_encode($data_reports_count_by_month); ?>;
                     renderBarGraphReportsByMonths(data_reports_by_months,"Počet nahlášení dle měsíců","Počet nahlášení dle měsíců");
+                    var data_employee_average_score_by_months = <?php echo json_encode($data_average_employees_scores_by_months); ?>;
+                    renderBarGraphAverageEmployeesScoreByTime(data_employee_average_score_by_months, "Vývoj průměrného skóre zaměstnanců v čase", "Vývoj průměrného skóre zaměstnanců v čase");
+
                 </script>
         </div>
     </section>

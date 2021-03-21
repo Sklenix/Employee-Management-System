@@ -162,7 +162,11 @@ class Employee extends Authenticatable
         $hodiny_celkove_arr = explode(".", $smenyPocetHodin);
         if(sizeof($hodiny_celkove_arr) > 1){
             $hodiny_celkove_arr[1] = substr( $hodiny_celkove_arr[1],0,2);
-            $hodiny_celkove_arr[1]= round(($hodiny_celkove_arr[1]/100)*60,0);
+            $scale = 1;
+            for($i = 0; $i < strlen($hodiny_celkove_arr[1]); $i++){
+                $scale *= 10;
+            }
+            $hodiny_celkove_arr[1]= round(($hodiny_celkove_arr[1]/$scale)*60,0);
             return $hodiny_celkove_arr[0].'h'.$hodiny_celkove_arr[1].'m';
         }else{
             return $hodiny_celkove_arr[0].'h0m';
@@ -184,6 +188,10 @@ class Employee extends Authenticatable
         $hodiny_celkove_arr = explode(".", $smenyPocetHodin);
         if(sizeof($hodiny_celkove_arr) > 1){
             $hodiny_celkove_arr[1] = substr( $hodiny_celkove_arr[1],0,2);
+            $scale = 1;
+            for($i = 0; $i < strlen($hodiny_celkove_arr[1]); $i++){
+                $scale *= 10;
+            }
             $hodiny_celkove_arr[1]= round(($hodiny_celkove_arr[1]/100)*60,0);
             return $hodiny_celkove_arr[0].'h'.$hodiny_celkove_arr[1].'m';
         }else{
@@ -206,7 +214,11 @@ class Employee extends Authenticatable
         $hodiny_celkove_arr = explode(".", $smenyPocetHodin);
         if(sizeof($hodiny_celkove_arr) > 1){
             $hodiny_celkove_arr[1] = substr( $hodiny_celkove_arr[1],0,2);
-            $hodiny_celkove_arr[1]= round(($hodiny_celkove_arr[1]/100)*60,0);
+            $scale = 1;
+            for($i = 0; $i < strlen($hodiny_celkove_arr[1]); $i++){
+                $scale *= 10;
+            }
+            $hodiny_celkove_arr[1]= round(($hodiny_celkove_arr[1]/$scale)*60,0);
             return $hodiny_celkove_arr[0].'h'.$hodiny_celkove_arr[1].'m';
         }else{
             return $hodiny_celkove_arr[0].'h0m';
@@ -247,7 +259,11 @@ class Employee extends Authenticatable
         $cas_odpracovano_arr = explode(".", $celkove_odpracovano);
         if(sizeof($cas_odpracovano_arr) > 1){
             $cas_odpracovano_arr[1] = substr($cas_odpracovano_arr[1],0,2);
-            $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/100)*60,0);
+            $scale = 1;
+            for($i = 0; $i < strlen($cas_odpracovano_arr[1]); $i++){
+                $scale *= 10;
+            }
+            $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/$scale)*60,0);
             return $cas_odpracovano_arr[0].'h'.$cas_odpracovano_arr[1].'m';
         }else{
             return $cas_odpracovano_arr[0].'h0m';
@@ -288,7 +304,11 @@ class Employee extends Authenticatable
         $cas_odpracovano_arr = explode(".", $celkove_odpracovano);
         if(sizeof($cas_odpracovano_arr) > 1){
             $cas_odpracovano_arr[1] = substr($cas_odpracovano_arr[1],0,2);
-            $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/100)*60,0);
+            $scale = 1;
+            for($i = 0; $i < strlen($cas_odpracovano_arr[1]); $i++){
+                $scale *= 10;
+            }
+            $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/$scale)*60,0);
             return $cas_odpracovano_arr[0].'h'.$cas_odpracovano_arr[1].'m';
         }else{
             return $cas_odpracovano_arr[0].'h0m';
@@ -329,7 +349,11 @@ class Employee extends Authenticatable
         $cas_odpracovano_arr = explode(".", $celkove_odpracovano);
         if(sizeof($cas_odpracovano_arr) > 1){
             $cas_odpracovano_arr[1] = substr($cas_odpracovano_arr[1],0,2);
-            $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/100)*60,0);
+            $scale = 1;
+            for($i = 0; $i < strlen($cas_odpracovano_arr[1]); $i++){
+                $scale *= 10;
+            }
+            $cas_odpracovano_arr[1]= round(($cas_odpracovano_arr[1]/$scale)*60,0);
             return $cas_odpracovano_arr[0].'h'.$cas_odpracovano_arr[1].'m';
         }else{
             return $cas_odpracovano_arr[0].'h0m';

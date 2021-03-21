@@ -44,63 +44,36 @@ class StatisticsController extends Controller
         $min_shift_hour = Company::getMinShiftHour($user->company_id);
 
         $shifts_assigned_count = OlapAnalyzator::getCountOfShiftFacts($user->company_id);
-        $shifts_employee_assigned_count = OlapAnalyzator::getCountOfEmployeeShiftFacts(8);
-
         $shifts_assigned_count_future_count = OlapAnalyzator::getCountUpcomingShiftFacts($user->company_id);
         $shifts_assigned_count_historical_count = OlapAnalyzator::getCountHistoricalShiftFacts($user->company_id);
-
         $shifts_assigned_count_by_months = OlapAnalyzator::getCountOfShiftFactsByMonths($user->company_id);
-        $shifts_employee_assigned_count_by_months = OlapAnalyzator::getCountOfEmployeeShiftFactsByMonths(8);
 
         $total_shifts_hours = OlapAnalyzator::getTotalShiftsHours($user->company_id);
-        $total_employee_shifts_hours = OlapAnalyzator::getTotalEmployeeShiftsHours(8);
         $shift_total_hours_by_months = OlapAnalyzator::getTotalShiftsHoursByMonths($user->company_id);
-        $shift_total_employee_hours_by_months = OlapAnalyzator::getTotalEmployeeShiftsHoursByMonths(8);
 
         $shift_total_worked_hours = OlapAnalyzator::getTotalShiftsWorkedHours($user->company_id);
-        $shift_total_employee_worked_hours = OlapAnalyzator::getTotalEmployeeShiftsWorkedHours(8);
         $shift_total_worked_hours_by_months = OlapAnalyzator::getTotalWorkedShiftsHoursByMonths($user->company_id);
-        $shift_employee_total_worked_hours_by_months = OlapAnalyzator::getTotalEmployeeShiftsWorkedHoursByMonths(5);
 
         $shift_total_late_hours = OlapAnalyzator::getTotalLateShiftHours($user->company_id);
-        $shift_total_employee_late_hours = OlapAnalyzator::getTotalEmployeeLateShiftHours(6);
         $shift_total_late_hours_by_months = OlapAnalyzator::getTotalLateShiftsHoursByMonths($user->company_id);
-        $shift_total_employee_late_hours_by_months = OlapAnalyzator::getTotalEmployeeLateShiftsHoursByMonths(5);
 
         $total_late_flags_count = OlapAnalyzator::getTotalLateFlagsCount($user->company_id);
-        $total_late_employee_flags_count = OlapAnalyzator::getTotalEmployeeLateFlagsCount(4);
         $total_late_flags_count_by_months = OlapAnalyzator::getTotalLateFlagsCountByMonths($user->company_id);
-        $total_late_flags_count_employee_by_months = OlapAnalyzator::getTotalEmployeeLateFlagsCountByMonths(4);
 
         $total_injury_flags_count = OlapAnalyzator::getTotalInjuryFlagsCount($user->company_id);
-        $total_injury_employee_flags_count = OlapAnalyzator::getTotalEmployeeInjuryFlagsCount(8);
         $total_injury_flags_count_by_months = OlapAnalyzator::getTotalInjuryFlagsCountByMonths($user->company_id);
-        $total_injury_flags_count_employee_by_months = OlapAnalyzator::getTotalEmployeeInjuryFlagsCountByMonths(8);
 
         $average_employees_scores = OlapAnalyzator::getAverageEmployeesScores($user->company_id);
-        $average_employee_score = OlapAnalyzator::getAverageEmployeeScore(20);
         $average_employees_scores_by_months = OlapAnalyzator::getAverageEmployeesScoresByMonths($user->company_id);
-        $average_employee_score_by_months = OlapAnalyzator::getAverageEmployeeScoreByMonths(4);
 
         $company_diseases_count = Disease::getCompanyDiseasesCount($user->company_id);
-        $employee_diseases_count = Disease::getEmployeeDiseasesCount(8);
         $company_diseases_by_months = Disease::getCompanyDiseasesByMonths($user->company_id);
-        $employee_diseases_by_months = Disease::getEmployeeDiseasesByMonths(2);
-
         $company_injuries_count = Injury::getCompanyInjuriesCount($user->company_id);
-        $employee_injuries_count = Injury::getEmployeeInjuriesCount(8);
         $company_injuries_count_by_months = Injury::getCompanyInjuriesByMonths($user->company_id);
-        $employee_injuries_count_by_months = Injury::getEmployeeInjuriesByMonths(8);
-
         $company_reports_count = Report::getCompanyReportsCount($user->company_id);
-        $employee_reports_count = Report::getEmployeeReportsCount(15);
         $company_reports_count_by_months = Report::getCompanyReportsByMonths($user->company_id);
-        $employee_reports_count_by_months = Report::getEmployeeReportsByMonths(8);
-
         $company_vacations_count = Vacation::getCompanyVacationsCount($user->company_id);
-        $employee_vacations_count = Vacation::getEmployeeVacationsCount(8);
         $company_vacations_count_by_months = Vacation::getCompanyVacationsByMonths($user->company_id);
-        $employee_vacations_count_by_months = Vacation::getEmployeeVacationsByMonths(4);
 
         $pocet_absenci_firmy = Attendance::getCompanyAbsenceCount($user->company_id);
         $pocet_absenci_zpozdeni_firmy = Attendance::getCompanyAbsenceLateCount($user->company_id);
@@ -165,7 +138,8 @@ class StatisticsController extends Controller
             ->with('data_diseases_count_by_month', $company_diseases_by_months)
             ->with('data_injuries_count_by_month', $company_injuries_count_by_months)
             ->with('data_reports_count_by_month', $company_reports_count_by_months)
-            ->with('data_vacations_count_by_month', $company_vacations_count_by_months);
+            ->with('data_vacations_count_by_month', $company_vacations_count_by_months)
+            ->with('data_average_employees_scores_by_months',$average_employees_scores_by_months);
     }
 
     public function changeEmployeeGraphYear($rok){
@@ -243,6 +217,13 @@ class StatisticsController extends Controller
         $user=Auth::user();
         $company_reports_count_by_months = Company::changeReportsYear($user->company_id, $rok);
         return response()->json(['data_reports' => $company_reports_count_by_months]);
+    }
+
+    public function changeAverageScoreYear($rok){
+        $user=Auth::user();
+        $average_employees_scores_by_months = Company::changeAverageEmployeesScoresYear($user->company_id, $rok);
+        return response()->json(['data_score' => $average_employees_scores_by_months]);
+
     }
 
 }
