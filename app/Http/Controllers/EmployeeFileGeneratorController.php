@@ -149,6 +149,37 @@ class EmployeeFileGeneratorController extends Controller
 
     }
 
+    public function generateInjuriesList(){
+        $user = Auth::user();
+        $html = '';
+        $zraneni = Injury::getEmployeeInjuriesInjuryCentre($user->employee_id);
+        $html = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Nahlášení zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
+                    <table class="table" style="font-family: DejaVu Sans;font-size: 12px;padding-right:50px;border-collapse: collapse;">
+                     <thead>
+                          <tr style="text-align: left;">
+                            <th width="15%" style="border-bottom: 1px solid black;padding-bottom: 7px;padding-right:50px;font-size:13px;">Popis zranění</th>
+                            <th width="15%" style="border-bottom: 1px solid black;padding-bottom: 7px;padding-right:50px;font-size:13px;">Datum zranění</th>
+                            <th width="15%" style="border-bottom: 1px solid black;padding-bottom: 7px;padding-right:50px;font-size:13px;">Začátek směny</th>
+                            <th width="15%" style="border-bottom: 1px solid black;padding-bottom: 7px;padding-right:50px;font-size:13px;">Konec směny</th>
+                            <th width="15%" style="border-bottom: 1px solid black;padding-bottom: 7px;padding-right:50px;font-size:13px;">Lokace</th>
+                           </tr>
+                      </thead>
+                      <tbody>';
+
+        foreach ($zraneni as $zran){
+            $html .= '<tr>';
+            $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->injury_description.'</td>
+                      <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->injury_date.'</td>
+                      <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->shift_start.'</td>
+                      <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->shift_end.'</td>
+                      <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->shift_place.'</td>';
+            $html .='</tr>';
+        }
+        $html .= '</tbody></table>';
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_zraneni.pdf','UTF-8');
+    }
+
     public function generateReportsList(){
         $user = Auth::user();
         $html = '';
@@ -239,7 +270,7 @@ class EmployeeFileGeneratorController extends Controller
     public function generateCurrentShiftsList(Request $request){
         $user = Auth::user();
         $html = '';
-        $smeny = Employee_Shift::getEmployeeCurrentShiftsWithAttendance($user->employee_id);
+        $smeny = Shift::getEmployeeCurrentShifts($user->employee_id);
         $html = '<html style="margin:0;padding:0;">
                 <body>
                 <h4 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Seznam směn aktuálního týdne zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h4>
@@ -318,7 +349,7 @@ class EmployeeFileGeneratorController extends Controller
     public function generateShiftHistoryList(Request $request){
         $user = Auth::user();
         $html = '';
-        $smeny = Employee_Shift::getEmployeeAllShiftsWithAttendance($user->employee_id);
+        $smeny =  Shift::getEmployeeShifts($user->employee_id);
         $html = '<html style="margin:0;padding:0;">
                 <body>
                 <h4 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Seznam směn aktuálního týdne zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h4>

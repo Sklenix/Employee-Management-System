@@ -154,12 +154,6 @@
                         </button>
                     </div>
                 </form>
-                    <ul class="list-group">
-                        <li class="list-group-item" style="color:black;">Statistiky</li>
-                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet směn</strong></span> {{$pocetSmen}}</li>
-                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet absencí</strong></span> {{$pocetAbsenci}}</li>
-                        <li class="list-group-item text-right"><span class="pull-left"><strong>Počet dovolených</strong></span> {{$pocetDovolenych}}</li>
-                    </ul>
                     <button type="button" data-id="{{Auth::user()->employee_id}}" data-toggle="modal" style="margin-top:15px;" data-target="#confirmDeleteModal" class="btn btn-danger btn-block" id="getDeleteId" ><i class="fa fa-trash-o" aria-hidden="true"></i> Smazat účet</button>
             </div><br>
         </div>

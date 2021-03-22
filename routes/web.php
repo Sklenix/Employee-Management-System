@@ -265,6 +265,7 @@ Route::group(['middleware' => 'auth:employee'], function () {
     /* Generovani souboru */
     Route::get('/employee/generator', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'index'])->name('employee_generator.index');
     Route::get('/employee/generator/generate/Vacations', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateVacationsList'])->name('employee_generator.vacationsList');
+    Route::get('/employee/generator/generate/Injuries', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateInjuriesList'])->name('employee_generator.injuriesList');
     Route::get('/employee/generator/generate/Diseases', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateDiseasesList'])->name('employee_generator.diseasesList');
     Route::get('/employee/generator/generate/Reports', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateReportsList'])->name('employee_generator.reportsList');
     Route::get('/employee/generator/generate/EmployeeProfile', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateEmployeeProfile'])->name('employee_generator.employeeprofile');
@@ -277,6 +278,26 @@ Route::group(['middleware' => 'auth:employee'], function () {
     Route::get('/dashboard/googleFilesCheckboxes/employee/show/', [\App\Http\Controllers\UserEmployeeController::class, 'getAllGoogleDriveFilesCheckboxes'])->name('dashboard.getAllGoogleDriveFilesEmployee');
     Route::get('/dashboard/googleFoldersOptions/employee/show/', [\App\Http\Controllers\UserEmployeeController::class, 'getAllGoogleDriveFoldersOptions'])->name('dashboard.getAllGoogleDriveFoldersOptionsEmployee');
     Route::get('/employee/dashboard/', [App\Http\Controllers\UserEmployeeController::class, 'index'])->name('homeEmployee');
+
+    /* Statistiky */
+    /* Zmena roku u grafu prirazenych smen */
+    Route::get('/employee/statistics/shiftsassigned/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeShiftsAssignedGraphYear'])->name('changeEmployeeShiftsAssignedGraphYear');
+    /* Zmena roku u grafu celkovych hodin smen dle mesicu */
+    Route::get('/employee/statistics/shiftstotalhours/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeShiftsTotalHoursGraphYear'])->name('changeEmployeeShiftsTotalHoursGraphYear');
+    /* Zmena roku u grafu celkove odpracovanych hodin v ramci smen dle mesicu */
+    Route::get('/employee/statistics/shiftstotalworkedhours/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeShiftsTotalWorkedHoursGraphYear'])->name('changeEmployeeShiftsTotalWorkedHoursGraphYear');
+    /* Zmena roku u grafu celkovych zpozdenich v hodinach v ramci smen dle mesicu */
+    Route::get('/employee/statistics/shiftstotallatehours/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeShiftsTotalLateHoursGraphYear'])->name('changeEmployeeShiftsTotalLateHoursGraphYear');
+    /* Zmena roku u grafu poctu zpozdenich v ramci smen dle mesicu */
+    Route::get('/employee/statistics/lateflagscount/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeShiftsLateFlagsCountGraphYear'])->name('changeEmployeeShiftsLateFlagsCountGraphYear');
+    /* Zmena roku u grafu poctu zraneni v ramci smen dle mesicu */
+    Route::get('/employee/statistics/injuriesflagscount/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeShiftsInjuriesFlagsCountGraphYear'])->name('changeEmployeeShiftsInjuriesFlagsCountGraphYear');
+    /* Zmena roku u grafu poctu dovolenych v ramci smen dle mesicu */
+    Route::get('/employee/statistics/vacations/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeVacationsGraphYear'])->name('changeEmployeeVacationsGraphYear');
+    /* Zmena roku u grafu poctu nemocenskych v ramci smen dle mesicu */
+    Route::get('/employee/statistics/diseases/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeDiseasesGraphYear'])->name('changeEmployeeDiseasesGraphYear');
+    /* Zmena roku u grafu poctu nahlasenich v ramci smen dle mesicu */
+    Route::get('/employee/statistics/reports/chart/year/{rok}', [App\Http\Controllers\EmployeeStatisticsController::class, 'changeEmployeeReportsGraphYear'])->name('changeEmployeeReportsGraphYear');
 
     /* Smazani uctu zamestnance */
     Route::post('/employee/profile/delete', [App\Http\Controllers\UserEmployeeController::class, 'deleteEmployeeProfile'])->name('deleteEmployeeProfile');
@@ -308,4 +329,13 @@ Route::group(['middleware' => 'auth:admin'], function () {
 
     /* Statistiky */
     Route::get('/admin/statistics', [\App\Http\Controllers\AdminStatisticsController::class, 'index'])->name('admin_statistics.index');
+    /* Zmena roku u grafu poctu nove zaregistrovanych firem dle mesicu */
+    Route::get('/admin/statistics/companies/chart/year/{rok}', [App\Http\Controllers\AdminStatisticsController::class, 'changeCompanyGraphYear'])->name('changeCompanyGraphYear');
+    /* Zmena roku u grafu poctu novych zamestnancu dle mesicu*/
+    Route::get('/admin/statistics/employees/chart/year/{rok}', [App\Http\Controllers\AdminStatisticsController::class, 'changeAdminEmployeesGraphYear'])->name('changeAdminEmployeesGraphYear');
+    /* Zmena roku u grafu poctu vypsanych smen dle mesicu */
+    Route::get('/admin/statistics/shifts/chart/year/{rok}', [App\Http\Controllers\AdminStatisticsController::class, 'changeAdminShiftsGraphYear'])->name('changeAdminShiftsGraphYear');
+    /* Zmena roku u grafu poctu prirazenych smen dle mesicu */
+    Route::get('/admin/statistics/shiftsassigned/chart/year/{rok}', [App\Http\Controllers\AdminStatisticsController::class, 'changeAdminShiftsAssignedGraphYear'])->name('changeAdminShiftsAssignedGraphYear');
+
 });

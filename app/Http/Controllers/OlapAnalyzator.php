@@ -97,7 +97,7 @@ class OlapAnalyzator extends Controller
         if($shifts_hours == NULL){
             return 0;
         }else{
-            return $shifts_hours;
+            return round($shifts_hours, 2);
         }
     }
 
@@ -108,7 +108,7 @@ class OlapAnalyzator extends Controller
         if($shifts_hours == NULL){
             return 0;
         }else{
-            return $shifts_hours;
+            return round($shifts_hours, 2);
         }
     }
 
@@ -132,7 +132,7 @@ class OlapAnalyzator extends Controller
 
         $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
         foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_hodiny[$index];
+            $data_shifts[$month_shift - 1] = round($smeny_hodiny[$index], 2);
         }
         return $data_shifts;
     }
@@ -157,7 +157,7 @@ class OlapAnalyzator extends Controller
 
         $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
         foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_hodiny[$index];
+            $data_shifts[$month_shift - 1] = round($smeny_hodiny[$index], 2);
         }
         return $data_shifts;
     }
@@ -229,7 +229,7 @@ class OlapAnalyzator extends Controller
 
         $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
         foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_odpracovane_hodiny[$index];
+            $data_shifts[$month_shift - 1] = round($smeny_odpracovane_hodiny[$index], 3);
         }
         return $data_shifts;
     }
@@ -252,7 +252,7 @@ class OlapAnalyzator extends Controller
         if($late_hours == NULL){
             return 0;
         }else{
-            return $late_hours;
+            return round($late_hours, 3);
         }
     }
 
@@ -304,7 +304,7 @@ class OlapAnalyzator extends Controller
 
         $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
         foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_zpozdeni_hodiny[$index];
+            $data_shifts[$month_shift - 1] = round($smeny_zpozdeni_hodiny[$index], 3);
         }
         return $data_shifts;
     }

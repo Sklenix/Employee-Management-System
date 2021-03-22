@@ -67,7 +67,7 @@
                 <div class="col-lg-12 col-md-12 col-sm-12 text-center">
                     <hr style="border-top: 2px solid #333333;">
                 </div>
-                <div class=" col-lg-4" style="font-size: 15px;">
+                <div class=" col-lg-3" style="font-size: 15px;">
                 </div>
                 <a class="btn btn-dark" href="{{route('employee_generator.currentshiftsList')}}" style="cursor: pointer;color:black;text-decoration: none;margin-right: 25px;margin-bottom:5px;">
                     <div class="col-lg-1 col-md-1 text-center">
@@ -80,6 +80,14 @@
                     <div class="col-lg-1 col-md-1 text-center">
                         <div style="padding-top: 50px;padding-bottom:50px;">
                             <h5 style="color:white;">&nbsp;&nbsp;&nbsp;&nbsp;Historie směn&nbsp;&nbsp;&nbsp;&nbsp;</h5>
+                        </div>
+                    </div>
+                </a>
+
+                <a class="btn btn-dark" href="{{route('employee_generator.injuriesList')}}" style="cursor: pointer;color:black;text-decoration: none;margin-right: 25px;margin-bottom:5px;">
+                    <div class="col-lg-1 col-md-1 text-center">
+                        <div style="padding-top: 50px;padding-bottom:50px;">
+                            <h5 style="color:white;">&nbsp;&nbsp;&nbsp;&nbsp;Seznam zranění&nbsp;&nbsp;&nbsp;&nbsp;</h5>
                         </div>
                     </div>
                 </a>

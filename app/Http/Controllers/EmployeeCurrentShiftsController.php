@@ -125,6 +125,9 @@ class EmployeeCurrentShiftsController extends Controller
                 Attendance::create(['employee_id' => $user->employee_id, 'shift_id' => $shift_id, 'attendance_check_in' => $now, 'attendance_came' => 1, 'absence_reason_id' => 5]);
             }
         }else{
+            if($dochazka[0]->attendance_check_out != NULL){
+                OlapETL::aggregateEmployeeTotalWorkedHours($shift_info_id, $user->employee_id, $user->employee_company , NULL, NULL, $now, $dochazka[0]->attendance_check_out);
+            }
             if($now->gt($shift_start_date)){
                 Attendance::where(['employee_id' => $user->employee_id, 'shift_id' => $shift_id])->update(['attendance_check_in' => $now,'attendance_came' => 1, 'absence_reason_id' => 4]);
             }else{
@@ -153,6 +156,9 @@ class EmployeeCurrentShiftsController extends Controller
         if($dochazka->isEmpty()){
             Attendance::create(['employee_id' => $user->employee_id, 'shift_id' => $shift_id, 'attendance_check_out' => $now, 'attendance_came' => 1]);
         }else{
+            if($dochazka[0]->attendance_check_in != NULL){
+                OlapETL::aggregateEmployeeTotalWorkedHours($shift_info_id, $user->employee_id, $user->employee_company , NULL, NULL, $dochazka[0]->attendance_check_in, $now);
+            }
             Attendance::where(['employee_id' => $user->employee_id, 'shift_id' => $shift_id])->update(['attendance_check_out' => $now,'attendance_came' => 1]);
         }
         OlapETL::extractAttendanceCheckOutToShiftInfoDimension($shift_info_id, $now);

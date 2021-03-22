@@ -53,16 +53,8 @@ class UserEmployeeController extends Controller
 
     public function showEmployeeProfileData(){
         $user = Auth::user();
-        $pocetSmen = Shift::getEmployeeShiftsCount($user->employee_id);
-        $pocetAbsenci = Attendance::getEmployeeAbsenceCount($user->employee_id);
-        $pocetDovolenych = Vacation::getEmployeeVacationsCount($user->employee_id);
-        $pocetNemoci = Disease::getEmployeeDiseasesCount($user->employee_id);
-        $pocetZraneni = Injury::getEmployeeInjuriesInjuryCentreCount($user->employee_id);
         return view('profiles.employee_profile')
-            ->with('profilovka',$user->employee_picture)
-            ->with('pocetSmen',$pocetSmen)
-            ->with('pocetAbsenci',$pocetAbsenci)
-            ->with('pocetDovolenych',$pocetDovolenych);
+            ->with('profilovka',$user->employee_picture);
     }
 
     public function deleteEmployeeProfile(){

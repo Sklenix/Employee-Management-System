@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Employee_Shift;
 use App\Models\Shift;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +55,29 @@ class EmployeeAllShiftsController extends Controller
                         }
                     }
                 })
+                ->addColumn('hours_total', function($data){
+                    $udaje = Attendance::getAllCheckInCheckOutForShift($data->shift_id, $data->employee_id);
+                    if($udaje->isEmpty()){
+                        return '<p style="color:black;">Nezapsaný check-in/out</p>';
+                    }else{
+                        if ($udaje[0]->attendance_check_in_company == NULL || $udaje[0]->attendance_check_out_company == NULL){
+                            if($udaje[0]->attendance_check_in == NULL || $udaje[0]->attendance_check_out == NULL){
+                                return '<p style="color:black;">Nezapsaný check-in/out</p>';
+                            }else if($udaje[0]->attendance_check_in != NULL && $udaje[0]->attendance_check_out != NULL){
+                                $checkin = new DateTime($udaje[0]->attendance_check_in);
+                                $checkout = new DateTime($udaje[0]->attendance_check_out);
+                                $hodinyRozdilCheck =$checkout->diff($checkin);
+                                return '<p style="color:black;">'.$hodinyRozdilCheck->h.'h'.$hodinyRozdilCheck->i.'m</p>';
+                            }
+                            return '<p style="color:black;">Nezapsaný check-in/out</p>';
+                        }else if($udaje[0]->attendance_check_in_company != NULL && $udaje[0]->attendance_check_out_company != NULL){
+                            $checkin = new DateTime($udaje[0]->attendance_check_in_company);
+                            $checkout = new DateTime($udaje[0]->attendance_check_out_company);
+                            $hodinyRozdilCheck =$checkout->diff($checkin);
+                            return '<p style="color:black;">'.$hodinyRozdilCheck->h.'h'.$hodinyRozdilCheck->i.'m</p>';
+                        }
+                    }
+                })
                 ->addColumn('reason_description', function($data){
                     $aktualniAbsence = Attendance::getEmployeeCurrentShiftAbsenceStatus($data->shift_id, $data->employee_id);
                      if($aktualniAbsence->isEmpty()){
@@ -69,9 +93,8 @@ class EmployeeAllShiftsController extends Controller
                              }
                          }
                      }
-
                 })
-                ->rawColumns(['action','reason_description','attendance_check_in','attendance_check_out'])
+                ->rawColumns(['action','reason_description','attendance_check_in','attendance_check_out', 'hours_total'])
                 ->make(true);
         }
     }

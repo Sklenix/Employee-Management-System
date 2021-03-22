@@ -141,7 +141,6 @@ class EmployeeAttendanceController extends Controller
                             return '<p style="color:black;">'.$hodinyRozdilCheck->h.'h'.$hodinyRozdilCheck->i.'m</p>';
                         }
                     }
-
                 })
                 ->addColumn('action', function($data){
                     return '<button type="button" data-id="'.$data->shift_id.'" data-toggle="modal" style="margin-top:5px;" data-target="#ShowAttendanceOptionsModal" class="btn btn-success btn-sm" id="getEmployeesOptions"><i class="fa fa-calendar-check-o" aria-hidden="true"></i> Docházka</button>';

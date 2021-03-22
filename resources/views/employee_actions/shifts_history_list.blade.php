@@ -31,6 +31,7 @@
                     <th width="4%">Důležitost</th>
                     <th width="5%">Příchod</th>
                     <th width="5%">Odchod</th>
+                    <th width="5%" style="padding-bottom: 20px;padding-top: 20px;">Odpracováno</th>
                     <th width="5%">Status</th>
                 </tr>
                 </thead>
@@ -95,6 +96,7 @@
                                 return date;
                             }
                         },sClass:'text-center',},
+                    { data: 'hours_total', name: 'hours_total',sClass:'text-center'},
                     { data: 'reason_description', name: 'reason_description',sClass:'text-center'},
                 ]
             });

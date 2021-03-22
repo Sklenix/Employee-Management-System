@@ -347,19 +347,8 @@ class UserCompanyController extends Controller
 
     public function showCompanyProfileData(){
         $user = Auth::user();
-        $pocetZamestnancu = Employee::getCompanyEmployeesCount($user->company_id);
-        $pocetSmen = Shift::getCompanyTotalShiftCount($user->company_id);
-        $pocetNadchazejicich = Shift::getUpcomingCompanyShiftsCount($user->company_id);
-        $pocetHistorie = Shift::getHistoricalCompanyShiftsCount($user->company_id);
-        $datumVytvoreni = new DateTime($user->created_at);
-        $datumZobrazeniVytvoreni = $datumVytvoreni->format('d.m.Y');
         return view('profiles.company_profile')
-            ->with('profilovka',$user->company_picture)
-            ->with('pocetZamestnancu',$pocetZamestnancu)
-            ->with('pocetSmen',$pocetSmen)
-            ->with('pocetNadchazejicich',$pocetNadchazejicich)
-            ->with('pocetHistorie',$pocetHistorie)
-            ->with('vytvorenUcet',$datumZobrazeniVytvoreni);
+            ->with('profilovka',$user->company_picture);
     }
 
     public function deleteCompanyProfile(){
