@@ -18,7 +18,6 @@ class CreateReportsTable extends Migration
             $table->id('report_id');
             $table->string('report_title')->nullable();
             $table->string('report_description')->nullable();
-            $table->string('report_note')->nullable();
             $table->integer('report_state')->default('0');
             $table->timestamps();
             $table->bigInteger('employee_id')->unsigned();

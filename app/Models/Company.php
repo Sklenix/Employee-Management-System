@@ -62,7 +62,7 @@ class Company extends Authenticatable implements  MustVerifyEmail
 
     protected $primaryKey = 'company_id';
     protected $table = 'table_companies';
-    protected $guard = 'users';
+
     /**
      * The attributes that are mass assignable.
      *

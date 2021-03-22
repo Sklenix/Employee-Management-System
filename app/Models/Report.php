@@ -52,7 +52,7 @@ class Report extends Model
     public static function getEmployeeReports($employee_id){
         return DB::table('table_reports')
             ->select('table_reports.report_title','table_reports.report_description','table_reports.report_importance_id',
-                'table_reports.report_note','table_reports.report_state','table_reports_importances.importance_report_value', 'table_reports.report_id',
+                'table_reports.report_state','table_reports_importances.importance_report_value', 'table_reports.report_id',
                 'table_reports_importances.importance_report_description','table_reports.created_at','table_reports.updated_at')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
             ->where(['table_reports.employee_id' => $employee_id])
@@ -68,7 +68,7 @@ class Report extends Model
         }
         return DB::table('table_reports')
             ->select('table_reports.report_title','table_reports.report_description','table_reports.report_importance_id',
-                'table_reports.report_note','table_reports.report_state','table_reports_importances.importance_report_value', 'table_reports.report_id',
+                'table_reports.report_state','table_reports_importances.importance_report_value', 'table_reports.report_id',
                 'table_reports_importances.importance_report_description','table_reports.created_at','table_reports.updated_at', 'table_employees.employee_name',
                 'table_employees.employee_surname','table_employees.employee_picture')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')

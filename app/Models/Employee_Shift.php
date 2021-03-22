@@ -31,10 +31,9 @@ use Illuminate\Support\Str;
 class Employee_Shift extends Authenticatable implements  MustVerifyEmail
 {
     use HasFactory;
-    public $timestamps = false;
     protected $primaryKey = 'employee_shift_id';
     protected $table = 'table_employee_shifts';
-    protected $guard = 'users';
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *

@@ -35,7 +35,6 @@ class Injury extends Model
 
     protected $primaryKey = 'injury_id';
     protected $table = 'table_injuries';
-    protected $guard = 'users';
 
     /**
      * The attributes that are mass assignable.

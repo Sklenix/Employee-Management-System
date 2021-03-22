@@ -145,5 +145,93 @@ class ShiftsSeeder extends Seeder
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '13',
+            'shift_start' => '2021-03-22 11:00:00',
+            'shift_end' => '2021-03-22 19:00:00',
+            'shift_place' => 'Brno',
+            'shift_importance_id' => '2',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '14',
+            'shift_start' => '2021-03-23 11:00:00',
+            'shift_end' => '2021-03-23 19:00:00',
+            'shift_place' => 'Praha',
+            'shift_importance_id' => '2',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '15',
+            'shift_start' => '2021-03-24 10:00:00',
+            'shift_end' => '2021-03-24 18:00:00',
+            'shift_place' => 'Praha',
+            'shift_importance_id' => '3',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '16',
+            'shift_start' => '2021-03-25 09:00:00',
+            'shift_end' => '2021-03-25 18:00:00',
+            'shift_place' => 'Ostrava',
+            'shift_importance_id' => '4',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '17',
+            'shift_start' => '2021-03-26 13:00:00',
+            'shift_end' => '2021-03-26 18:00:00',
+            'shift_place' => 'Třebíč',
+            'shift_importance_id' => '4',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '18',
+            'shift_start' => '2021-03-27 09:00:00',
+            'shift_end' => '2021-03-27 18:00:00',
+            'shift_place' => 'Ostrava',
+            'shift_importance_id' => '4',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '19',
+            'shift_start' => '2021-03-28 09:00:00',
+            'shift_end' => '2021-03-28 18:00:00',
+            'shift_place' => 'Ostrava',
+            'shift_importance_id' => '4',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('table_shifts')->insert([
+            'shift_id' => '20',
+            'shift_start' => '2021-03-29 09:00:00',
+            'shift_end' => '2021-03-29 18:00:00',
+            'shift_place' => 'Jihlava',
+            'shift_importance_id' => '4',
+            'company_id' => '1',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }

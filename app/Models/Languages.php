@@ -29,7 +29,6 @@ class Languages extends Model
     public $timestamps = false;
     protected $primaryKey = 'language_id';
     protected $table = 'table_employee_languages';
-    protected $guard = 'employees';
     /**
      * The attributes that are mass assignable.
      *

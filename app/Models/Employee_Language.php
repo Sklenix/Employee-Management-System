@@ -29,7 +29,6 @@ class Employee_Language extends Model
     use HasFactory;
 
     protected $table = 'table_employee_table_languages';
-    protected $guard = 'employees';
     public $timestamps = false;
     /**
      * The attributes that are mass assignable.
