@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Employee;
 use App\Models\Shift;
+use App\Models\ShiftFacts;
+use App\Notifications\VerifyEmailNotification;
 use Carbon\Carbon;
 use Google_Client;
 use Google_Service_Drive_DriveFile;
 use Google_Service_Drive_Permission;
 use GuzzleHttp\Client;
 use http\Exception;
+use App\Http\Controllers\OlapETL;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -135,7 +138,7 @@ class AdminCompaniesDatatable extends Controller
             file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
             die();
         }
-
+        $new_company->notify(new VerifyEmailNotification());
         return response()->json(['success'=>'Firma '.$jmeno.' byla úspešně vytvořena.']);
     }
 
@@ -484,6 +487,32 @@ class AdminCompaniesDatatable extends Controller
     public function destroy($id){
         $company = Company::findOrFail($id);
         $jmeno = $company->company_name;
+        if($company->company_url != NULL){
+            $keyFileLocation =storage_path('app/credentials.json');
+            /*ID složky, do které chceme soubory nahrávat*/
+            $client = new Google_Client();
+            $httpClient = $client->getHttpClient();
+            $config = $httpClient->getConfig();
+            $config['verify'] = false;
+            $client->setHttpClient(new Client($config));
+            $client->setApplicationName("BackupDrive");
+            try {
+                /*Inicializace klienta*/
+                $client->setAuthConfig($keyFileLocation);
+                $client->useApplicationDefaultCredentials();
+                $client->addScope([
+                    \Google_Service_Drive::DRIVE,
+                    \Google_Service_Drive::DRIVE_METADATA
+                ]);
+                $service = new \Google_Service_Drive($client);
+                $results = $service->files->get($company->company_url);
+                if($results != NULL) {
+                    $service->files->delete($company->company_url);
+                }
+            }catch (Exception $e){
+            }
+        }
+        OlapETL::deleteRecordFromCompanyDimension($company->company_id);
         Company::findOrFail($id)->delete();
         return response()->json(['success' => 'Smazání firmy '.$jmeno.' proběhlo úspěšně']);
     }

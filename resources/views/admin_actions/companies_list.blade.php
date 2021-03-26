@@ -170,6 +170,11 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="button" style="margin-bottom: 15px;" class="btn btn-sm btn-warning pull-right" value="Generovat heslo" onClick="generator_admin();">
+                        </div>
+                    </div>
                     <div class="form-group">
                         <div class="row">
                             <label for="password" class="col-form-label col-md-2 text-center" style="font-size: 15px;">Heslo (<span style="color:red;">*</span>)</label>
@@ -180,19 +185,51 @@
                                     </div>
                                     <input id="password" placeholder="Zadejte heslo ..." type="password" class="form-control" name="password"  autocomplete="password">
                                 </div>
+                                <span toggle="#password" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword"></span>
+                                <script>
+                                    $(".showpassword").click(function() {
+                                        $(this).toggleClass("fa-eye fa-eye-slash");
+                                        var input = $($(this).attr("toggle"));
+                                        if (input.attr("type") == "password") {
+                                            input.attr("type", "text");
+                                        } else {
+                                            input.attr("type", "password");
+                                        }
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label for="password-confirm" class="col-form-label col-md-2 text-center" style="font-size: 15px;">Heslo znovu (<span style="color:red;">*</span>)</label>
+                            <label for="password_confirmation" class="col-form-label col-md-2 text-center" style="font-size: 15px;">Heslo znovu (<span style="color:red;">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
                                     </div>
-                                    <input id="password-confirm" placeholder="Znovu zadejte heslo ..." type="password" class="form-control" name="password_confirmation"  autocomplete="password_confirmation">
+                                    <input id="password_confirmation" placeholder="Znovu zadejte heslo ..." type="password" class="form-control" name="password_confirmation"  autocomplete="password_confirmation">
                                 </div>
+                                <span toggle="#password_confirmation" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpasswordverify"></span>
+                                <script>
+                                    function generator_admin() {
+                                        var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
+                                        var password_tmp = "";
+                                        for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
+                                        password.value = password_tmp;
+                                        password_confirmation.value = password_tmp;
+                                    }
+
+                                    $(".showpasswordverify").click(function() {
+                                        $(this).toggleClass("fa-eye fa-eye-slash");
+                                        var input = $($(this).attr("toggle"));
+                                        if (input.attr("type") == "password") {
+                                            input.attr("type", "text");
+                                        } else {
+                                            input.attr("type", "password");
+                                        }
+                                    });
+                                </script>
                             </div>
                         </div>
                     </div>
@@ -200,7 +237,7 @@
                 </div>
                 <div class="modal-footer">
                     <div class="col-md-12 text-center">
-                        <input type="submit" name="button_action" id="SubmitCreateCompany" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalSuccess" value="Přidat firmu" />
+                        <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitCreateCompany">Přidat firmu</button>
                         <button type="button" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalClose" data-dismiss="modal">Zavřít</button>
                     </div>
                 </div>
@@ -342,11 +379,15 @@
                         phone: $('#phone').val(),
                         company_login: $('#company_login').val(),
                         password: $('#password').val(),
-                        password_confirmation: $('#password-confirm').val()
+                        password_confirmation: $('#password_confirmation').val()
+                    },
+                    beforeSend:function(){
+                        $('#SubmitCreateCompany').text('Přidávání...');
                     },
                     success: function(result) {
                         if(result.errors) {
                             $('.chyby_add').html('');
+                            $('#SubmitCreateCompany').text('Přidat firmu');
                             $.each(result.errors, function(key, value) {
                                 $('.chyby_add').show();
                                 $('.chyby_add').append('<strong><li>'+value+'</li></strong>');

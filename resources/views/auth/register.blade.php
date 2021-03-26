@@ -240,6 +240,7 @@
                                     @enderror
                                     </div>
                                 </div>
+                                <input type="button" class="btn btn-warning btn-sm pull-right" value="Generovat heslo" onClick="generator_registration();">
                                 <div class="form-group">
                                     <label for="password" class="col-form-label text-md-right">Heslo (<span style="color:red;">*</span>)</label>
                                     <div class="input-group">
@@ -254,16 +255,48 @@
                                     </span>
                                     @enderror
                                     </div>
+                                    <span toggle="#password" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword"></span>
+                                    <script>
+                                        $(".showpassword").click(function() {
+                                            $(this).toggleClass("fa-eye fa-eye-slash");
+                                            var input = $($(this).attr("toggle"));
+                                            if (input.attr("type") == "password") {
+                                                input.attr("type", "text");
+                                            } else {
+                                                input.attr("type", "password");
+                                            }
+                                        });
+                                    </script>
                                 </div>
 
                                 <div class="form-group">
-                                    <label for="password-confirm" class="col-form-label text-md-right">Heslo znovu (<span style="color:red;">*</span>)</label>
+                                    <label for="password_confirmation" class="col-form-label text-md-right">Heslo znovu (<span style="color:red;">*</span>)</label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
                                         </div>
-                                    <input id="password-confirm" placeholder="Znovu zadejte Vaše heslo ..." type="password" class="form-control" name="password_confirmation"  autocomplete="password_confirmation">
+                                    <input id="password_confirmation" placeholder="Znovu zadejte Vaše heslo ..." type="password" class="form-control" name="password_confirmation"  autocomplete="password_confirmation">
                                 </div>
+                                <span toggle="#password_confirmation" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpasswordverify"></span>
+                                <script>
+                                    function generator_registration() {
+                                        var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
+                                        var password_tmp = "";
+                                        for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
+                                        password.value = password_tmp;
+                                        password_confirm.value = password_tmp;
+                                    }
+
+                                    $(".showpasswordverify").click(function() {
+                                        $(this).toggleClass("fa-eye fa-eye-slash");
+                                        var input = $($(this).attr("toggle"));
+                                        if (input.attr("type") == "password") {
+                                            input.attr("type", "text");
+                                        } else {
+                                            input.attr("type", "password");
+                                        }
+                                    });
+                                </script>
                                 </div>
 
                                 <div class="form-group text-center">

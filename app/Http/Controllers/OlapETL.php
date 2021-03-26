@@ -150,33 +150,12 @@ class OlapETL extends Controller
     }
 
     public static function deleteRecordFromEmployeeDimension($employee_id){
-        $smeny = DB::table('shift_facts')
-            ->select('shift_info_dimension.shift_info_id','shift_info_dimension.shift_start','shift_info_dimension.shift_end')
-            ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
-            ->where(['shift_facts.employee_id' => $employee_id])
-            ->get();
-        foreach ($smeny as $smena){
-            DB::table('shift_info_dimension')
-                ->where(['shift_info_dimension.shift_info_id' => $smena->shift_info_id])
-                ->delete();
-            DB::table('time_dimension')
-                ->where(['time_dimension.time_id' => $smena->shift_info_id])
-                ->delete();
-        }
-        EmployeeDimension::findOrFail($employee_id)->delete();
-    }
-
-    public static function deleteRecordFromCompanyDimension($company_id){
-        $zamestnanci = DB::table('shift_facts')
-            ->select('employee_dimension.employee_id','employee_dimension.employee_name','employee_dimension.employee_surname')
-            ->join('employee_dimension','shift_facts.employee_id','=','employee_dimension.employee_id')
-            ->where(['shift_facts.company_id' => $company_id])
-            ->get();
-        foreach ($zamestnanci as $zamestnanec){
+        $zamestnanec = EmployeeDimension::find($employee_id);
+        if($zamestnanec != NULL){
             $smeny = DB::table('shift_facts')
                 ->select('shift_info_dimension.shift_info_id','shift_info_dimension.shift_start','shift_info_dimension.shift_end')
                 ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
-                ->where(['shift_facts.employee_id' => $zamestnanec->employee_id])
+                ->where(['shift_facts.employee_id' => $employee_id])
                 ->get();
             foreach ($smeny as $smena){
                 DB::table('shift_info_dimension')
@@ -186,11 +165,38 @@ class OlapETL extends Controller
                     ->where(['time_dimension.time_id' => $smena->shift_info_id])
                     ->delete();
             }
-            DB::table('employee_dimension')
-                ->where(['employee_dimension.employee_id' => $zamestnanec->employee_id])
-                ->delete();
+            $zamestnanec->delete();
         }
-        CompanyDimension::findOrFail($company_id)->delete();
+    }
+
+    public static function deleteRecordFromCompanyDimension($company_id){
+        $firma = CompanyDimension::find($company_id);
+        if($firma != NULL){
+            $zamestnanci = DB::table('shift_facts')
+                ->select('employee_dimension.employee_id','employee_dimension.employee_name','employee_dimension.employee_surname')
+                ->join('employee_dimension','shift_facts.employee_id','=','employee_dimension.employee_id')
+                ->where(['shift_facts.company_id' => $company_id])
+                ->get();
+            foreach ($zamestnanci as $zamestnanec){
+                $smeny = DB::table('shift_facts')
+                    ->select('shift_info_dimension.shift_info_id','shift_info_dimension.shift_start','shift_info_dimension.shift_end')
+                    ->join('shift_info_dimension','shift_facts.shift_info_id','=','shift_info_dimension.shift_info_id')
+                    ->where(['shift_facts.employee_id' => $zamestnanec->employee_id])
+                    ->get();
+                foreach ($smeny as $smena){
+                    DB::table('shift_info_dimension')
+                        ->where(['shift_info_dimension.shift_info_id' => $smena->shift_info_id])
+                        ->delete();
+                    DB::table('time_dimension')
+                        ->where(['time_dimension.time_id' => $smena->shift_info_id])
+                        ->delete();
+                }
+                DB::table('employee_dimension')
+                    ->where(['employee_dimension.employee_id' => $zamestnanec->employee_id])
+                    ->delete();
+            }
+            $firma->delete();
+        }
     }
 
     public static function updateEmployeeDimension($employee_id, $employee_name, $employee_surname, $employee_position){
