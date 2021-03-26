@@ -284,7 +284,7 @@
                                         var password_tmp = "";
                                         for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
                                         password.value = password_tmp;
-                                        password_confirm.value = password_tmp;
+                                        password_confirmation.value = password_tmp;
                                     }
 
                                     $(".showpasswordverify").click(function() {
