@@ -1,61 +1,66 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+## Informační systém pro řízení zaměstnanců firmy
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+Webová aplikace implementovaná v jazyce PHP s využitím frameworku Laravel společně s MySQL databází. 
+Mezi hlavní funkce systému patří:
+- správa zaměstnanců, včetně správy jejich docházek, 
+- práce s Google Drive diskem,
+- generování různých souborů ve formátu PDF,
+- zobrazení různých statistik, hodnocení zaměstnanců,
+- správa směn, 
+- správa zaměstnaneckých jazyků, 
+- správa dovolených, nemocenských a nahlášení zaměstnanců.
 
-## About Laravel
+## Použitý framework
+- [Laravel](https://laravel.com/)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Použité knihovny
+- [Yajra Datatables](https://yajrabox.com/docs/laravel-datatables/master/installation)
+- [Google Drive API](https://developers.google.com/drive/api/v3/quickstart/php)
+- [Chart.js](https://www.chartjs.org/)
+- [DOMPDF Wrapper for Laravel](https://github.com/barryvdh/laravel-dompdf)
+- [Chart.js Doughnutlabel plugin](https://github.com/ciprianciurea/chartjs-plugin-doughnutlabel)
+- [Chart.js Datalabels plugin](https://github.com/chartjs/chartjs-plugin-datalabels)
+- [Bootstrap](https://getbootstrap.com/)
+- [DataTables](https://datatables.net/)
+- [Moment.js](https://momentjs.com/)
+- [Datetimepicker](https://github.com/xdan/datetimepicker/blob/master/MIT-LICENSE.txt)
+- [Modernizr](https://modernizr.com/)
+- [Laravel IDE Helper Generator](https://github.com/barryvdh/laravel-ide-helper)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalace
+### Prerekvizity
+1. Nainstalovaný nástroj [Composer](https://getcomposer.org/)
+2. Nainstalované libovolné vývojové prostředí pro tvorbu webových aplikací, které obsahuje MySQL databázi a PHP,
+   například [WAMP Server](https://www.wampserver.com/en/)
+3. Nastavit jazyk PHP jako systémovou proměnnou, aby se dal ovládat z příkazové řádky (cmd) 
+### Proces
+1. Vytvořte soubor **.env**, následně do něj zkopírujte obsah souboru **.env.example**. V souboru **.env** vyplňte 
+údaje potřebné k připojení k databázi.
+2. V kořenovém adresáři spustťe příkaz **composer install** (přes cmd).
+3. Vygenerujte klíč aplikace pomocí příkazu **php artisan key:generate**
+4. Zadejte příkaz **php artisan migrate:fresh** pro vytvoření tabulek a následovně **php artisan db:seed** pro 
+naplnění tabulek záznamy.
+5. Nyní stačí spustit databázi MySQL (WAMP Server) a zadat příkaz **php artisan serve** a přejít na stránku **http://127.0.0.1:8000/**.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Poznámka
+Pro nahrávání objemnějších souborů je zapotřebí v souboru php.ini přenastavit proměnné post_max_size a upload_max_size na příslušnou požadovanou hodnotu, například 100 MB.
 
-## Learning Laravel
+## Licence
+- Framework Laravel je open source software, který je distribuován pod licencí [MIT](https://opensource.org/licenses/MIT).
+- Yajra Datatables je knihovna, která je distribuovaná pod licencí [MIT](https://github.com/yajra/laravel-datatables/blob/9.0/LICENSE.md).
+- Google Drive API je knihovna, která je distribuovaná pod licencí [Apache License 2.0](https://github.com/googleapis/google-api-php-client/blob/master/LICENSE)
+- Chart.js je knihovna, která je distribuovaná pod licencí [MIT](https://github.com/chartjs/Chart.js/blob/master/LICENSE.md).
+- DOMPDF Wrapper for Laravel je knihovna, která je distribuovaná pod licencí [MIT](https://opensource.org/licenses/MIT).
+- Chart.js Datalabels plugin je plugin, který je distribuován pod licencí [MIT](https://github.com/chartjs/chartjs-plugin-datalabels/blob/master/LICENSE.md).
+- Chart.js Doughnutlabel plugin je plugin, který je distribuován pod licencí [MIT](https://github.com/ciprianciurea/chartjs-plugin-doughnutlabel/blob/master/LICENSE).
+- Bootstrap je knihovna, která je distribuovaná pod licencí [MIT](https://github.com/twbs/bootstrap/blob/main/LICENSE)
+- DataTables je open source software, který je od verze 1.10 distribuovaný pod licencí [MIT](https://datatables.net/license/)
+- Moment.js je knihovna, která je distribuovaná pod licencí [MIT](https://github.com/moment/momentjs.com/blob/master/LICENSE)
+- Datetimepicker je plugin, který je distribuován pod licencí [MIT](https://github.com/xdan/datetimepicker/blob/master/MIT-LICENSE.txt)
+- Modernizr je knihovna, která je distribuovaná pod licencí [MIT](https://github.com/Modernizr/Modernizr/blob/master/LICENSE.md)
+- Laravel IDE Helper Generator je knihovna, která je distribuovaná pod licencí [MIT](https://opensource.org/licenses/MIT)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Laravel IDE Helper Generator byl použit pro generování komentářů pro automatické doplňování v rámci IDE. Jedná se například o doplňování atributů tabulek, metod v rámci modelů, ... 
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Jednotlivé licence jsou obsaženy v souboru LICENSE.md
 
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).

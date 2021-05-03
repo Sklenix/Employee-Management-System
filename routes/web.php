@@ -3,34 +3,29 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+/* Tento soubor obsahuje vsechny cesty v ramci informacniho systemu */
 
 /* Uvodni strana zobrazeni hlavni stranky plus odeslani emailu skrze formular */
 Route::get('/', [App\Http\Controllers\WelcomeController::class, 'index'])->name('welcome');
 Route::post('/welcome/send',[App\Http\Controllers\WelcomeController::class, 'send'])->name('sendEmail');
 
 /* Sekce pro zobrazeni formularu pro prihlaseni*/
-Route::get('/login/admin', [App\Http\Controllers\Auth\LoginController::class, 'showAdminLoginForm'])->name('showAdminLoginForm');
-Route::get('/login/company', [App\Http\Controllers\Auth\LoginController::class, 'showCompanyLoginForm'])->name('company');
-Route::get('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'showEmployeeLoginForm'])->name('employee');
+Route::get('/login/admin', [App\Http\Controllers\Auth\LoginController::class, 'renderAdminLogin'])->name('renderAdminLogin');
+Route::get('/login/company', [App\Http\Controllers\Auth\LoginController::class, 'renderCompanyLogin'])->name('renderCompanyLogin');
+Route::get('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'renderEmployeeLogin'])->name('renderEmployeeLogin');
 
 /* Samotne provedeni prihlaseni */
 Route::post('/login/admin', [App\Http\Controllers\Auth\LoginController::class,'adminLogin']);
 Route::post('/login/company', [App\Http\Controllers\Auth\LoginController::class,'companyLogin']);
 Route::post('/login/employee', [App\Http\Controllers\Auth\LoginController::class,'employeeLogin']);
 
+/* Cesty pro odhlaseni jednotlivych uzivatelskych roli ze systemu */
+Route::post('/logout/admin', [App\Http\Controllers\Auth\LoginController::class,'adminLogout'])->name('adminLogOut');
+Route::post('/logout/company', [App\Http\Controllers\Auth\LoginController::class,'companyLogout'])->name('companyLogout');
+Route::post('/logout/employee', [App\Http\Controllers\Auth\LoginController::class,'employeeLogout'])->name('employeeLogout');
+
 /* Sekce pro logout a pro overovaci stranku */
 Auth::routes(['verify'=>true]);
-Route::get('/logout', [App\Http\Controllers\Auth\LoginController::class, 'loggedOut']);
 
 Route::group(['middleware' => 'auth:company'], function () {
     /* ---------------Dashboard operace------------------ */
@@ -98,8 +93,8 @@ Route::group(['middleware' => 'auth:company'], function () {
     /* Samostatny datatable pro zobrazeni hodnoceni zamestnancu */
     Route::get('/company/employees/ratings', [\App\Http\Controllers\RatingDatatableController::class, 'index'])->name('ratings.index');
     Route::get('/company/employees/ratings/list', [\App\Http\Controllers\RatingDatatableController::class, 'getRatings'])->name('ratings.list');
-    Route::get('/company/employees/ratings/rate/{id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'editRate'])->name('ratings.rate');
-    Route::put('/company/employees/ratings/rate/edit/{id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'updateRate'])->name('ratings.rateedit');
+    Route::get('/company/employees/ratings/rate/{id}', [\App\Http\Controllers\RatingDatatableController::class, 'editRate'])->name('ratings.rate');
+    Route::put('/company/employees/ratings/rate/edit/{id}', [\App\Http\Controllers\RatingDatatableController::class, 'updateRate'])->name('ratings.rateedit');
 
     /* Hodnoceni zamestnance v datatable */
     Route::get('/company/employees/rate/{id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'editRate'])->name('employees.rate');
@@ -139,15 +134,15 @@ Route::group(['middleware' => 'auth:company'], function () {
     /* Zobrazeni moznosti dochazky v datatable smen */
     Route::get('/shift/attendance/options/{id}', [\App\Http\Controllers\ShiftDatatableController::class, 'getAttendanceOptions'])->name('shifts.getAttendanceOptions');
 
-    /* Zobrazeni nadokna pro checkin, checkout, absenci a poznamku*/
+    /* Zobrazeni nadokna pro prichod, odchod, absenci a poznamku*/
     Route::get('/shift/attendance/options/checkin/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\ShiftDatatableController::class, 'showCheckin'])->name('shifts.showCheckin');
     Route::get('/shift/attendance/options/checkout/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\ShiftDatatableController::class, 'showCheckOut'])->name('shifts.showCheckOut');
     Route::get('/shift/attendance/options/absence/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\ShiftDatatableController::class, 'showAbsence'])->name('shifts.showAbsence');
     Route::get('/shift/attendance/options/note/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\ShiftDatatableController::class, 'showAttendanceNote'])->name('shifts.showAttendanceNote');
 
-    /* Ulozeni check-in do databaze */
+    /* Ulozeni prichodu do databaze */
     Route::put('/shift/attendance/options/checkin/update/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\ShiftDatatableController::class, 'updateCheckIn'])->name('shifts.updateCheckIn');
-    /* Ulozeni check-out do databaze*/
+    /* Ulozeni odchodu do databaze*/
     Route::put('/shift/attendance/options/checkout/update/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\ShiftDatatableController::class, 'updateCheckOut'])->name('shifts.updateCheckOut');
     /* Ulozeni absence do databaze */
     Route::put('/shift/attendance/options/absence/update/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\ShiftDatatableController::class, 'updateAbsence'])->name('shifts.updateAbsence');
@@ -157,15 +152,15 @@ Route::group(['middleware' => 'auth:company'], function () {
     /* Zobrazeni moznosti dochazky v datatable zamestnancu */
     Route::get('/employee/attendance/options/{id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'getAttendanceOptions'])->name('employee.getAttendanceOptions');
 
-    /* Zobrazeni nadokna pro checkin, checkout, absenci a poznamku (datatable zamestnancu)*/
+    /* Zobrazeni nadokna pro prichod, odchod, absenci a poznamku (datatable zamestnancu)*/
     Route::get('/employee/attendance/options/checkin/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'showCheckin'])->name('employee.showCheckin');
     Route::get('/employee/attendance/options/checkout/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'showCheckOut'])->name('employee.showCheckOut');
     Route::get('/employee/attendance/options/absence/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'showAbsence'])->name('employee.showAbsence');
     Route::get('/employee/attendance/options/note/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'showAttendanceNote'])->name('employee.showAttendanceNote');
 
-    /* Ulozeni check-in do databaze (datatable zamestnancu) */
+    /* Ulozeni prichodu do databaze (datatable zamestnancu) */
     Route::put('/employee/attendance/options/checkin/update/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'updateCheckIn'])->name('employee.updateCheckIn');
-    /* Ulozeni check-out do databaze (datatable zamestnancu) */
+    /* Ulozeni odchodu do databaze (datatable zamestnancu) */
     Route::put('/employee/attendance/options/checkout/update/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'updateCheckOut'])->name('employee.updateCheckOut');
     /* Ulozeni absence do databaze (datatable zamestnancu) */
     Route::put('/employee/attendance/options/absence/update/{zamestnanec_id}/{smena_id}', [\App\Http\Controllers\EmployeeDatatableController::class, 'updateAbsence'])->name('employee.updateAbsence');
@@ -206,6 +201,7 @@ Route::group(['middleware' => 'auth:company'], function () {
     /* Zmena roku u grafu prumerneho skore zamestnancu v case v ramci smen dle mesicu */
     Route::get('/company/statistics/averagescorebytime/chart/year/{rok}', [App\Http\Controllers\StatisticsController::class, 'changeAverageScoreYear'])->name('changeAverageScoreYear');
 
+    /* Uprava profilu, ovladani Google Drive, vytvoreni zamestnance */
     Route::post('/company/profile/upload', [App\Http\Controllers\UserCompanyController::class, 'uploadGoogleDrive'])->name('uploadDrive');
     Route::post('/company/profile/createFolder', [App\Http\Controllers\UserCompanyController::class, 'createFolderGoogleDrive'])->name('createFolder');
     Route::post('/company/profile/deleteFile', [App\Http\Controllers\UserCompanyController::class, 'deleteFileGoogleDrive'])->name('deleteFile');
@@ -213,10 +209,9 @@ Route::group(['middleware' => 'auth:company'], function () {
     Route::post('/company/profile/update/password',[App\Http\Controllers\UserCompanyController::class, 'updateProfilePassword'])->name('updateProfilePassword');
     Route::post('/company/profile/update',[App\Http\Controllers\UserCompanyController::class, 'updateProfileData'])->name('updateProfileData');
     Route::post('/company/profile/addEmployee',[App\Http\Controllers\UserCompanyController::class, 'addEmployee'])->name('addEmployee');
-
+    /* Presmerovani na domovskou stranku */
     Route::get('/company/dashboard/', [App\Http\Controllers\UserCompanyController::class, 'index'])->name('home')->middleware('verified');
-
-    Route::get('/login/company/verifySuccess', [App\Http\Controllers\UserCompanyController::class, 'showVerifySuccess'])->name('OvereniHotovo');
+    /* Nahrani a smazani profiloveho obrazku */
     Route::post('/company/profile/uploadImage',[App\Http\Controllers\UserCompanyController::class, 'uploadImage'])->name('uploadImage');
     Route::post('/company/profile/deleteOldImage',[App\Http\Controllers\UserCompanyController::class, 'deleteOldImage'])->name('deleteOldImage');
 
@@ -271,7 +266,7 @@ Route::group(['middleware' => 'auth:employee'], function () {
     Route::get('/employee/generator/generate/EmployeeProfile', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateEmployeeProfile'])->name('employee_generator.employeeprofile');
     Route::get('/employee/generator/generate/CurrentShifts', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateCurrentShiftsList'])->name('employee_generator.currentshiftsList');
     Route::get('/employee/generator/generate/ShiftHistory', [\App\Http\Controllers\EmployeeFileGeneratorController::class, 'generateShiftHistoryList'])->name('employee_generator.shifthistoryList');
-
+    /* Prace s Google Drive a zobrazeni domovske stranky */
     Route::post('/employee/createFolder', [App\Http\Controllers\UserEmployeeController::class, 'createFolderGoogleDrive'])->name('createFolderEmployee');
     Route::post('/employee/uploadFile', [App\Http\Controllers\UserEmployeeController::class, 'uploadGoogleDrive'])->name('uploadDriveEmployee');
     Route::post('/employee/deleteFile', [App\Http\Controllers\UserEmployeeController::class, 'deleteFileGoogleDrive'])->name('deleteFileEmployee');
@@ -301,6 +296,7 @@ Route::group(['middleware' => 'auth:employee'], function () {
 
     /* Smazani uctu zamestnance */
     Route::post('/employee/profile/delete', [App\Http\Controllers\UserEmployeeController::class, 'deleteEmployeeProfile'])->name('deleteEmployeeProfile');
+    /* Zobrazeni a uprava profilu a nahrani, smazani profiloveho obrazku */
     Route::get('/employee/profile/', [App\Http\Controllers\UserEmployeeController::class, 'showEmployeeProfileData'])->name('showEmployeeProfileData');
     Route::post('/employee/profile/update',[App\Http\Controllers\UserEmployeeController::class, 'updateEmployeeProfileData'])->name('updateEmployeeProfileData');
     Route::post('/employee/profile/update/password',[App\Http\Controllers\UserEmployeeController::class, 'updateEmployeeProfilePassword'])->name('updateEmployeeProfilePassword');
@@ -309,11 +305,13 @@ Route::group(['middleware' => 'auth:employee'], function () {
 });
 
 Route::group(['middleware' => 'auth:admin'], function () {
+    /* Zobrazeni domovske stranky */
     Route::get('/admin/dashboard/', [App\Http\Controllers\UserAdminController::class, 'index'])->name('homeAdmin');
 
     /* Smazani uctu admina */
     Route::post('/admin/profile/delete', [App\Http\Controllers\UserAdminController::class, 'deleteAdminProfile'])->name('deleteAdminProfile');
 
+    /* Zobrazeni a uprava profilu */
     Route::get('/admin/profile/', [App\Http\Controllers\UserAdminController::class, 'showAdminProfileData'])->name('showAdminProfileData');
     Route::post('/admin/profile/update',[App\Http\Controllers\UserAdminController::class, 'updateAdminProfileData'])->name('updateAdminProfileData');
     Route::post('/admin/profile/update/password',[App\Http\Controllers\UserAdminController::class, 'updateAdminProfilePassword'])->name('updateAdminProfilePassword');
@@ -337,5 +335,4 @@ Route::group(['middleware' => 'auth:admin'], function () {
     Route::get('/admin/statistics/shifts/chart/year/{rok}', [App\Http\Controllers\AdminStatisticsController::class, 'changeAdminShiftsGraphYear'])->name('changeAdminShiftsGraphYear');
     /* Zmena roku u grafu poctu prirazenych smen dle mesicu */
     Route::get('/admin/statistics/shiftsassigned/chart/year/{rok}', [App\Http\Controllers\AdminStatisticsController::class, 'changeAdminShiftsAssignedGraphYear'])->name('changeAdminShiftsAssignedGraphYear');
-
 });

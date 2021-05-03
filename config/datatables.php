@@ -1,7 +1,7 @@
 <?php
 
 return [
-    /*
+    /* Soubor knihovny Yajra, ktera slouzi k zobrazovani datovych tabulek
      * DataTables search options.
      */
     'search'         => [

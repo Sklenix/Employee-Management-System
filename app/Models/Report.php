@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\Report
- *
  * @property int $report_id
  * @property string|null $report_title
  * @property string|null $report_description
@@ -33,22 +32,22 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|Report whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Report extends Model
-{
+class Report extends Model {
+    /* Nazev souboru: Report.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida je modelem k tabulce table_reports */
     use HasFactory;
-
+    /* Urceni primarniho klice tabulky, nazvu tabulky */
     protected $primaryKey = 'report_id';
     protected $table = 'table_reports';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    /* Definice atributu tabulky, s kterymi model pracuje */
     protected $fillable = [
         'report_title', 'report_description','report_note', 'report_state', 'report_importance_id', 'employee_id'
     ];
 
+    /* Nazev funkce: getEmployeeReports
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani vsech nahlaseni konkretniho zamestnance */
     public static function getEmployeeReports($employee_id){
         return DB::table('table_reports')
             ->select('table_reports.report_title','table_reports.report_description','table_reports.report_importance_id',
@@ -60,6 +59,9 @@ class Report extends Model
             ->get();
     }
 
+    /* Nazev funkce: getEmployeeReports
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani vsech nahlaseni zamestnancu v ramci konkretni firmy */
     public static function getCompanyEmployeesReports($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $id_zamestnancu = array();
@@ -79,6 +81,9 @@ class Report extends Model
             ->get();
     }
 
+    /* Nazev funkce: getCompanyReportsCount
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani poctu vsech nahlaseni zamestnancu v ramci konkretni firmy */
     public static function getCompanyReportsCount($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $id_zamestnancu = array();
@@ -91,6 +96,9 @@ class Report extends Model
             ->count();
     }
 
+    /* Nazev funkce: getEmployeeReportsCount
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu vsech nahlaseni konkretniho zamestnance */
     public static function getEmployeeReportsCount($employee_id){
         return DB::table('table_reports')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
@@ -98,6 +106,9 @@ class Report extends Model
             ->count();
     }
 
+    /* Nazev funkce: getCompanyReportsByMonths
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani poctu nahlaseni zamestnancu v konkretni firme dle mesicu */
     public static function getCompanyReportsByMonths($company_id){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci = Employee::getCompanyEmployees($company_id);
@@ -106,51 +117,50 @@ class Report extends Model
             array_push($id_zamestnancu,$zamestnanec->employee_id);
         }
         $nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("COUNT(*) as count_reports"))
+            ->selectRaw('COUNT(*) as count_reports')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
             ->whereIn('table_reports.employee_id',$id_zamestnancu)
             ->whereYear('table_reports.created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('count_reports');
-
+            ->groupByRaw('MONTH(table_reports.created_at)')
+            ->get();
         $mesice_nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("Month(table_reports.created_at) as month_report"))
+            ->selectRaw('MONTH(table_reports.created_at) as month_report')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
             ->whereIn('table_reports.employee_id',$id_zamestnancu)
             ->whereYear('table_reports.created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('month_report');
-
-        $data_reports = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nahlaseni as $index => $month_shift){
-            $data_reports[$month_shift - 1] = $nahlaseni[$index];
+            ->groupByRaw('MONTH(table_reports.created_at)')
+            ->get();
+        $statistikaNahlaseni = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_nahlaseni); $i++){
+            $statistikaNahlaseni[$mesice_nahlaseni[$i]->month_report - 1] = $nahlaseni[$i]->count_reports;
         }
-        return $data_reports;
+        return $statistikaNahlaseni;
     }
 
+    /* Nazev funkce: getEmployeeReportsByMonths
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu nahlaseni konkretniho zamestnance dle mesicu */
     public static function getEmployeeReportsByMonths($employee_id){
         date_default_timezone_set('Europe/Prague');
         $nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("COUNT(*) as count_reports"))
+            ->selectRaw('COUNT(*) as count_reports')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
             ->where(['table_reports.employee_id' => $employee_id])
             ->whereYear('table_reports.created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('count_reports');
-
+            ->groupByRaw('MONTH(table_reports.created_at)')
+            ->get();
         $mesice_nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("Month(table_reports.created_at) as month_report"))
+            ->selectRaw('MONTH(table_reports.created_at) as month_report')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
             ->where(['table_reports.employee_id' => $employee_id])
             ->whereYear('table_reports.created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('month_report');
-
-        $data_reports = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nahlaseni as $index => $month_shift){
-            $data_reports[$month_shift - 1] = $nahlaseni[$index];
+            ->groupByRaw('MONTH(table_reports.created_at)')
+            ->get();
+        $statistikaNahlaseni = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_nahlaseni); $i++){
+            $statistikaNahlaseni[$mesice_nahlaseni[$i]->month_report - 1] = $nahlaseni[$i]->count_reports;
         }
-        return $data_reports;
+        return $statistikaNahlaseni;
     }
 
 }

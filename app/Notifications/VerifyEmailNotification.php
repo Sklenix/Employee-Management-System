@@ -3,59 +3,28 @@
 namespace App\Notifications;
 
 use Illuminate\Auth\Notifications\VerifyEmail;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Lang;
 
-class VerifyEmailNotification extends VerifyEmail
-{
-    use Queueable;
 
-    /**
-     * Create a new notification instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
+class VerifyEmailNotification extends VerifyEmail {
+    /* Tato trida slouzi k prepsani puvodni notifikace k odesilani verifikacnich emailovych zprav (zabudovane v Laravel autentizacnim a autorizacnim balicku) tak,
+    aby byla notifikace v ceskem jazyce, jedna se o prepsani souboru VerifyEmail.php, autor uprav: Pavel Sklenář (xsklen12) */
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
-    {
+    /* Nastaveni jakou formou se ma notifikace odeslat */
+    public function via($urlOvereni){
         return ['mail'];
     }
 
-    /**
-     * Get the mail representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return \Illuminate\Notifications\Messages\MailMessage
-     */
-    public function toMail($notifiable)
-    {
-        $verificationUrl = $this->verificationUrl($notifiable);
-
-        return (new MailMessage)->view('emails_company_verify', ['url' => $verificationUrl]);
+    /* Odeslani notifikace */
+    public function toMail($urlOvereni){
+        return $this->buildMailMessage($urlOvereni);
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
+    /* Definice emailove zpravy*/
+    protected function buildMailMessage($urlOvereni){
+        return (new MailMessage)
+            ->subject(Lang::get('Ověření emailové adresy'))
+            ->view('emails_company_verify', ['url' => $this->verificationUrl($urlOvereni)]);
     }
 }

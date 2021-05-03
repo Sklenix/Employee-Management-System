@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-/*
+/* Tento soubor je soucasti frameworku Laravel
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------

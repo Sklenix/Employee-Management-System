@@ -1,47 +1,54 @@
 @extends('layouts.employee_dashboard')
 @section('title') - Nemocenské @endsection
 @section('content')
+    <!-- Nazev souboru: diseases_list.blade.php -->
+    <!-- Autor: Pavel Sklenář (xsklen12) -->
+    <!-- Tento soubor reprezentuje moznost "Centrum dovolených" v ramci uctu s roli zamestnance -->
+    <!-- K inspiraci prace s datovymi tabulky slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020
+         Modalni okna viz dokumentace Bootstrap: https://getbootstrap.com/docs/4.0/components/modal/ -->
     <center>
-        <br><br>
+        <br>
+        <!-- Usek kodu pro definici chybovych hlasek za pomoci Session -->
         <div class="col-lg-11 col-md-11 col-sm-11">
-            @if($message = Session::get('success'))
+            @if($zprava = Session::get('success'))
                 <div class="alert alert-success alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
-            @if($message = Session::get('fail'))
+            @if($zprava = Session::get('fail'))
                 <div class="alert alert-danger alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
+            <!-- Tento div slouzi k zobrazeni chyb v ramci AJAXovych pozadavku -->
             <div class="flash-message text-center">
             </div>
-            <table class="table-responsive disease-list">
+            <!-- Usek kodu pro definici tabulky -->
+            <table class="diseases_employee_table">
                 <thead>
-                <tr>
-                    <th width="10%">Od</th>
-                    <th width="10%">Do</th>
-                    <th width="15%">Název</th>
-                    <th width="25%">Poznámka</th>
-                    <th width="7%">Aktuálnost</th>
-                    <th width="9%">Stav</th>
-                    <th width="15%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button"  data-toggle="modal" data-target="#CreateDiseaseModal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Vytvořit</button></th>
-                </tr>
+                    <tr>
+                        <th width="12%">Od</th>
+                        <th width="12%">Do</th>
+                        <th width="20%">Název</th>
+                        <th width="25%">Poznámka</th>
+                        <th width="7%">Aktuálnost</th>
+                        <th width="9%">Stav</th>
+                        <th width="15%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button" data-toggle="modal" data-target="#DiseaseCreateForm"><i class="fa fa-plus-square-o"></i> Vytvořit</button></th>
+                    </tr>
                 </thead>
             </table>
         </div>
     </center>
 
-    <!-- Pridani nemocenske !-->
-    <div class="modal fade" id="CreateDiseaseModal" style="color:white;">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+    <!-- Modalni okno slouzici pro vytvareni nemocenskych -->
+    <div class="modal fade" id="DiseaseCreateForm" style="color:white;">
+        <div class="modal-dialog" style="max-width: 750px;">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                         <span class="col-md-12 text-center">
-                              <h4 class="modal-title" id="modal_title" style="color:#4aa0e6;">Přidat novou nemocenskou</h4>
-                         </span>
+                    <h4 class="modal-title" id="modal_title" style="color:#4aa0e6;">Vytvořit novou nemocenskou</h4>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger chyby_add" role="alert">
@@ -51,52 +58,52 @@
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left">Název(<span class="text-danger">*</span>)</label>
+                            <label for="nazev_nemoc" class="col-md-2 text-left">Název(<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-user"></i></div>
                                     </div>
-                                    <input placeholder="Zadejte název nemoci..." type="text" class="form-control" id="nazev_nemoc" name="nazev_nemoc" value="{{ old('nazev_nemoc') }}"  autocomplete="nazev_nemoc">
+                                    <input placeholder="Zadejte název nemoci..." type="text" class="form-control" id="nazev_nemoc" name="nazev_nemoc" value="{{ old('nazev_nemoc') }}"  autocomplete="on" autofocus>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left">Datum od (<span class="text-danger">*</span>)</label>
+                            <label for="nemoc_zacatek" class="col-md-2 text-left">Datum od (<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
-                                    <input type="datetime-local" class="form-control" name="nemoc_zacatek" id="nemoc_zacatek" value="{{ old('nemoc_zacatek') }}" autocomplete="nemoc_zacatek" autofocus>
+                                    <input type="datetime-local" class="form-control" placeholder="Zadejte datum ve formátu YYYY-mm-dd H:i" name="nemoc_zacatek" id="nemoc_zacatek" value="{{ old('nemoc_zacatek') }}" autocomplete="on" >
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left">Datum do (<span class="text-danger">*</span>)</label>
+                            <label for="nemoc_konec" class="col-md-2 text-left">Datum do (<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
-                                    <input type="datetime-local" class="form-control" name="nemoc_konec" id="nemoc_konec" value="{{ old('nemoc_konec') }}" autocomplete="nemoc_konec" autofocus>
+                                    <input type="datetime-local" class="form-control" placeholder="Zadejte datum ve formátu YYYY-mm-dd H:i" name="nemoc_konec" id="nemoc_konec" value="{{ old('nemoc_konec') }}" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left">Poznámka</label>
+                            <label for="poznamka" class="col-md-2 text-left">Poznámka</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-sticky-note-o" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-sticky-note-o"></i></div>
                                     </div>
-                                    <textarea placeholder="Zadejte poznámku k dovolené..." name="poznamka" id="poznamka" class="form-control" autocomplete="poznamka"></textarea>
+                                    <textarea placeholder="Zadejte poznámku k nemocenské [maximálně 180 znaků]..." name="poznamka" id="poznamka" class="form-control" autocomplete="on"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -105,21 +112,21 @@
                 </div>
                 <div class="modal-footer">
                     <div class="col-md-12 text-center">
-                        <input type="submit" name="button_action" id="SubmitCreateDisease" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalSuccess" value="Přidat nemocenskou" />
-                        <button type="button" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalClose" data-dismiss="modal">Zavřít</button>
+                        <input type="submit" id="SubmitCreateDisease" style="color:rgba(255, 255, 255, 0.90);" class="btn tlacitkoPotvrzeniOkna" value="Vytvořit nemocenskou"/>
+                        <button type="button" style="color:rgba(255, 255, 255, 0.90);" class="btn tlacitkoZavreniOkna" data-dismiss="modal">Zavřít</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Editace nemocenske -->
-    <div class="modal fade" id="EditDiseaseModal">
+    <!-- Modalni okno slouzici pro editaci nemocenskych -->
+    <div class="modal fade" id="EditDiseaseForm">
         <div class="modal-dialog" style="max-width: 750px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h4 class="modal-title" style="color:white;">Detail nemocenské</h4>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color:#4aa0e6;">Detail nemocenské</h4>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body" style="color:white;">
                     <div class="alert alert-danger" role="alert" style="font-size: 16px;">
@@ -127,73 +134,73 @@
                     </div>
                     <div class="chyby alert alert-danger" style="text-decoration: none;">
                     </div>
-                    <div id="EditDiseaseModalBody">
+                    <div id="EditDiseaseFormContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitEditDiseaseForm">Aktualizovat</button>
-                    <button type="button" class="btn btn-modalClose modelClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitEditDiseaseForm">Aktualizovat</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Smazani nemocenske -->
-    <div id="DeleteDiseaseModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro odstranovani nemocenskych -->
+    <div id="DeleteDiseaseForm" class="modal fade" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení smazání nemocenské</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení smazání nemocenské</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete smazat tuto nemocenskou?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu si přejete smazat tuto nemocenskou?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="SubmitDeleteDisease" style="color:white;" id="SubmitDeleteDisease" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" name="SubmitDeleteDisease" style="color:white;" id="SubmitDeleteDisease" class="btn tlacitkoPotvrzeniOkna">Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Zazadat nemocenskou -->
-    <div id="ApplyDiseaseModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro zazadani o nemocenske -->
+    <div id="ApplyDiseaseForm" class="modal fade" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení žádosti o nemocenskou</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení žádosti o nemocenskou</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
                     <div class="chyby_apply" style="text-decoration: none;">
                     </div>
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu chcete zažádat o tuto nemocenskou?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu chcete zažádat o tuto nemocenskou?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="SubmitApply" style="color:white;" id="SubmitApply" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" name="SubmitApply" style="color:white;" id="SubmitApply" class="btn tlacitkoPotvrzeniOkna">Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Zrusit zadost dovolene -->
-    <div id="DeleteApplyDiseaseModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro zruseni zadosti o nemocenske -->
+    <div id="DeleteApplyDiseaseForm" class="modal fade" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení zrušení žádosti o nemocenskou</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení zrušení žádosti o nemocenskou</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
                     <div class="chyby_delete_apply" style="text-decoration: none;">
                     </div>
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete zrušit žádost o tuto nemocenskou?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu si přejete zrušit žádost o tuto nemocenskou?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="SubmitDeleteApply" style="color:white;" id="SubmitDeleteApply" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" name="SubmitDeleteApply" style="color:white;" id="SubmitDeleteApply" class="btn tlacitkoPotvrzeniOkna">Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
@@ -201,65 +208,57 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#CreateDiseaseModal').on('hidden.bs.modal', function () {
+            /* K inspiraci prace s datovymi tabulkami slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020,
+               pro inspiraci prace  s modalnimi okny (udalosti) slouzil clanek https://www.tutorialspoint.com/hidden-bs-modal-Bootstrap-Event, ktery napsal David Meador v roce 2018 */
+
+            /* Usek kodu starajici se o schovani chybovych hlaseni pri zavreni modalniho okna, inspirace z: https://www.tutorialspoint.com/hidden-bs-modal-Bootstrap-Event */
+            $('#DiseaseCreateForm').on('hidden.bs.modal', function () {
                 $('.chyby_add').hide();
-                $('#nazev_nemoc').val('');
-                $('#nemoc_zacatek').val('');
-                $('#nemoc_konec').val('');
-                $('#poznamka').val('');
             })
 
-            $('#EditDiseaseModal').on('hidden.bs.modal', function () {
+            $('#EditDiseaseForm').on('hidden.bs.modal', function () {
                 $('.chyby').hide();
             })
 
-            $('#ApplyDiseaseModal').on('hidden.bs.modal', function () {
+            $('#ApplyDiseaseForm').on('hidden.bs.modal', function () {
                 $('.chyby_apply').hide();
             })
 
-            $('#DeleteApplyDiseaseModal').on('hidden.bs.modal', function () {
+            $('#DeleteApplyDiseaseForm').on('hidden.bs.modal', function () {
                 $('.chyby_delete_apply').hide();
             })
 
+            /* Usek kodu pro schovani chybovych hlaseni pri nacteni webove stranky */
             $('.chyby_add').hide();
             $('.chyby').hide();
             $('.chyby_apply').hide();
             $('.chyby_delete_apply').hide();
 
-            /* Zobrazení datatable */
-            var dataTable = $('.disease-list').DataTable({
-                processing: true,
+            /* Nastaveni zobrazeni datove tabulky a odeslani do controlleru za pomoci AJAX pozadavku
+              Odkaz na yajra datove tabulky: https://yajrabox.com/docs/laravel-datatables/master/installation
+              Odkaz na datove tabulky jQuery: https://datatables.net/ a manual k nim https://datatables.net/manual/ a jednotlive moznosti k nim https://datatables.net/reference/option/.
+              K prepsani pravidel pro datovou tabulku slouzila tato dokumentace https://legacy.datatables.net/usage/i18n.
+            */
+            $('.diseases_employee_table').DataTable({
                 serverSide: true,
-                responsive: true,
-                scrollX: true,
+                paging: true,
                 autoWidth: true,
-                jQueryUI: true,
-                scrollCollapse: true,
-                oLanguage: {
-                    "sSearch": ""
-                },
+                pageLength: 15,
+                scrollX: true,
+                oLanguage: {"sSearch": "", sZeroRecords: "Nebyla nalezena žádná nemocenská."},
                 language: {
                     searchPlaceholder: "Vyhledávání ... ",
                     emptyTable: "Nemáte zaevidované žádné nemocenské.",
-                    paginate: {
-                        previous: "Předchozí",
-                        next: "Další",
-                    }
+                    paginate: { previous: "Předchozí", next: "Další"}
                 },
-                bLengthChange: false,
-                paging: false,
                 bInfo: false,
-                order: [[0, "asc"]],
-                dom: '<"pull-left"f><"pull-right"l>tip',
-                ajax: "{{ route('employee_diseases.list') }}",
-                columns: [
-                    { data: 'disease_from', name: 'disease_from', render: function(data, type, full, meta){
-                            return moment(data).format('DD.MM.YYYY HH:mm');
-                        },sClass:'text-center',},
-                    { data: 'disease_to', name: 'disease_to', render: function(data, type, full, meta){
-                            return moment(data).format('DD.MM.YYYY HH:mm');
-                        },sClass:'text-center',},
-                    {data: 'disease_name', name: 'disease_name', sClass: 'text-center'},
+                bLengthChange: false,
+                order: [[1, "asc"]],
+                ajax: "{{ route('employee_diseases.list') }}", // smerovani ajax pozadavku viz. https://datatables.net/reference/option/ajax
+                columns: [ // definice dat (viz https://datatables.net/manual/data/)
+                    {data: 'disease_from', name: 'disease_from', render: function(odpoved){return moment(odpoved).format('DD.MM.YYYY HH:mm');}, sClass:'text-center'}, // viz https://datatables.net/reference/option/columns.render
+                    {data: 'disease_to', name: 'disease_to', render: function(odpoved){return moment(odpoved).format('DD.MM.YYYY HH:mm');}, sClass:'text-center',}, // zmena formatu datumu pomoci knihovny moment (https://momentjs.com/)
+                    {data: 'disease_name', name: 'disease_name', sClass: 'text-center'}, // atribut sClass viz. https://legacy.datatables.net/usage/columns
                     {data: 'disease_note', name: 'disease_note', sClass: 'text-center', orderable: false, searchable: false},
                     {data: 'disease_actuality', name: 'disease_actuality', sClass: 'text-center'},
                     {data: 'disease_state', name: 'disease_state', sClass: 'text-center'},
@@ -267,237 +266,192 @@
                 ]
             });
 
-
-            /* Vytvoreni nemocenske */
-            $('#SubmitCreateDisease').click(function(e) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Po stisknuti tlacitka "Vytvořit nemocenskou" dojde k pridani nemocenske do databaze */
+            $('#SubmitCreateDisease').click(function() {
                 $.ajax({
                     url: "{{ route('DiseaseActionsEmployee.store') }}",
                     method: 'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
                     data: {
                         nazev_nemoc: $('#nazev_nemoc').val(),
                         nemoc_zacatek: $('#nemoc_zacatek').val(),
                         nemoc_konec: $('#nemoc_konec').val(),
                         poznamka: $('#poznamka').val(),
                     },
-                    success: function(result) {
-                        if(result.errors) {
-                            $('.chyby_add').html('');
-                            $.each(result.errors, function(key, value) {
-                                $('.chyby_add').show();
-                                $('.chyby_add').append('<strong><li>'+value+'</li></strong>');
-                            });
-                        } else {
+                    beforeSend:function(){$('#SubmitCreateDisease').text('Vytváření...');},
+                    success: function(odpoved) { // zpracovani odpovedi
+                        if (!(odpoved.fail)) {
+                            /* Smazani hodnot v modalnim okne */
                             $('.chyby_add').hide();
                             $('#nazev_nemoc').val('');
                             $('#nemoc_zacatek').val('');
                             $('#nemoc_konec').val('');
                             $('#poznamka').val('');
-                            $('.disease-list').DataTable().ajax.reload();
-                            var succadd = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ result.success +
-                                '</div>';
-                            $('.flash-message').html(succadd);
-                            $('#CreateDiseaseModal').modal('hide');
+                            /* Nacteni tabulky po pridani nemocenske, aby sla ihned videt */
+                            $('.diseases_employee_table').DataTable().ajax.reload();
+                            var successAdd = '<div class="alert alert-success">'+
+                                '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                            $('.flash-message').html(successAdd);
+                            $('#DiseaseCreateForm').modal('hide');
+                        } else {
+                            $('#SubmitCreateDisease').text('Vytvořit nemocenskou');
+                            $('.chyby_add').html('');
+                            /* Iterace skrze chyby a postupne pridavani jich do elementu chyby_add */
+                            odpoved.fail.forEach(function (polozka){
+                                $('.chyby_add').append('<strong>'+polozka+'</strong><br>');
+                            });
+                            /* Zobrazeni chyb */
+                            $('.chyby_add').show();
                         }
                     }
                 });
             });
 
-            /* Nahled do detailu nemocenske */
-            $('.modelClose').on('click', function(){
-                $('#EditDiseaseModal').hide();
-            });
-            var id;
-            $('body').on('click', '#getEditDisease', function(e) {
-                id = $(this).data('id');
+            /* Zobrazeni profilu nemocenske po stisknuti tlacitka "Editovat" */
+            var id_nemocenske;
+            $('body').on('click', '#obtainDiseaseEdit', function() {
+                id_nemocenske = $(this).data('id');
                 $.ajax({
-                    url: "/employee/DiseaseActionsEmployee/"+id+"/edit",
+                    url: "/employee/DiseaseActionsEmployee/"+id_nemocenske+"/edit",
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#EditDiseaseModalBody').html(result.html);
-                        $('#EditDiseaseModal').show();
+                    success: function(odpoved) {
+                        $('#EditDiseaseFormContent').html(odpoved.out); // vlozeni obsahu do okna
+                        $('#EditDiseaseForm').show(); // zobrazeni okna
                     }
                 });
             });
 
-            /* Ulozeni hodnot detailu nemocenske */
-            $('#SubmitEditDiseaseForm').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni hodnot v profilu nemocenske do databaze */
+            $('#SubmitEditDiseaseForm').click(function() {
                 $.ajax({
-                    url: "/employee/DiseaseActionsEmployee/"+id,
+                    url: "/employee/DiseaseActionsEmployee/"+id_nemocenske,
                     method: 'PUT',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
                     data: {
-                        disease_name_edit: $('#disease_name_edit').val(),
-                        disease_from_edit: $('#disease_from_edit').val(),
-                        disease_to_edit: $('#disease_to_edit').val(),
-                        disease_note_edit: $('#disease_note_edit').val(),
+                        nazev_nemoci: $('#disease_name_edit').val(),
+                        nemoc_zacatek: $('#disease_from_edit').val(),
+                        nemoc_konec: $('#disease_to_edit').val(),
+                        poznamka: $('#disease_note_edit').val(),
                     },
-                    beforeSend:function(){
-                        $('#SubmitEditDiseaseForm').text('Aktualizace...');
-                    },
-                    success: function(data) {
-                        if(data.fail) {
-                            $('.chyby').hide();
-                            $('.chyby').html('');
-                            var failHtml = '<div class="alert alert-danger">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                                '</div>';
-                            $('.flash-message').html(failHtml);
-                            $('#SubmitEditDiseaseForm').text('Aktualizovat');
-                            $("#EditDiseaseModal").modal('hide');
-                        }else if(data.errors) {
-                            $('.chyby').show();
-                            $('.chyby').html('');
-                            $('#SubmitEditDiseaseForm').text('Aktualizovat');
-                            $.each(data.errors, function(key, value) {
-                                $('.chyby').append('<strong><li>'+value+'</li></strong>');
-                            });
-                        } else {
-                            $('.disease-list').DataTable().ajax.reload();
-                            var succ;
-                            if(data.success != "0"){
-                                succ = '<div class="alert alert-success">'+
-                                    '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                    '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                    '</div>';
+                    beforeSend:function(){ $('#SubmitEditDiseaseForm').text('Aktualizace...'); }, // zobrazeni textu po zakliknuti tlacitka
+                    success: function(odpoved) { // zpracovani odpovedi
+                        if(odpoved.success) {
+                            $('.diseases_employee_table').DataTable().ajax.reload();
+                            var uspechUlozeni;
+                            if(odpoved.success != "0"){
+                                uspechUlozeni = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>'+ '<strong> ' + odpoved.success + '</strong></div>';
                             }
                             $('#SubmitEditDiseaseForm').text('Aktualizovat');
-                            $('.flash-message').html(succ);
+                            $('.flash-message').html(uspechUlozeni);
                             $('.chyby').hide();
-                            $("#EditDiseaseModal").modal('hide');
+                            $("#EditDiseaseForm").modal('hide');
+                        }else if(odpoved.errors) {
+                            $('#SubmitEditDiseaseForm').text('Aktualizovat');
+                            $('.chyby').html('');
+                            /* Iterace skrze chyby a postupne pridavani jich do elementu chyby */
+                            odpoved.errors.forEach(function (polozka){
+                                $('.chyby').append('<strong>'+polozka+'</strong><br>');
+                            });
+                            /* Zobrazeni chyb */
+                            $('.chyby').show();
+                        } else {
+                            $('.chyby').hide(); // schovani a smazani chybovych hlasek
+                            $('.chyby').html('');
+                            var failSave = '<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.fail + '</strong></div>';
+                            $('.flash-message').html(failSave); // naplneni elementu div obsahem html, v tomto pripade promennou failSave
+                            $('#SubmitEditDiseaseForm').text('Aktualizovat');
+                            $("#EditDiseaseForm").modal('hide');
                         }
                     }
                 });
             });
 
-            /* Smazani nemocenske */
-            var deleteID;
-            $('body').on('click', '#getDiseaseDelete', function(){
-                deleteID = $(this).data('id');
-            })
-            $('#SubmitDeleteDisease').click(function(e) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Modalni okno slouzici pro smazani nemocenskych (po stisknuti tlacitka "Smazat") */
+            var nemocenske_id_del;
+            $('body').on('click', '#obtainDiseaseDelete', function(){
+                /* ziskani id nemocenske skrze tlacitko (data-id atribut)*/
+                nemocenske_id_del = $(this).data('id');
+            });
+
+            /* Odstraneni nemocenske z databaze */
+            $('#SubmitDeleteDisease').click(function() {
                 $.ajax({
-                    url: "/employee/DiseaseActionsEmployee/"+deleteID,
+                    url: "/employee/DiseaseActionsEmployee/"+nemocenske_id_del,
                     method: 'DELETE',
-                    beforeSend:function(){
-                        $('#SubmitDeleteDisease').text('Mazání...');
-                    },
-                    success:function(data) {
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
+                    beforeSend:function(){ $('#SubmitDeleteDisease').text('Mazání...') ;}, // zmena textu pri kliknuti
+                    success:function(odpoved) { // zpracovani odpovedi
                         var successHtml = '<div class="alert alert-success">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                            '</div>';
-                        var failHtml = '<div class="alert alert-danger">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                            '</div>';
-                        if(data.success === ''){
+                            '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                        var failHtml = '<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.fail + '</strong></div>';
+                        if(odpoved.success === ''){ // zjisteni, zdali doslo k chybe
                             $('.flash-message').html(failHtml);
                         }else{
                             $('.flash-message').html(successHtml);
                         }
-                        $('.disease-list').DataTable().ajax.reload();
+                        $('.diseases_employee_table').DataTable().ajax.reload();
                         $('#SubmitDeleteDisease').text('Ano');
-                        $("#DeleteDiseaseModal").modal('hide');
+                        $("#DeleteDiseaseForm").modal('hide');
                     }
                 })
             });
 
-            /* Ziskani ID nemocenske */
-            var id;
-            $('body').on('click', '#getDiseaseApply', function(){
-                id = $(this).data('id');
-            })
-            /* Zmena stavu zadosti pri zazadani o nemocenskou */
-            $('#SubmitApply').click(function(e) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+
+            /* Ziskani ID nemocenske pri stisknuti tlacitka "Zažádat" */
+            var id_nemocenske_zazadani;
+            $('body').on('click', '#obtainDiseaseApply', function(){
+                id_nemocenske_zazadani = $(this).data('id');
+            });
+
+            /* Zmena stavu zadosti pri zazadani o nemocenskou (zapis do databaze) */
+            $('#SubmitApply').click(function() {
                 $.ajax({
-                    url: "/employee/disease/apply/"+id,
+                    url: "/employee/disease/apply/"+id_nemocenske_zazadani,
                     method: 'PUT',
-                    beforeSend:function(){
-                        $('#SubmitApply').text('Žádání...');
-                    },
-                    success: function(data) {
-                        if(data.fail) {
-                            $('.chyby_apply').show();
-                            $('.chyby_apply').html('<div class="alert alert-danger">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                                '</div>');
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
+                    beforeSend:function(){ $('#SubmitApply').text('Žádání...'); }, // zmena textu pri kliknuti
+                    success: function(odpoved) { // zpracovani odpovedi
+                        if(odpoved.success) {
+                            $('.diseases_employee_table').DataTable().ajax.reload();
+                            var successZazadani = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>'+ '<strong>' + odpoved.success + '</strong></div>';
                             $('#SubmitApply').text('Ano');
-                        } else {
-                            $('.disease-list').DataTable().ajax.reload();
-                            var succ = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
-                            $('#SubmitApply').text('Ano');
-                            $('.flash-message').html(succ);
+                            $('.flash-message').html(successZazadani);
                             $('.chyby_apply').hide();
-                            $("#ApplyDiseaseModal").modal('hide');
+                            $("#ApplyDiseaseForm").modal('hide');
+                        } else { // pokud doslo k chybe
+                            $('.chyby_apply').show();
+                            $('.chyby_apply').html('<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.fail + '</strong></div>');
+                            $('#SubmitApply').text('Ano');
                         }
                     }
                 });
             });
 
-            /* Ziskani ID nemocenske */
-            var id;
-            $('body').on('click', '#getDiseaseDeleteApply', function(){
-                id = $(this).data('id');
-            })
-            /* Zruseni zadosti o nemocenskou */
-            $('#SubmitDeleteApply').click(function(e) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ziskani ID nemocenske pri zmacknuti tlacitka "Zrušit žádost" */
+            var id_nemocenske_zruseni;
+            $('body').on('click', '#obtainDiseaseDeleteApply', function(){
+                id_nemocenske_zruseni = $(this).data('id');
+            });
+
+            /* Zruseni zadosti o nemocenskou v databazi */
+            $('#SubmitDeleteApply').click(function() {
                 $.ajax({
-                    url: "/employee/disease/deleteApply/"+id,
+                    url: "/employee/disease/deleteApply/"+id_nemocenske_zruseni,
                     method: 'PUT',
-                    beforeSend:function(){
-                        $('#SubmitDeleteApply').text('Žádání...');
-                    },
-                    success: function(data) {
-                        if(data.fail) {
-                            $('.chyby_delete_apply').show();
-                            $('.chyby_delete_apply').html('<div class="alert alert-danger">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                                '</div>');
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
+                    beforeSend:function(){ $('#SubmitDeleteApply').text('Žádání...'); }, // zobrazeni textu po zakliknuti tlacitka
+                    success: function(odpoved) { // zpracovani odpovedi
+                        if(odpoved.success) {
+                            $('.diseases_employee_table').DataTable().ajax.reload();
+                            var successZruseni = '<div class="alert alert-success">'+ '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
                             $('#SubmitDeleteApply').text('Ano');
-                        } else {
-                            $('.disease-list').DataTable().ajax.reload();
-                            var succ = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
-                            $('#SubmitDeleteApply').text('Ano');
-                            $('.flash-message').html(succ);
+                            $('.flash-message').html(successZruseni);
                             $('.chyby_delete_apply').hide();
-                            $("#DeleteApplyDiseaseModal").modal('hide');
+                            $("#DeleteApplyDiseaseForm").modal('hide');
+                        } else { // pri chybe
+                            $('.chyby_delete_apply').show();
+                            $('.chyby_delete_apply').html('<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.fail + '</strong></div>');
+                            $('#SubmitDeleteApply').text('Ano');
                         }
                     }
                 });

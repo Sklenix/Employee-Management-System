@@ -4,15 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateShiftFacts extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+class CreateShiftFacts extends Migration {
+    /* Nazev souboru: CreateShiftFacts.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato migrace slouzi pro vytvoreni tabulky faktu v ramci OLAP sekce systemu
+       Migrace detailneji: https://laravel.com/docs/8.x/migrations.
+    */
+
+    /* Definice tabulky (pro vytvoreni) */
+    public function up(){
         Schema::create('shift_facts', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->double('shift_total_hours');
@@ -21,6 +21,7 @@ class CreateShiftFacts extends Migration
             $table->double('employee_overall')->nullable();
             $table->integer('employee_late_flag')->nullable();
             $table->integer('employee_injury_flag')->nullable();
+            $table->integer('attendance_came')->nullable();
             $table->integer('absence_reason')->nullable();
             $table->bigInteger('company_id')->unsigned();
             $table->bigInteger('time_id')->unsigned();
@@ -36,13 +37,8 @@ class CreateShiftFacts extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
+    /* Odstraneni tabulky */
+    public function down(){
         Schema::dropIfExists('shift_facts');
     }
 }

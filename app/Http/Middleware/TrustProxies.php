@@ -7,9 +7,10 @@ use Illuminate\Http\Request;
 
 class TrustProxies extends Middleware
 {
+    /* Tato trida je soucasti frameworku Laravel */
+
     /**
      * The trusted proxies for this application.
-     *
      * @var array|string|null
      */
     protected $proxies;

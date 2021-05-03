@@ -4,15 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateInjuriesTable extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+class CreateInjuriesTable extends Migration {
+    /* Nazev souboru: CreateInjuriesTable.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato migrace slouzi pro vytvoreni tabulky pro evidenci zraneni danych zamestnancu firem
+       Migrace detailneji: https://laravel.com/docs/8.x/migrations.
+    */
+
+    /* Definice tabulky (pro vytvoreni) */
+    public function up(){
         Schema::create('table_injuries', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id('injury_id');
@@ -29,13 +29,8 @@ class CreateInjuriesTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
+    /* Odstraneni tabulky */
+    public function down(){
         Schema::dropIfExists('table_injuries');
     }
 }

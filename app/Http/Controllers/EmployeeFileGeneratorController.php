@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Disease;
-use App\Models\Employee;
 use App\Models\Employee_Language;
-use App\Models\Employee_Shift;
 use App\Models\Injury;
 use App\Models\Report;
 use App\Models\Report_Importance;
@@ -15,23 +13,47 @@ use App\Models\Vacation;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use DateTime;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
-class EmployeeFileGeneratorController extends Controller
-{
+class EmployeeFileGeneratorController extends Controller {
+    /* Nazev souboru:  EmployeeFileGeneratorController.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida slouzi ke generovani souboru ve formatu PDF pro ucty s roli zamestnance.
+    Pro generovani souboru ve formatu PDF byla pouzita knihovna DOMPDF Wrapper for Laravel: https://github.com/barryvdh/laravel-dompdf, ktera je poskytovana s MIT licenci, ktera je zapsana nize
+
+    Copyright 2021 DOMPDF Wrapper for Laravel
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"),
+    to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software,
+    and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+    OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    */
+
+    /* Nazev funkce: index
+        Argumenty: zadne
+        Ucel: Zobrazeni prislusneho pohledu pro generovani souboru v ramci uctu s roli zamestnance */
     public function index(){
         $user = Auth::user();
         return view('employee_actions.file_generator')
-            ->with('profilovka',$user->employee_picture);
+            ->with('profilovka',$user->employee_picture)->with('employee_url', $user->employee_url);
     }
 
+    /* Nazev funkce: generateVacationsList
+       Argumenty: zadne
+       Ucel: Vygenerovani seznamu dovolenych zamestnance */
     public function generateVacationsList(){
         $user = Auth::user();
-        $html = '';
+        /* Promenna, do ktere se ulozi generovany obsah stranky */
+        $out = '';
+        /* Ziskani dovolenych zamestnance*/
         $dovolene = Vacation::getEmployeeVacations($user->employee_id);
-        $html = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Dovolené zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
+        /* Priprava zahlavi tabulky a nadpisu v souboru */
+        $out = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Dovolené zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
                     <table class="table" style="font-family: DejaVu Sans;font-size: 13px;margin-left:50px;border-collapse: collapse;">
                      <thead>
                           <tr style="text-align: left;">
@@ -42,9 +64,10 @@ class EmployeeFileGeneratorController extends Controller
                            </tr>
                       </thead>
                       <tbody>';
-
+        /* Iterace skrz dovolene */
         foreach ($dovolene as $dovolena){
-            $html .= '<tr>';
+            $out .= '<tr>';
+            /* Ziskani udaju o dovolene */
             $vacation_start_tmp = $dovolena->vacation_start;
             $vacation_end_tmp = $dovolena->vacation_end;
             $vacation_start = new DateTime($dovolena->vacation_start);
@@ -52,46 +75,50 @@ class EmployeeFileGeneratorController extends Controller
             $vacation_end = new DateTime($dovolena->vacation_end);
             $dovolena->vacation_end = $vacation_end->format('d.m.Y H:i');
 
-            $html .= '  <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$dovolena->vacation_start.'</td>
+            /* Zapsani udaju o dovolene do HTML jako radky tabulky */
+            $out .= '  <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$dovolena->vacation_start.'</td>
                         <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$dovolena->vacation_end.'</td>';
-
             if($dovolena->vacation_state == 0){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Nezažádáno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Nezažádáno</td>';
             }else if($dovolena->vacation_state == 1){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Odesláno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Odesláno</td>';
             }else if($dovolena->vacation_state == 2){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Schváleno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Schváleno</td>';
             }else if($dovolena->vacation_state == 3){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Neschváleno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Neschváleno</td>';
             }
-
+            /* Usek kodu slouzici pro zapsani aktualnosti dovolene do promenne ve formatu HTML */
             $start = Carbon::createFromFormat('Y-m-d H:i:s', $vacation_start_tmp);
             $end = Carbon::createFromFormat('Y-m-d H:i:s', $vacation_end_tmp);
             $now = Carbon::now();
             $rozhod_start = $now->gte($start);
             $rozhod_end = $now->lte($end);
             $rozhod_end2 = $now->gte($end);
-
             if($rozhod_start == 1 && $rozhod_end == 1){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Probíhá</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Probíhá</td>';
             }else if($rozhod_end2 == 1){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhla</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhla</td>';
             }else{
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhne</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhne</td>';
             }
-            $html .='</tr>';
+            $out .='</tr>'; // ukonceni radku tabulky
         }
-        $html .= '</tbody></table>';
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_dovolene.pdf','UTF-8');
-
+        $out .= '</tbody></table>'; // ukonceni tabulky
+        /* Samotne vygenerovani souboru PDF z promenne out */
+        return PDF::loadHTML($out)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_dovolene.pdf','UTF-8');
     }
 
+    /* Nazev funkce: generateDiseasesList
+     Argumenty: zadne
+     Ucel: Vygenerovani seznamu nemocenskych zamestnance */
     public function generateDiseasesList(){
         $user = Auth::user();
-        $html = '';
+        /* Promenna, do ktere se ulozi generovany obsah stranky */
+        $out = '';
+        /* Ziskani nemocenskych zamestnance */
         $nemocenske = Disease::getEmployeeDiseases($user->employee_id);
-        $html = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Nemocenské zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
+        /* Definice zahlavi tabulky a nadpisu v souboru */
+        $out = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Nemocenské zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
                     <table class="table" style="font-family: DejaVu Sans;font-size: 13px;margin-left:30px;border-collapse: collapse;">
                      <thead>
                           <tr style="text-align: left;">
@@ -103,30 +130,30 @@ class EmployeeFileGeneratorController extends Controller
                            </tr>
                       </thead>
                       <tbody>';
-
+        /* Iterace skrze nemocenske zamestnance */
         foreach ($nemocenske as $nemocenska){
-            $html .= '<tr>';
+            $out .= '<tr>';
+            /* Ziskani udaju o nemocenske */
             $nemocenska_from_tmp = $nemocenska->disease_from;
             $nemocenska_to_tmp = $nemocenska->disease_to;
             $nemocenska_from = new DateTime($nemocenska->disease_from);
             $nemocenska->disease_from = $nemocenska_from->format('d.m.Y H:i');
             $nemocenska_to = new DateTime($nemocenska->disease_to);
             $nemocenska->disease_to = $nemocenska_to->format('d.m.Y H:i');
-
-            $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$nemocenska->disease_name.'</td>
+            /* Ulozeni udaju o nemocenske do tabulky v podobe radku */
+            $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$nemocenska->disease_name.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$nemocenska->disease_from.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$nemocenska->disease_to.'</td>';
-
             if($nemocenska->disease_state == 0){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Nezažádáno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Nezažádáno</td>';
             }else if($nemocenska->disease_state == 1){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Odesláno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Odesláno</td>';
             }else if($nemocenska->disease_state == 2){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Schváleno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Schváleno</td>';
             }else if($nemocenska->disease_state == 3){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Neschváleno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Neschváleno</td>';
             }
-
+            /* Ulozeni aktualnosti nemocenske do promenne out */
             $start = Carbon::createFromFormat('Y-m-d H:i:s', $nemocenska_from_tmp);
             $end = Carbon::createFromFormat('Y-m-d H:i:s', $nemocenska_to_tmp);
             $now = Carbon::now();
@@ -135,25 +162,30 @@ class EmployeeFileGeneratorController extends Controller
             $rozhod_end2 = $now->gte($end);
 
             if($rozhod_start == 1 && $rozhod_end == 1){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Probíhá</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Probíhá</td>';
             }else if($rozhod_end2 == 1){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhla</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhla</td>';
             }else{
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhne</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-bottom: 12px;padding-right:50px;padding-top: 12px;">Proběhne</td>';
             }
-            $html .='</tr>';
+            $out .='</tr>'; // ukonceni radku tabulky
         }
-        $html .= '</tbody></table>';
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_nemocenske.pdf','UTF-8');
+        $out .= '</tbody></table>'; // ukonceni tabulky
+        /* Samotne vygenerovani souboru ve formatu PDF z promenne out */
+        return PDF::loadHTML($out)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_nemocenske.pdf','UTF-8');
 
     }
 
+    /* Nazev funkce: generateInjuriesList
+       Argumenty: zadne
+       Ucel: Vygenerovani seznamu zraneni zamestnance */
     public function generateInjuriesList(){
         $user = Auth::user();
-        $html = '';
+        $out = '';
+        /* Ziskani zraneni zamestnance */
         $zraneni = Injury::getEmployeeInjuriesInjuryCentre($user->employee_id);
-        $html = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Nahlášení zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
+        /* Definice zahlavi tabulky a nadpisu v souboru */
+        $out = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Nahlášení zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
                     <table class="table" style="font-family: DejaVu Sans;font-size: 12px;padding-right:50px;border-collapse: collapse;">
                      <thead>
                           <tr style="text-align: left;">
@@ -165,26 +197,32 @@ class EmployeeFileGeneratorController extends Controller
                            </tr>
                       </thead>
                       <tbody>';
-
+        /* Iterace skrze zraneni */
         foreach ($zraneni as $zran){
-            $html .= '<tr>';
-            $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->injury_description.'</td>
+            /* Ulozeni udaju o zraneni jako radek tabulky*/
+            $out .= '<tr>';
+            $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->injury_description.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->injury_date.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->shift_start.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->shift_end.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$zran->shift_place.'</td>';
-            $html .='</tr>';
+            $out .='</tr>'; // ukonceni radku tabulky
         }
-        $html .= '</tbody></table>';
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_zraneni.pdf','UTF-8');
+        $out .= '</tbody></table>'; // ukonceni tabulky
+        /* Samotne vygenerovani souboru ve formatu PDF z promenne out */
+        return PDF::loadHTML($out)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_zraneni.pdf','UTF-8');
     }
 
+    /* Nazev funkce: generateReportsList
+       Argumenty: zadne
+       Ucel: Vygenerovani seznamu nahlaseni zamestnance */
     public function generateReportsList(){
         $user = Auth::user();
-        $html = '';
+        $out = '';
+        /* Ziskani konkretnich nahlaseni */
         $nahlaseni = Report::getEmployeeReports($user->employee_id);
-        $html = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Nahlášení zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
+        /* Definice zahlavi tabulky a nadpisu v souboru */
+        $out = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Nahlášení zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
                     <table class="table" style="font-family: DejaVu Sans;font-size: 12px;padding-right:50px;border-collapse: collapse;">
                      <thead>
                           <tr style="text-align: left;">
@@ -195,49 +233,53 @@ class EmployeeFileGeneratorController extends Controller
                            </tr>
                       </thead>
                       <tbody>';
-
+        /* Iterace skrze nahlaseni */
         foreach ($nahlaseni as $nahlas){
-            $html .= '<tr>';
+            $out .= '<tr>';
+            /* Zapis udaju o nahlaseni do promenne out */
             $dulezitost = Report_Importance::getConcreteImportance($nahlas->report_importance_id);
-            $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$nahlas->report_title.'</td>
+            $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$nahlas->report_title.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$nahlas->report_description.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">'.$dulezitost->importance_report_description.'</td>';
-
             if($nahlas->report_state == 0){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Nezažádáno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Nezažádáno</td>';
             }else if($nahlas->report_state == 1){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Odesláno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Odesláno</td>';
             }else if($nahlas->report_state == 2){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Schváleno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Schváleno</td>';
             }else if($nahlas->report_state == 3){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Neschváleno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:50px;padding-bottom: 12px;padding-top: 12px;">Neschváleno</td>';
             }
-
-            $html .='</tr>';
+            $out .='</tr>'; // ukonceni radku tabulky
         }
-        $html .= '</tbody></table>';
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_nemocenske.pdf','UTF-8');
+        $out .= '</tbody></table>'; // ukonceni tabulky
+        /* Samotne vygenerovani souboru ve formatu PDF z promenne out */
+        return PDF::loadHTML($out)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'nahlaseni.pdf','UTF-8');
     }
 
+    /* Nazev funkce: generateEmployeeProfile
+       Argumenty: zadne
+       Ucel: Vygenerovani udaju z profilu zamestnance */
     public function generateEmployeeProfile(){
         $user = Auth::user();
-        $html = '';
+        $out = '';
+        /* Ziskani jednotlivych udaju */
         $vytvoren = new DateTime($user->created_at);
-        $shift_format = $vytvoren->format('d.m.Y H:i');
+        $vytvoren_spravny_format = $vytvoren->format('d.m.Y H:i'); // zmena formatu datumu
         $pocetSmen = Shift::getEmployeeShiftsCount($user->employee_id);
         $pocetAbsenci = Attendance::getEmployeeAbsenceCount($user->employee_id);
         $pocetDovolenych = Vacation::getEmployeeVacationsCount($user->employee_id);
         $pocetNemoci = Disease::getEmployeeDiseasesCount($user->employee_id);
         $pocetNahlaseni = Report::getEmployeeReportsCount($user->employee_id);
         $pocetZraneni = Injury::getEmployeeInjuriesInjuryCentreCount($user->employee_id);
+        /* Ziskani jazyku, ktere zamestnanec ovlada */
         $jazyky = Employee_Language::getEmployeeLanguages($user->employee_id);
         if($jazyky->isEmpty()){
             $jazyky_html = '<p>Ovládané jazyky: žádné</p>';
         }else{
             $jazyky_html = '<p>Ovládané jazyky: ';
             $i = 0;
-            foreach ($jazyky as $jazyk){
+            foreach ($jazyky as $jazyk){ // iterace skrze jazyky
                 if($i == count($jazyky) - 1){
                     $jazyky_html .= $jazyk->language_name.'.';
                 }else{
@@ -247,7 +289,8 @@ class EmployeeFileGeneratorController extends Controller
             }
             $jazyky_html .= '</p>';
         }
-        $html = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Údaje zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
+        /* Ulozeni udaju zamestnance do promenne out */
+        $out = '<h3 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Údaje zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h3>
                   <center><div class="text-center" style="font-family: DejaVu Sans;font-size: 13px;">
                        <p>Email: '.$user->email.'</p>
                        <p>Telefon: '.$user->employee_phone.'</p>
@@ -261,17 +304,22 @@ class EmployeeFileGeneratorController extends Controller
                        <p>Počet nahlášení: '.$pocetNahlaseni.'</p>
                        <p>Počet zranění: '.$pocetZraneni.'</p>
                        '.$jazyky_html.'
-                       <p>Profil vytvořen: '. $shift_format.'</p>
+                       <p>Profil vytvořen: '.$vytvoren_spravny_format.'</p>
                    </div></center>';
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_profil.pdf','UTF-8');
+        /* Samotne vygenerovani souboru ve formatu PDF z promenne out */
+        return PDF::loadHTML($out)->setPaper('a4', 'portrait')->download(''.$user->employee_name.'_'.$user->employee_surname.'_profil.pdf','UTF-8');
     }
 
-    public function generateCurrentShiftsList(Request $request){
+    /* Nazev funkce: generateCurrentShiftsList
+       Argumenty: zadne
+       Ucel: Vygenerovani aktualnich smen zamestnance */
+    public function generateCurrentShiftsList(){
         $user = Auth::user();
-        $html = '';
+        $out = '';
+        /* Ziskani aktualnich smen zamestnance */
         $smeny = Shift::getEmployeeCurrentShifts($user->employee_id);
-        $html = '<html style="margin:0;padding:0;">
+        /* Definice zahlavi tabulky a nadpisu v souboru */
+        $out = '<html style="margin:0;padding:0;">
                 <body>
                 <h4 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Seznam směn aktuálního týdne zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h4>
                 <table class="table center" style="font-family: DejaVu Sans;font-size: 12px;border-collapse: collapse;">
@@ -286,71 +334,72 @@ class EmployeeFileGeneratorController extends Controller
                         <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;padding-right: 25px;">Status</th>
                        </tr>
                   </thead>
-                  <tbody>
-                ';
+                  <tbody>';
+        /* Iterace skrze smeny */
         foreach ($smeny as $smena){
+            /* Ziskani udaju o smene */
             $shift_start = new DateTime($smena->shift_start);
             $smena->shift_start = $shift_start->format('d.m.Y H:i');
             $shift_end = new DateTime( $smena->shift_end);
             $smena->shift_end = $shift_end->format('d.m.Y H:i');
             $dulezitost = Shift::getCurrentImportanceShift($smena->shift_importance_id);
-            $html .= '<tr>';
-            $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_start.'</td>
+            /* Zapis udaju smeny do promenne out */
+            $out .= '<tr>';
+            $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_start.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_end.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_place.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$dulezitost[0]->importance_description.'</td>';
-
             $checkin = Attendance::getEmployeeCheckIn($smena->shift_id,$user->employee_id);
-
             if($checkin->isEmpty()){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
             }else{
                 if($checkin[0]->attendance_check_in === NULL){
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
                 }else{
                     $checkin = new DateTime($checkin[0]->attendance_check_in);
                     $checkin = $checkin->format('d.m.Y H:i');
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkin.'</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkin.'</td>';
                 }
             }
-
             $checkout = Attendance::getEmployeeCheckOut($smena->shift_id,$user->employee_id);
-
             if($checkout->isEmpty()){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
             }else{
                 if($checkout[0]->attendance_check_out === NULL){
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
                 }else{
                     $checkout = new DateTime($checkout[0]->attendance_check_out);
                     $checkout = $checkout->format('d.m.Y H:i');
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkout.'</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkout.'</td>';
                 }
             }
-
             $aktualniAbsence = Attendance::getEmployeeCurrentShiftAbsenceStatus($smena->shift_id, $user->employee_id);
-
             if($aktualniAbsence->isEmpty()){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
             }else{
                 if($aktualniAbsence[0]->reason_description === NULL){
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
                 }else{
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$aktualniAbsence[0]->reason_description.'</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$aktualniAbsence[0]->reason_description.'</td>';
                 }
             }
-            $html .= '</tr>';
+            $out .= '</tr>'; // ukonceni radku tabulky
         }
-        $html .= '</tbody></table></body></html>';
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.' '.$user->employee_surname.'_rozvrh_aktualni.pdf','UTF-8');
+        $out .= '</tbody></table></body></html>'; // ukonceni tabulky
+        /* Samotne vygenerovani souboru ve formatu PDF z promenne out */
+        return PDF::loadHTML($out)->setPaper('a4', 'portrait')->download(''.$user->employee_name.' '.$user->employee_surname.'_rozvrh_aktualni.pdf','UTF-8');
     }
 
-    public function generateShiftHistoryList(Request $request){
+    /* Nazev funkce: generateShiftHistoryList
+      Argumenty: zadne
+      Ucel: Vygenerovani vsech smen zamestnance */
+    public function generateShiftHistoryList(){
         $user = Auth::user();
-        $html = '';
+        $out = '';
+        /* Ziskani smen zamestnance */
         $smeny =  Shift::getEmployeeShifts($user->employee_id);
-        $html = '<html style="margin:0;padding:0;">
+        /* Definice zahlavi tabulky a nadpisu v souboru */
+        $out = '<html style="margin:0;padding:0;">
                 <body>
                 <h4 style="font-family: DejaVu Sans;text-align: center;border-collapse: collapse;margin-bottom: 20px;">Seznam směn aktuálního týdne zaměstnance: '.$user->employee_name.' '.$user->employee_surname.'</h4>
                 <table class="table center" style="font-family: DejaVu Sans;font-size: 12px;padding: 0;margin: 0;border-collapse: collapse;">
@@ -365,65 +414,60 @@ class EmployeeFileGeneratorController extends Controller
                         <th style="border-bottom: 1px solid black;padding-bottom: 8px;font-size:13px;padding-right: 25px;">Status</th>
                        </tr>
                   </thead>
-                  <tbody>
-                ';
+                  <tbody>';
+        /* Iterace skrze smeny */
         foreach ($smeny as $smena){
+            /* Ziskani udaju o smene */
             $shift_start = new DateTime($smena->shift_start);
             $smena->shift_start = $shift_start->format('d.m.Y H:i');
             $shift_end = new DateTime( $smena->shift_end);
             $smena->shift_end = $shift_end->format('d.m.Y H:i');
             $dulezitost = Shift::getCurrentImportanceShift($smena->shift_importance_id);
-            $html .= '<tr>';
-            $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_start.'</td>
+            /* Zapsani udaju o smene do promenne out */
+            $out .= '<tr>';
+            $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_start.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_end.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$smena->shift_place.'</td>
                       <td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$dulezitost[0]->importance_description.'</td>';
-
             $checkin = Attendance::getEmployeeCheckIn($smena->shift_id,$user->employee_id);
-
             if($checkin->isEmpty()){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
             }else{
                 if($checkin[0]->attendance_check_in === NULL){
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
                 }else{
                     $checkin = new DateTime($checkin[0]->attendance_check_in);
                     $checkin = $checkin->format('d.m.Y H:i');
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkin.'</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkin.'</td>';
                 }
             }
-
             $checkout = Attendance::getEmployeeCheckOut($smena->shift_id,$user->employee_id);
-
             if($checkout->isEmpty()){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
             }else{
                 if($checkout[0]->attendance_check_out === NULL){
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Nezapsáno</td>';
                 }else{
                     $checkout = new DateTime($checkout[0]->attendance_check_out);
                     $checkout = $checkout->format('d.m.Y H:i');
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkout.'</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$checkout.'</td>';
                 }
             }
-
             $aktualniAbsence = Attendance::getEmployeeCurrentShiftAbsenceStatus($smena->shift_id, $user->employee_id);
-
             if($aktualniAbsence->isEmpty()){
-                $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
+                $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
             }else{
                 if($aktualniAbsence[0]->reason_description === NULL){
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">Čekající</td>';
                 }else{
-                    $html .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$aktualniAbsence[0]->reason_description.'</td>';
+                    $out .= '<td style="text-align: center;border-bottom: 1px solid black;padding-right:25px;padding-bottom: 12px;padding-top: 12px;">'.$aktualniAbsence[0]->reason_description.'</td>';
                 }
             }
-            $html .= '</tr>';
+            $out .= '</tr>'; // ukonceni radku tabulky
         }
-        $html .= '</tbody></table></body></html>';
-        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
-        return PDF::loadHTML($html)->setPaper('a4', 'portrait')->download(''.$user->employee_name.' '.$user->employee_surname.'_historie_smen.pdf','UTF-8');
+        $out .= '</tbody></table></body></html>'; // ukonceni tabulky
+        /* Samotne vygenerovani souboru ve formatu PDF z promenne out */
+        return PDF::loadHTML($out)->setPaper('a4', 'portrait')->download(''.$user->employee_name.' '.$user->employee_surname.'_historie_smen.pdf','UTF-8');
     }
-
 
 }

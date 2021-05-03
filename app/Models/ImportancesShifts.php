@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\ImportancesShifts
- *
  * @property int $importance_id
  * @property int|null $importance_value
  * @property string|null $importance_description
@@ -21,22 +19,24 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|ImportancesShifts whereImportanceValue($value)
  * @mixin \Eloquent
  */
-class ImportancesShifts extends Model
-{
-    use HasFactory;
+class ImportancesShifts extends Model {
+    /* Nazev souboru: ImportancesShifts.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida je modelem k tabulce table_importances_shifts */
 
+    use HasFactory;
+    /* Urceni primarniho klice tabulky, nazvu tabulky a zruseni defaultnich atributu (created_at a updated_at) */
     protected $primaryKey = 'importance_id';
     protected $table = 'table_importances_shifts';
     public $timestamps = false;
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    /* Definice atributu tabulky, s kterymi model pracuje */
     protected $fillable = [
         'importance_value', 'importance_description'
     ];
 
+    /* Nazev funkce: getParticularImportance
+       Argumenty: importance_id - identifikator dulezitosti
+       Ucel: ziskani aktualni dulezitosti smeny */
     public static function getParticularImportance($importance_id){
         date_default_timezone_set('Europe/Prague');
         return DB::table('table_importances_shifts')
@@ -47,12 +47,18 @@ class ImportancesShifts extends Model
             ->get();
     }
 
+    /* Nazev funkce: getAllImportances
+       Argumenty: zadny
+       Ucel: ziskani vsech moznych dulezitosti smeny */
     public static function getAllImportances(){
        return DB::table('table_importances_shifts')
             ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
             ->get();
     }
 
+    /* Nazev funkce: getAllImportancesExceptUnspecified
+       Argumenty: zadny
+       Ucel: ziskani vsech moznych dulezitosti smeny az na dulezitost Nespecifikovano */
     public static function getAllImportancesExceptUnspecified(){
        return DB::table('table_importances_shifts')
             ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')

@@ -7,22 +7,16 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class EmployeeFactory extends Factory
-{
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
+class EmployeeFactory extends Factory {
+    /* Nazev souboru: EmployeeFactory.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida slouzi jako tovarna pro vyrobu zaznamu zamestnancu */
+
+    /* Napojeni na model */
     protected $model = Employee::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
-    {
+    /* Definice samotneho zaznamu */
+    public function definition(){
         return [
             'employee_name' => $this->faker->firstName,
             'employee_surname' => $this->faker->lastName,
@@ -34,8 +28,7 @@ class EmployeeFactory extends Factory
             'employee_company' => '1',
             'email' => $this->faker->email,
             'employee_login' => $this->faker->userName,
-            'password' => Hash::make('maly1234'),
-            'remember_token' => Str::random(10),
+            'password' => Hash::make('qwertz1234')
         ];
     }
 }

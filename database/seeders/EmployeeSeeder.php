@@ -5,17 +5,13 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
-class EmployeeSeeder extends Seeder
-{
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
-    public function run()
-    {
+class EmployeeSeeder extends Seeder {
+    /* Nazev souboru: EmployeeSeeder.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida slouzi pro naplneni tabulky table_employees definovanymi hodnotami uvedenymi v metode run.
+       Vice informaci o seederech: https://laravel.com/docs/8.x/seeding */
+    public function run(){
         DB::table('table_employees')->insert([
             'employee_name' => 'George',
             'employee_surname' => 'Butler',
@@ -23,6 +19,7 @@ class EmployeeSeeder extends Seeder
             'email' => 'butler@gmail.com',
             'employee_position' => 'Skladník',
             'employee_city' => 'Jihlava',
+            'employee_birthday' => '1970-05-05',
             'employee_street' => 'Třebíčská 10',
             'employee_reliability' => 3,
             'employee_absence' => 2,
@@ -30,12 +27,10 @@ class EmployeeSeeder extends Seeder
             'employee_overall' => 2,
             'employee_login' => 'butler',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
-
         DB::table('table_employees')->insert([
             'employee_name' => 'Josh',
             'employee_surname' => 'Pearl',
@@ -43,6 +38,7 @@ class EmployeeSeeder extends Seeder
             'email' => 'pearl@gmail.com',
             'employee_position' => 'Mechanik',
             'employee_city' => 'Brno',
+            'employee_birthday' => '1968-04-05',
             'employee_street' => 'Semilasso',
             'employee_reliability' => 4,
             'employee_absence' => 4,
@@ -50,12 +46,10 @@ class EmployeeSeeder extends Seeder
             'employee_overall' => 4,
             'employee_login' => 'pearl',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
-
         DB::table('table_employees')->insert([
             'employee_name' => 'Albert',
             'employee_surname' => 'Xander',
@@ -63,6 +57,7 @@ class EmployeeSeeder extends Seeder
             'email' => 'xander@gmail.com',
             'employee_position' => 'HR asistent',
             'employee_city' => 'Brno',
+            'employee_birthday' => '1985-03-12',
             'employee_street' => 'Jihlavská 12',
             'employee_reliability' => 3,
             'employee_absence' => 4,
@@ -70,12 +65,10 @@ class EmployeeSeeder extends Seeder
             'employee_overall' => 4,
             'employee_login' => 'xander',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
-
         DB::table('table_employees')->insert([
             'employee_name' => 'Benjamin',
             'employee_surname' => 'Felix',
@@ -83,6 +76,7 @@ class EmployeeSeeder extends Seeder
             'email' => 'felix@gmail.com',
             'employee_position' => 'Mechanik',
             'employee_city' => 'Jihlava',
+            'employee_birthday' => '1992-06-18',
             'employee_street' => 'Markova 2',
             'employee_reliability' => 1,
             'employee_absence' => 5,
@@ -90,12 +84,10 @@ class EmployeeSeeder extends Seeder
             'employee_overall' => 3,
             'employee_login' => 'felix',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
-
         DB::table('table_employees')->insert([
             'employee_name' => 'Andre',
             'employee_surname' => 'Bush',
@@ -103,6 +95,7 @@ class EmployeeSeeder extends Seeder
             'email' => 'bush@gmail.com',
             'employee_position' => 'HR asistent',
             'employee_city' => 'Brno',
+            'employee_birthday' => '1986-12-24',
             'employee_street' => 'Technická 10',
             'employee_reliability' => 4,
             'employee_absence' => 3,
@@ -110,12 +103,10 @@ class EmployeeSeeder extends Seeder
             'employee_overall' => 4,
             'employee_login' => 'bush',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
-
         DB::table('table_employees')->insert([
             'employee_name' => 'Esme',
             'employee_surname' => 'Maxwell',
@@ -123,6 +114,7 @@ class EmployeeSeeder extends Seeder
             'email' => 'maxwell@gmail.com',
             'employee_position' => 'Vedoucí',
             'employee_city' => 'Brno',
+            'employee_birthday' => '1996-01-05',
             'employee_street' => 'Technická 12',
             'employee_reliability' => 2,
             'employee_absence' => 2,
@@ -130,12 +122,10 @@ class EmployeeSeeder extends Seeder
             'employee_overall' => 2,
             'employee_login' => 'maxwell',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
-
         DB::table('table_employees')->insert([
             'employee_name' => 'Erik',
             'employee_surname' => 'Laurent',
@@ -143,6 +133,7 @@ class EmployeeSeeder extends Seeder
             'email' => 'laurent@gmail.com',
             'employee_position' => 'Manažer',
             'employee_city' => 'Třebíč',
+            'employee_birthday' => '1990-07-08',
             'employee_street' => 'Hlavní 8',
             'employee_reliability' => 3,
             'employee_absence' => 3,
@@ -150,12 +141,10 @@ class EmployeeSeeder extends Seeder
             'employee_overall' => 3,
             'employee_login' => 'laurent',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
-
         DB::table('table_employees')->insert([
             'employee_name' => 'Fergus',
             'employee_surname' => 'Bale',
@@ -164,13 +153,13 @@ class EmployeeSeeder extends Seeder
             'employee_position' => 'Správce IT',
             'employee_city' => 'Jihlava',
             'employee_street' => 'Průmyslová 10',
+            'employee_birthday' => '1999-06-14',
             'employee_reliability' => 4,
             'employee_absence' => 1,
             'employee_workindex' => 1,
             'employee_overall' => 2,
             'employee_login' => 'bale',
             'password' => Hash::make('qwertz1234'),
-            'remember_token' => Str::random(10),
             'created_at' => now(),
             'updated_at' => now(),
             'employee_company' => '1',

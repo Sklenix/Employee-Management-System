@@ -5,15 +5,17 @@ namespace App\Exceptions;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
-class Handler extends ExceptionHandler
-{
+class Handler extends ExceptionHandler {
+    /* Nazev souboru: Handler.php */
+    /* Autor upravy (metoda unauthenticated): Pavel Sklenář (xsklen12) */
+    /* Tato trida je soucasti frameworku Laravel, byla upravena metoda unauthenticated */
+
     /**
      * A list of the exception types that are not reported.
-     *
      * @var array
      */
     protected $dontReport = [
-        //
+
     ];
 
     /**
@@ -31,24 +33,21 @@ class Handler extends ExceptionHandler
      *
      * @return void
      */
-    public function register()
-    {
-        //
+    public function register(){
+
     }
 
-    protected function unauthenticated($request, AuthenticationException $exception)
-    {
-        if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
-        }
-        if ($request->is('admin') || $request->is('admin/*')) {
-            return redirect()->guest('/login/admin');
-        }
-        if ($request->is('employee') || $request->is('employee/*')) {
-            return redirect()->guest('/login/employee');
-        }
-        if ($request->is('company') || $request->is('company/*')) {
-            return redirect()->guest('/login/company');
+     /* Pokud jsou uzivatele dve a vice hodin neaktivni (lifetime session), tak jsou automaticky odhlaseni a nasledne presmerovani na prihlasovaci formular (na zaklade jejich roli)
+        viz https://laravel.com/docs/5.6/authentication */
+    protected function unauthenticated($request, AuthenticationException $exception) {
+        if($request->expectsJson()){ return response()->json(['message' => $exception->getMessage()], 401); }
+        $guard = $exception->guards(); // ziskani role uzivatele
+        if($guard[0] == "admin"){
+            return redirect()->guest(route('renderAdminLogin'))->with(['success' => 'Byl jste automaticky odhlášen ze systému [vypršel časový limit neaktivity].']);
+        }else if($guard[0] == "company"){
+            return redirect()->guest(route('renderCompanyLogin'))->with(['success' => 'Byl jste automaticky odhlášen ze systému [vypršel časový limit neaktivity].']);
+        }else if($guard[0] == "employee"){
+            return redirect()->guest(route('renderEmployeeLogin'))->with(['success' => 'Byl jste automaticky odhlášen ze systému [vypršel časový limit neaktivity].']);
         }
     }
 }

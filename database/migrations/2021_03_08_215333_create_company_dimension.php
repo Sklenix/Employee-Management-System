@@ -4,15 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCompanyDimension extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+class CreateCompanyDimension extends Migration {
+    /* Nazev souboru: CreateCompanyDimension.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato migrace slouzi pro vytvoreni dimenze firem v ramci OLAP sekce systemu
+       Migrace detailneji: https://laravel.com/docs/8.x/migrations.
+    */
+
+    /* Definice tabulky (pro vytvoreni) */
+    public function up(){
         Schema::create('company_dimension', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id('company_id');
@@ -24,13 +24,8 @@ class CreateCompanyDimension extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
+    /* Odstraneni tabulky */
+    public function down(){
         Schema::dropIfExists('company_dimension');
     }
 }

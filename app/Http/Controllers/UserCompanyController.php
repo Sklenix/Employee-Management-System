@@ -1,1111 +1,849 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Employee_Language;
+use App\Models\Employee_Shift;
+use App\Models\ImportancesShifts;
 use App\Models\Shift;
 use DateTime;
-use http\Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\Company;
 use App\Models\Languages;
 use App\Models\Employee;
-use App\Providers\RouteServiceProvider;
 use Google_Service_Drive_Permission;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use Guzzle\Http\Exception\ClientErrorResponseException;
-use GuzzleHttp\Exception\ServerException;
-use GuzzleHttp\Exception\BadResponseException;
 use Google_Client;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Google_Service_Drive;
 use Google_Service_Drive_DriveFile;
-use Illuminate\Validation\ValidationException;
 
-class UserCompanyController extends Controller
-{
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
+class UserCompanyController extends Controller {
+    /* Nazev souboru:  UserCompanyController.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida slouzi k zobrazovani dashboardu a profilu uctu s roli firmy. Dale slouzi ke zmene udaju (vcetne hesla a profiloveho obrazku) v profilu firmy a take k praci s Google Drive v ramci firmy.
+       Nazvy jednotlivych metod jsou konvenci frameworku laravel, viz https://laravel.com/docs/8.x/controllers
+       Inspiraci k napojeni na Google Drive a prace s nim byl clanek https://www.kutac.cz/weby-a-vse-okolo/google-drive-api-nahravani-souboru-v-php, ktery napsal Pavel Kutac v roce 2019
+       Odkaz na Google Drive API: https://developers.google.com/drive/api/v3/quickstart/php a jeji git: https://github.com/googleapis/google-api-php-client. Google Drive API knihovna je poskytovana pod licenci Apache License 2.0.
+       Copyright pro Google Drive API:
+           Copyright 2021 Google Drive API
 
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function index()
-    {
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+
+           http://www.apache.org/licenses/LICENSE-2.0
+
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+    */
+
+    /* Nazev funkce: index
+       Argumenty: zadne
+       Ucel: Zobrazeni firemni domovske stranky */
+    public function index() {
         $user = Auth::user();
-
         $userJazyky = Languages::where('company_id', '=', $user->company_id)->get();
-        $moznostiImportance = DB::table('table_importances_shifts')
-            ->select('table_importances_shifts.importance_id', 'table_importances_shifts.importance_description')
-            ->get();
-
+        $moznostiImportance = ImportancesShifts::getAllImportancesExceptUnspecified();
         return view('homes.company_home')
             ->with('profilovka',$user->company_picture)
             ->with('jazyky',$userJazyky)
-            ->with('importances',$moznostiImportance);
+            ->with('importances',$moznostiImportance)
+            ->with('company_url', $user->company_url);
     }
 
-    public function showVerifySuccess()
-    {
-        return view('email_verified_login', [
-        ]);
-
-    }
-
-
-    protected function validator(array $data,$emailDuplicate,$loginDuplicate,$verze){
+    /* Nazev funkce: validator
+       Argumenty: udaje - udaje zadane uzivatelem, emailDuplicate - indikacni promenna znacici stejne emailove adresy, loginDuplicate - indikacni promenna znacici stejne prihlasovaci jmena, verze - volba validatoru
+       Ucel: Validace udaju zadane uzivatelem */
+    protected function validator(array $udaje, $emailDuplicate, $loginDuplicate, $verze) {
         if($verze == 1){
-            if($emailDuplicate == 1 && $loginDuplicate == 0){
-                if($data['company_ico'] == NULL){
+            if($emailDuplicate == 1 && $loginDuplicate == 0){ // emailove adresy jsou stejne, loginy nikoliv
+                if($udaje['ico'] == NULL){ // ico neni zadano
+                    /* Definice pravidel pro validaci */
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'prihlasovaci_jmeno' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }else{
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
-                        'company_ico' => ['digits:8'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'prihlasovaci_jmeno' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
+                        'ico' => ['digits:8'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }
-
-            }else if($loginDuplicate == 1 && $emailDuplicate == 0){
-                if($data['company_ico'] == NULL){
+            }else if($loginDuplicate == 1 && $emailDuplicate == 0){ // loginy jsou stejne, emailove adresy nikoliv
+                if($udaje['ico'] == NULL){ // ico neni zadano
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required', 'string', 'max:255'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'email' => ['required','unique:table_companies,email','string','email','max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }else{
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required', 'string', 'max:255'],
-                        'company_ico' => ['digits:8'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'email' => ['required','unique:table_companies,email','string','email','max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'ico' => ['digits:8'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }
-
-            }else if($loginDuplicate == 1 && $emailDuplicate == 1){
-                if($data['company_ico'] == NULL){
+            }else if($loginDuplicate == 1 && $emailDuplicate == 1){ // loginy jsou stejne a emailove adresy taktez
+                if($udaje['ico'] == NULL){ // ico neni zadano
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required', 'string', 'max:255'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }else{
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required', 'string', 'max:255'],
-                        'company_ico' => ['digits:8'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'ico' => ['digits:8'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }
-            }else if($loginDuplicate == 0 && $emailDuplicate == 0){
-                if($data['company_ico'] == NULL){
+            }else if($loginDuplicate == 0 && $emailDuplicate == 0){ // emailove adresy ani loginy nejsou stejne
+                if($udaje['ico'] == NULL){
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'email' => ['required','unique:table_companies,email','string','email','max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'prihlasovaci_jmeno' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }else{
                     $pravidla = [
-                        'company_name' => ['required', 'string', 'max:255'],
-                        'company_firstname' =>  ['required', 'string', 'max:255'],
-                        'company_surname' =>  ['required', 'string', 'max:255'],
-                        'company_email' => ['required','unique:table_companies,email','string','email','max:255'],
-                        'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                        'company_login' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
-                        'company_ico' => ['digits:8'],
-                        'company_city' => ['string', 'max:255'],
-                        'company_street' => ['max:255']
+                        'nazev_spolecnosti' => ['required', 'string', 'max:255'],
+                        'krestni_jmeno' =>  ['required', 'string', 'max:255'],
+                        'prijmeni' =>  ['required', 'string', 'max:255'],
+                        'email' => ['required','unique:table_companies,email','string','email','max:255'],
+                        'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                        'prihlasovaci_jmeno' => ['required','unique:table_companies,company_login', 'string', 'max:255'],
+                        'ico' => ['digits:8'],
+                        'mesto_sidla' => ['string', 'max:255'],
+                        'ulice_sidla' => ['max:255']
                     ];
                 }
             }
-            if($data['company_ico'] == NULL){
-                Validator::make($data, [
-                    'company_name' => ['required', 'string', 'max:255'],
-                    'company_firstname' =>  ['required', 'string', 'max:255'],
-                    'company_surname' =>  ['required', 'string', 'max:255'],
-                    'company_email' => ['required','string','email','max:255'],
-                    'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                    'company_login' => ['required', 'string', 'max:255'],
-                    'company_city' => ['string', 'max:255'],
-                    'company_street' => ['max:255']
-                ]);
-            }else{
-                Validator::make($data, [
-                    'company_name' => ['required', 'string', 'max:255'],
-                    'company_firstname' =>  ['required', 'string', 'max:255'],
-                    'company_surname' =>  ['required', 'string', 'max:255'],
-                    'company_email' => ['required','string','email','max:255'],
-                    'company_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                    'company_login' => ['required', 'string', 'max:255'],
-                    'company_ico' => ['digits:8'],
-                    'company_city' => ['string', 'max:255'],
-                    'company_street' => ['max:255']
-                ]);
-            }
-
-        }else if($verze == 2){
+        }else if($verze == 2){ // verze pro zamestnance
             $pravidla = [
-                'employee_name' => ['required', 'string', 'max:255'],
-                'employee_surname' =>  ['required', 'string', 'max:255'],
-                'employee_position' =>  ['required', 'string', 'max:255'],
-                'employee_email' => ['required','unique:table_employees,email','string','email','max:255'],
-                'employee_phone' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:9',
-                'employee_login' => ['required','unique:table_employees,employee_login', 'string', 'max:255'],
-                'employee_note' => ['nullable','max:500'],
-                'employee_city' => ['required','string', 'max:255'],
-                'employee_street' => ['nullable','max:255'],
-                'employee_password' => ['required', 'string', 'min:8','required_with:employee_password_confirm','same:employee_password_confirm'],
-                'employee_picture' => ['mimes:jpeg,jpg,png,gif','max:20000']
+                'krestni_jmeno' => ['required', 'string', 'max:255'],
+                'prijmeni' =>  ['required', 'string', 'max:255'],
+                'narozeniny' => ['nullable','before: 2006-04-21 00:00:00'],
+                'pozice' =>  ['required', 'string', 'max:255'],
+                'email' => ['required','unique:table_employees,email','string','email','max:255'],
+                'telefon' => ['required', 'regex:/^[\+]?([0-9\s\-]*)$/', 'min:9', 'max:16'],
+                'prihlasovaci_jmeno' => ['required','unique:table_employees,employee_login', 'string', 'max:255'],
+                'poznamka' => ['nullable','max:180'],
+                'mesto_bydliste' => ['required','string', 'max:255'],
+                'ulice_bydliste' => ['nullable','max:255'],
+                'heslo' => ['required', 'string', 'min:8','required_with:overeni_hesla','same:overeni_hesla'],
+                'profilovy_obrazek' => ['mimes:jpeg,jpg,png,gif','max:20000']
             ];
         }
-
-    $vlastniHlasky = [
-        'required' => 'Položka :attribute je povinná.',
-        'email' => 'U položky :attribute nebyl dodržen formát emailu.',
-        'regex' => 'Formát :attribute není validní.',
-        'max:255' => 'U položky :attribute je povoleno maximálně 255 znaků.',
-        'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.',
-        'digits' => 'Číslo musí mít 8 cifer'
-    ];
-    Validator::validate($data, $pravidla, $vlastniHlasky);
+        $vlastniHlasky = [
+            'required' => 'Položka :attribute je povinná.',
+            'email' => 'U položky :attribute nebyl dodržen formát emailu.',
+            'before' => 'Datum narození musí být nejméně před 15 lety.',
+            'regex' => 'Formát :attribute není validní.',
+            'max:255' => 'U položky :attribute je povoleno maximálně 255 znaků.',
+            'unique' => 'Váš e-mail, nebo Váš login už v databázi evidujeme.',
+            'digits' => 'Číslo musí mít 8 cifer.'
+        ];
+        /* Realizace zvalidovani */
+        Validator::validate($udaje, $pravidla, $vlastniHlasky);
     }
 
-    public function updateProfileData(Request $request){
+    /* Nazev funkce: updateProfileData
+       Argumenty: request - udaje zadane firmou
+       Ucel: Validace udaju zadane uzivatelem */
+    public function updateProfileData(Request $request) {
         $user = Auth::user();
+        /* Usek kodu ke zjisteni duplicit */
         $emailDuplicate = 0;
         $loginDuplicate = 0;
-        if($user->email == $request->company_email){
-            $emailDuplicate = 1;
-
-        }
-        if($user->company_login == $request->company_login){
-            $loginDuplicate = 1;
-        }
-
+        if($user->email == $request->email){ $emailDuplicate = 1; }
+        if($user->company_login == $request->prihlasovaci_jmeno){ $loginDuplicate = 1; }
+        /* Zavolani validatoru */
         $this->validator($request->all(),$emailDuplicate,$loginDuplicate,1);
-
-        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
-        $firma = $request->company_name;
-        $email = $request->company_email;
-        $souborZmena = $firma . " " . $email;
-        /*Cesta k autorizačnímu klíči*/
-        $keyFileLocation =storage_path('app/credentials.json');
-        $client = new Google_Client();
-        $httpClient = $client->getHttpClient();
-        $config = $httpClient->getConfig();
-        $config['verify'] = false;
-        $client->setHttpClient(new Client($config));
-        $client->setApplicationName("BackupDrive");
-        try {
-            /*Inicializace klienta*/
-            $client->setAuthConfig($keyFileLocation);
-            $client->useApplicationDefaultCredentials();
-            $client->addScope([
-                \Google_Service_Drive::DRIVE,
-                \Google_Service_Drive::DRIVE_METADATA
-            ]);
-            $service = new \Google_Service_Drive($client);
-            $zmena_jmena = new Google_Service_Drive_DriveFile();
-            $zmena_jmena->setName($souborZmena);
-            $service->files->update($user->company_url, $zmena_jmena, array(
-                'mimeType' => 'text/csv',
-                'uploadType' => 'multipart'
-            ));
-        } catch (Exception $e) {
-            print "Nastala chyba: " . $e->getMessage();
+        if($user->company_url != ""){
+            if($user->company_name == $request->nazev_spolecnosti && $user->email == $request->email){ // pokud je nazev firmy i email firmy stejny, tak neni spustena aktualizace nazvu Google Drive slozky firmy
+            }else{
+                /* Usek kodu zabyvajici se nazvem slozky v Google Drive firmy */
+                $souborZmena = $request->nazev_spolecnosti . " " . $request->email;
+                /*Cesta k autorizacnimu klici*/
+                $authKey = storage_path('app/credentials.json');
+                /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+                $httpClient = new Client(['verify' => false]);
+                /* Inicializace Google Drive klienta */
+                $GoogleClient = new Google_Client();
+                /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+                $GoogleClient->setHttpClient($httpClient);
+                /* Nastaveni prihlaseni ke Google Drive API */
+                $GoogleClient->setAuthConfig($authKey);
+                /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+                $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+                $googleServ = new Google_Service_Drive($GoogleClient);
+                $zmena_jmena = new Google_Service_Drive_DriveFile();
+                $zmena_jmena->setName($souborZmena);
+                $googleServ->files->update($user->company_url, $zmena_jmena, ['uploadType' => 'multipart']);
+            }
         }
-
-        $user->company_name=$request->company_name;
-        $user->company_user_name = $request->company_firstname;
-        $user->company_user_surname = $request->company_surname;
-        $user->email = $request->company_email;
-        $user->company_city = $request->company_city;
-        $user->company_street = $request->company_street;
-        $user->company_ico = $request->company_ico;
-        $user->company_phone = $request->company_phone;
-        $user->company_login = $request->company_login;
-        $user->save();
-        OlapETL::updateCompanyDimension($user->company_id, $request->company_name, $request->company_city, $request->company_street, $request->company_firstname, $request->company_surname);
+        /* Aktualizace udaju v databazi */
+        Company::where(['company_id' => $user->company_id])->update(['company_name' => $request->nazev_spolecnosti, 'company_user_name' => $request->krestni_jmeno, 'company_user_surname' => $request->prijmeni, 'email' => $request->email, 'company_city' => $request->mesto_sidla, 'company_street' => $request->ulice_sidla,
+                        'company_ico' => $request->ico, 'company_phone' => $request->telefon, 'company_login' => $request->prihlasovaci_jmeno]);
+        /* Aktualizace udaju v OLAP sekci systemu */
+        OlapETL::updateCompanyDimension($user->company_id, $request->nazev_spolecnosti, $request->mesto_sidla, $request->ulice_sidla, $request->krestni_jmeno, $request->prijmeni);
         session()->flash('message', 'Vaše údaje byly úspěšně změněny!');
         return redirect()->route('showCompanyProfileData');
     }
 
-    public function updateProfilePassword(Request $request){
+    /* Nazev funkce: updateProfilePassword
+       Argumenty: request - hesla zadane firmou
+       Ucel: Validace hesla zadaneho firmou */
+    public function updateProfilePassword(Request $request) {
         $user = Auth::user();
-        if($request->password == $request->password_verify){
-            if($request->password == "" || $request->password_verify == ""){
+        if($request->heslo == $request->overeni_heslo){
+            if($request->heslo == "" || $request->overeni_heslo == ""){
                 session()->flash('errorZprava', 'Položky password, password_verify jsou povinné!');
-                return back()->withInput(['tab'=>'zmenaHesla']);
-            }else if(strlen($request->password) < 8){
+                return redirect()->back();
+            }else if(strlen($request->heslo) < 8){
                 session()->flash('errorZprava', 'Heslo musí mít alespoň 8 znaků!');
-                return back()->withInput(['tab'=>'zmenaHesla']);
+                return redirect()->back();
             }else{
-                $user->password= Hash::make($request->password);
+                $user->password= Hash::make($request->heslo);
             }
-
         }else{
-            if($request->password == "" || $request->password_verify == ""){
+            if($request->heslo == "" || $request->overeni_heslo == ""){
                 session()->flash('errorZprava', 'Položky password, password_verify jsou povinné!');
             }
             session()->flash('errorZprava', 'Hesla se neshodují!');
-            return back()->withInput(['tab'=>'zmenaHesla']);
+            return redirect()->back();
         }
         $user->save();
         session()->flash('message', 'Vaše heslo bylo úspešně změněno!');
-        return back()->withInput(['tab'=>'zmenaHesla']);
+        return redirect()->back();
     }
 
-    public function deleteOldImage(){
+    /* Nazev funkce: deleteOldImage
+       Argumenty: zadne
+       Ucel: Smazani profiloveho obrazku */
+    public function deleteOldImage() {
         $user = Auth::user();
-        if($user->company_picture){
+        if($user->company_picture != NULL){
             Storage::delete('/public/company_images/'.$user->company_picture);
             $user->update(['company_picture' => NULL]);
         }
         return redirect()->back();
     }
 
-    public function uploadImage(Request $request){
+    /* Nazev funkce: uploadImage
+       Argumenty: request - profilovy obrazek
+       Ucel: Nahrani profiloveho obrazku */
+    public function uploadImage(Request $request) {
         if($request->hasFile('obrazek')){
-           $validator = Validator::make($request->all(),[
-                'obrazek' => 'required|mimes:jpg,jpeg,png|max:8096',
-            ]);
+            /* Definice pravidel */
+           $validator = Validator::make($request->all(),['obrazek' => ['required','mimes:jpg,jpeg,png','max:8096']]);
+           /* Odeslani chybove hlasky */
            if($validator->fails()){
                 session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg], maximální velikost obrázku je 8MB!');
                 return redirect()->back();
            }
+           /* Smazani stareho profiloveho obrazku */
            $user = Auth::user();
            if($user->company_picture){
                Storage::delete('/public/company_images/'.$user->company_picture);
            }
+           /* Vytvoreni nazvu profiloveho obrazku a nasledne jeho ulozeni na server a aktualizace nazvu profiloveho obrazku v databazi */
            $tokenUnique = Str::random(20);
            $tokenUnique2 = Str::random(5);
            $tokenUnique3 = Str::random(10);
            $request->obrazek->storeAs('company_images',$tokenUnique.$tokenUnique2.$tokenUnique3,'public');
            $user->update(['company_picture' => $tokenUnique.$tokenUnique2.$tokenUnique3]);
+           /* Odeslani odpovedi */
            session()->flash('obrazekZpravaSuccess', 'Profilová fotka úspěšně nahrána.');
         }
         return redirect()->back();
     }
 
-    public function showCompanyProfileData(){
+    /* Nazev funkce: showCompanyProfileData
+       Argumenty: zadne
+       Ucel: Zobrazeni profilu firmy */
+    public function showCompanyProfileData() {
         $user = Auth::user();
         return view('profiles.company_profile')
             ->with('profilovka',$user->company_picture);
     }
 
-    public function deleteCompanyProfile(){
+    /* Nazev funkce: deleteCompanyProfile
+       Argumenty: zadne
+       Ucel: Smazani uctu firmy */
+    public function deleteCompanyProfile() {
         $user = Auth::user();
+        /* Smazani z OLAP sekce systemu */
+        OlapETL::deleteRecordFromCompanyDimension($user->company_id);
+        /* Smazani z databaze */
         DB::table('table_companies')
             ->where(['table_companies.company_id' => $user->company_id])
             ->delete();
-        if($user->company_url != NULL){
-            $keyFileLocation =storage_path('app/credentials.json');
-            /*ID složky, do které chceme soubory nahrávat*/
-            $client = new Google_Client();
-            $httpClient = $client->getHttpClient();
-            $config = $httpClient->getConfig();
-            $config['verify'] = false;
-            $client->setHttpClient(new Client($config));
-            $client->setApplicationName("BackupDrive");
-            try {
-                /*Inicializace klienta*/
-                $client->setAuthConfig($keyFileLocation);
-                $client->useApplicationDefaultCredentials();
-                $client->addScope([
-                    \Google_Service_Drive::DRIVE,
-                    \Google_Service_Drive::DRIVE_METADATA
-                ]);
-                $service = new \Google_Service_Drive($client);
-                $results = $service->files->get($user->company_url);
-                if($results != NULL) {
-                    $service->files->delete($user->company_url);
-                }
-            }catch (Exception $e){
+        if($user->company_url != ""){
+            /*Cesta k autorizacnimu klici*/
+            $authKey = storage_path('app/credentials.json');
+            /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+            $httpClient = new Client(['verify' => false]);
+            /* Inicializace Google Drive klienta */
+            $GoogleClient = new Google_Client();
+            /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+            $GoogleClient->setHttpClient($httpClient);
+            /* Nastaveni prihlaseni ke Google Drive API */
+            $GoogleClient->setAuthConfig($authKey);
+            /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+            $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+            $googleServ = new Google_Service_Drive($GoogleClient);
+            $results = $googleServ->files->get($user->company_url);
+            /* Usek kodu, ktery zjisti, zdali existuje Google Drive slozka firmy, pokud ano, tak se odstrani */
+            if($results != NULL) {
+                $googleServ->files->delete($user->company_url);
             }
         }
-        OlapETL::deleteRecordFromCompanyDimension($user->company_id);
+        /* Odeslani zpravy uzivateli a presmerovani na prihlasovaci formular firmy */
         session()->flash('success', 'Váš účet byl úspěšně smazán!');
-        return redirect()->route('company');
+        return redirect()->route('renderCompanyLogin');
     }
 
-    public function createFolderGoogleDrive(Request $request){
-        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
-        $slozka=$request->nazev;
-        /*Service účet pro pripojeni ke Google Drive*/
-        $emailAddress = 'tozondoservices@tozondo-drive.iam.gserviceaccount.com';
-        /*Cesta k autorizačnímu klíči*/
+    /* Nazev funkce: createFolderGoogleDrive
+       Argumenty: request - nazev slozky
+       Ucel: vytvoreni nove slozky na Google Drive  */
+    public function createFolderGoogleDrive(Request $request) {
         $user = Auth::user();
-        $userSearch = Company::where('company_url', '=',$user->company_url )->first();
-        $keyFileLocation =storage_path('app/credentials.json');
-        /*ID složky, do které chceme soubory nahrávat*/
-        $folderId = $userSearch->company_url;
-        $client = new Google_Client();
-        $httpClient = $client->getHttpClient();
-        $config = $httpClient->getConfig();
-        $config['verify'] = false;
-        $client->setHttpClient(new Client($config));
-        $client->setApplicationName("BackupDrive");
-        try {
-            /*Inicializace klienta*/
-            $client->setAuthConfig($keyFileLocation);
-            $client->useApplicationDefaultCredentials();
-            $client->addScope([
-                \Google_Service_Drive::DRIVE,
-                \Google_Service_Drive::DRIVE_METADATA
-            ]);
-            $service = new \Google_Service_Drive($client);
-            /*Vytvoření složky*/
-            $file = new Google_Service_Drive_DriveFile();
-            $file->setName($slozka);
-            $mimeType = 'application/vnd.google-apps.folder';
-            $file->setMimeType($mimeType);
-            /*Nasměrování do zvolené složky*/
-
-            $file->setParents(array($folderId));
-
-            /*Odeslání dat*/
-            $createdFile = $service->files->create($file, array(
-                'mimeType' => $mimeType,
-                'uploadType' => "multipart"
-            ));
-
-
-        } catch (Exception $e) {
-            file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
-            die();
-        }
+        /* Pozadovany nazev slozky v Google Drive */
+        $slozka = $request->nazev;
+        /* Cesta k autorizacnimu klici */
+        $authKey = storage_path('app/credentials.json');
+        /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+        $httpClient = new Client(['verify' => false]);
+        /* Inicializace Google Drive klienta */
+        $GoogleClient = new Google_Client();
+        /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+        $GoogleClient->setHttpClient($httpClient);
+        /* Nastaveni prihlaseni ke Google Drive API */
+        $GoogleClient->setAuthConfig($authKey);
+        /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+        $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+        $googleServ = new Google_Service_Drive($GoogleClient);
+        /*Vytvoření složky*/
+        $nova_slozka = new Google_Service_Drive_DriveFile();
+        /* Nastaveni nazvu slozky */
+        $nova_slozka->setName($slozka);
+        /* Nastaveni typu MIME na typ slozky */
+        $nova_slozka->setMimeType('application/vnd.google-apps.folder');
+        /*Nasměrování do Google Drive slozky zamestnance */
+        $nova_slozka->setParents([$user->company_url]);
+        /* Vytvoreni slozky v Google Drive */
+        $googleServ->files->create($nova_slozka, ['mimeType' => "application/vnd.google-apps.folder", 'uploadType' => "multipart"]);
+        /* Odeslani hlasky o uspechu uzivateli */
         session()->flash('success', 'Složka '.$request->nazev.' byla úspešně vytvořena na Vašem Google Drive!');
         return redirect()->back();
     }
 
-    public function addLanguage(Request $request){
+    /* Nazev funkce: addLanguage
+       Argumenty: request - nazev jazyka
+       Ucel: vytvoreni noveho jazyka v ramci firmy */
+    public function addLanguage(Request $request) {
         $user = Auth::user();
-
-        $validator = Validator::make($request->all(), [
-            'jazyk' => ['required','min:2','string', 'max:30'],
-        ]);
-
+        /* Definice pravidel pro validaci nasledne jeji provedeni */
+        $validator = Validator::make($request->all(), [ 'jazyk' => ['required','min:2','string', 'max:30']]);
+        /* Pokud validace selze */
         if ($validator->fails()) {
             $chyby = implode($validator->errors()->all());
             session()->flash('errory', $chyby);
             return redirect()->back();
         }
-
-        \App\Models\Languages::create([
-            'language_name' => $request->jazyk,
-            'company_id' =>  $user->company_id
-        ]);
+        /* Vytvoreni jazyka v databazi */
+        Languages::create(['language_name' => $request->jazyk, 'company_id' =>  $user->company_id]);
+        /* Odeslani odpovedi uzivateli */
         session()->flash('success', 'Jazyk '.$request->jazyk.' byl úspešně přidán do výběru!');
         return redirect()->back();
     }
 
 
+    /* Nazev funkce: removeLanguage
+       Argumenty: request - jazyky urcene ke smazani
+       Ucel: odstraneni vybranych jazyku firmy */
     public function removeLanguage(Request $request){
-        for ($i = 0;$i < count($request->jazyky);$i++){
-            Languages::where('language_id', $request->jazyky[$i])->delete();
-        }
+        /* Postupne mazani jazyku v cyklu a nasledovne poslani odpovedi uzivateli */
+        for ($i = 0;$i < count($request->jazyky);$i++){ Languages::where('language_id', $request->jazyky[$i])->delete(); }
         session()->flash('success', 'Jazyk/y '.$request->jazyk.' byl úspešně smazán z výběru!');
         return redirect()->back();
     }
 
+    /* Nazev funkce: uploadGoogleDrive
+       Argumenty: request - soubor k nahrani na Google Drive
+       Ucel: nahrani souboru do Google Drive slozky firmy */
     public function uploadGoogleDrive(Request $request){
-        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
-        $jmenoSouboru = $request->fileInput;
-
-        /*Service účet pro pripojeni ke Google Drive*/
-        $emailAddress = 'tozondoservices@tozondo-drive.iam.gserviceaccount.com';
-        /*Cesta k autorizačnímu klíči*/
-        $user = Auth::user();
-        $userSearch = Company::where('company_url', '=',$user->company_url )->first();
-
-        $keyFileLocation =storage_path('app/credentials.json');
-        /*ID složky, do které chceme soubory nahrávat*/
-        $folderId =  $request->slozky;
-        $client = new Google_Client();
-        $httpClient = $client->getHttpClient();
-        $config = $httpClient->getConfig();
-        $config['verify'] = false;
-        $client->setHttpClient(new Client($config));
-        $client->setApplicationName("BackupDrive");
-        try {
-            /*Inicializace klienta*/
-            $client->setAuthConfig($keyFileLocation);
-            $client->useApplicationDefaultCredentials();
-            $client->addScope([
-                \Google_Service_Drive::DRIVE,
-                \Google_Service_Drive::DRIVE_METADATA
-            ]);
-            $service = new \Google_Service_Drive($client);
-            /*Vytvoření složky*/
-            $file = new Google_Service_Drive_DriveFile();
-            $file->setName( $request->file('fileInput')->getClientOriginalName());
-            $mime = finfo_open(FILEINFO_MIME);
-
-            $mimeType = finfo_file($mime,$jmenoSouboru);
-            finfo_close($mime);
-
-            $file->setMimeType($mimeType);
-            /*Nasměrování do zvolené složky*/
-
-            $file->setParents(array($folderId));
-
-            /*Odeslání dat*/
-            $createdFile = $service->files->create($file, array(
-                'data' => file_get_contents($jmenoSouboru),
-                'mimeType' => $mimeType,
-                'uploadType' => "multipart"
-            ));
-        }catch (Exception $e){
-            file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
-            die();
-        }
-        session()->flash('success', 'Soubor '.$request->file('fileInput')->getClientOriginalName().' byl úspešně nahrán na Váš Google Drive!');
+        /*Cesta k autorizacnimu klici*/
+        $authKey = storage_path('app/credentials.json');
+        /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+        $httpClient = new Client(['verify' => false]);
+        /* Inicializace Google Drive klienta */
+        $GoogleClient = new Google_Client();
+        /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+        $GoogleClient->setHttpClient($httpClient);
+        /* Nastaveni prihlaseni ke Google Drive API */
+        $GoogleClient->setAuthConfig($authKey);
+        /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+        $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+        $googleServ = new Google_Service_Drive($GoogleClient);
+        /* Vytvoření souboru */
+        $novy_soubor = new Google_Service_Drive_DriveFile();
+        $novy_soubor->setName($request->file('soubor')->getClientOriginalName());
+        /* Nastaveni typu MIME souboru */
+        $novy_soubor->setMimeType($request->file('soubor')->getMimeType());
+        /* Nasmerovani do slozky firmy */
+        $novy_soubor->setParents([$request->slozky]);
+        /* Vytvoreni souboru na Google Drive */
+        $googleServ->files->create($novy_soubor, ['data' => file_get_contents($request->soubor), 'mimeType' => $request->file('soubor')->getMimeType(), 'uploadType' => "resumable"]);
+        /* Odeslani hlasky o uspechu uzivateli */
+        session()->flash('success', 'Soubor '.$request->file('soubor')->getClientOriginalName().' byl úspešně nahrán na Váš Google Drive!');
         return redirect()->back();
-
     }
+
+    /* Nazev funkce: getAllGoogleDriveFoldersOptions
+       Argumenty: zadne
+       Ucel: ziskani vsech slozek v ramci Google Drive slozky firmy */
     public function getAllGoogleDriveFoldersOptions(){
-        $html = '';
+        $user = Auth::user();
+        /* Promenna, do ktere se bude ukladat HTML kod */
+        $out = '';
+        /* Promenna, do ktere se ulozi jednotlive slozky */
         $slozky="";
-        $keyFileLocation =storage_path('app/credentials.json');
-        $client = new Google_Client();
-        $httpClient = $client->getHttpClient();
-        $config = $httpClient->getConfig();
-        $config['verify'] = false;
-        $client->setHttpClient(new Client($config));
-        $client->setApplicationName("BackupDrive");
-
-        try {
-            $client->setAuthConfig($keyFileLocation);
-            $client->useApplicationDefaultCredentials();
-            $client->addScope([
-                \Google_Service_Drive::DRIVE,
-                \Google_Service_Drive::DRIVE_METADATA
-            ]);
-            $mimeType = 'application/vnd.google-apps.folder';
-            $service = new \Google_Service_Drive($client);
-            $user = Auth::user();
-            $userSearch = Company::where('company_url', '=', $user->company_url)->first();
-            $userJazyky = Languages::where('company_id', '=', $user->company_id)->get();
-            $optParams = array(
-                'pageSize' => 10,
-                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
-                'q' => "trashed = false AND mimeType='application/vnd.google-apps.folder' AND '" . $userSearch->company_url . "' in parents"
-            );
-            $slozky = $service->files->listFiles($optParams);
-
-            $html .= '<div class="alert alert-info alert-block text-center">
-                        <strong>Vyberte, do které složky chcete nahrát soubor.</strong>
-                    </div>';
-            $html .='<div class="form-group">
-                        <select name="slozky" required id="slozky" style="color:black" class="form-control input-lg dynamic" data-dependent="state">
-                             <option value="">Vyber složku</option>
-                             <option value="'.$user->company_url.'">/</option>';
-            foreach ($slozky as $slozka){
-                $html .= '<option value="'.$slozka->id.'">'.$slozka->name.'</option>';
-            }
-            $html .= ' </select></div>';
-
-        }catch (Exception $e){
+        /*Cesta k autorizacnimu klici*/
+        $authKey = storage_path('app/credentials.json');
+        /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+        $httpClient = new Client(['verify' => false]);
+        /* Inicializace Google Drive klienta */
+        $GoogleClient = new Google_Client();
+        /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+        $GoogleClient->setHttpClient($httpClient);
+        /* Nastaveni prihlaseni ke Google Drive API */
+        $GoogleClient->setAuthConfig($authKey);
+        /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+        $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+        $googleServ = new Google_Service_Drive($GoogleClient);
+        /* Definice pro vyhledavani slozek (jake udaje ze slozek potrebujeme a kde se nachazi misto pro prohledavani slozek) */
+        $optParams = ["fields" => "nextPageToken, files(id, name, fileExtension)", "q" => "mimeType='application/vnd.google-apps.folder' AND '" . $user->company_url . "' in parents"];
+        /* Nalezeni vsech slozek slozky */
+        $slozky = $googleServ->files->listFiles($optParams);
+        /* Definice obsahu modalniho okna */
+        $out .= '<div class="alert alert-info alert-block text-center"><strong>Vyberte, do které složky chcete nahrát soubor.</strong></div>';
+        /* Ulozeni nazvu slozek jako moznosti pro selectbox */
+        $out .='<div class="form-group">
+                    <select name="slozky" id="slozky" style="color:black" class="form-control input-lg" required>
+                         <option value="">Vyberte složku</option>
+                         <option value="'.$user->company_url.'">/</option>';
+        foreach ($slozky as $slozka){
+            $out .= '<option value="'.$slozka->id.'">'.$slozka->name.'</option>';
         }
-
-        return response()->json(['html'=>$html]);
+        $out .= '</select></div>'; // ukonceni moznosti
+        /* Zaslani obsahu do modalniho okna */
+        return response()->json(['out' => $out]);
     }
 
+    /* Nazev funkce: getAllGoogleDriveFilesCheckboxes
+     Argumenty: zadne
+     Ucel: ziskani vsech souboru a slozek v ramci Google Drive slozky firmy */
     public function getAllGoogleDriveFilesCheckboxes(){
-        $html = '';
-        $slozky="";
-        $keyFileLocation =storage_path('app/credentials.json');
-        $client = new Google_Client();
-        $httpClient = $client->getHttpClient();
-        $config = $httpClient->getConfig();
-        $config['verify'] = false;
-        $client->setHttpClient(new Client($config));
-        $client->setApplicationName("BackupDrive");
-        try {
-            $client->setAuthConfig($keyFileLocation);
-            $client->useApplicationDefaultCredentials();
-            $client->addScope([
-                \Google_Service_Drive::DRIVE,
-                \Google_Service_Drive::DRIVE_METADATA
-            ]);
-            $mimeType = 'application/vnd.google-apps.folder';
-            $service = new \Google_Service_Drive($client);
-            $user = Auth::user();
-            $userSearch = Company::where('company_url', '=', $user->company_url)->first();
-
-            $optParams = array(
-                'pageSize' => 10,
-                'fields' => "nextPageToken, files(contentHints/thumbnail,fileExtension,iconLink,id,name,size,thumbnailLink,webContentLink,webViewLink,mimeType,parents)",
-                'q' => "'" . $userSearch->company_url . "' in parents"
-            );
-            $slozkyDelete = $service->files->listFiles($optParams);
-            if(count($slozkyDelete) == 0){
-                $html .= '<div class="alert alert-danger alert-block">
-                            <strong>Na Google Drive nemáte žadné soubory/složky.</strong>
-                        </div>';
-            }else{
-                $html .= '<div class="alert alert-info alert-block text-center">
-                            <strong>Seznam souborů na Vašem Google Drive, vyberte, které soubory chcete smazat.</strong>
-                        </div>';
-                foreach ($slozkyDelete as $slozkaDelete){
-                    $html .= '<center><div class="custom-control form-control-lg custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="'.$slozkaDelete->name.'" name="google_drive_delete_listFile[]" value="'.$slozkaDelete->id.'">
-                             <label class="custom-control-label" style="font-size:16px;" for="'.$slozkaDelete->name.'">
-                                    '.$slozkaDelete->name.'
-                            </label>
-                            </div></center>
-                            ';
-                }
+        $user = Auth::user();
+        /* Promenna, do ktere se bude ukladat HTML kod */
+        $out = '';
+        /*Cesta k autorizacnimu klici*/
+        $authKey = storage_path('app/credentials.json');
+        /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+        $httpClient = new Client(['verify' => false]);
+        /* Inicializace Google Drive klienta */
+        $GoogleClient = new Google_Client();
+        /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+        $GoogleClient->setHttpClient($httpClient);
+        /* Nastaveni prihlaseni ke Google Drive API */
+        $GoogleClient->setAuthConfig($authKey);
+        /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+        $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+        $googleServ = new Google_Service_Drive($GoogleClient);
+        /* Definice pro vyhledavani souboru (jake udaje ze souboru potrebujeme a kde se nachazi misto pro prohledavani souboru) */
+        $optParams = ["fields" => "nextPageToken, files(id, name, fileExtension)", "q" => "'" . $user->company_url . "' in parents"];
+        /* Nalezeni vsech souboru slozky */
+        $slozkyDelete = $googleServ->files->listFiles($optParams);
+        /* Zjisteni, zdali ma firma vubec nejake soubory/slozky na Google Drive */
+        if(count($slozkyDelete) == 0){
+            $out .= '<div class="alert alert-danger alert-block" style="font-size: 16px;">
+                        <strong>Na Google Drive nemáte žadné soubory/složky.</strong>
+                    </div>';
+        }else{ // pokud ano, tak je generovan checkbox pro kazdou slozku/soubor
+            $out .= '<div class="alert alert-info alert-block text-center" style="font-size: 16px;"><strong>Seznam souborů na Vašem Google Drive. Vyberte, které soubory chcete smazat.</strong></div>';
+            foreach ($slozkyDelete as $slozkaDelete){
+                $out .= '<center><div class="form-check" style="margin-bottom: 10px;">
+                                     <input type="checkbox" style="width: 17px; height: 17px;" class="form-check-input" id="'.$slozkaDelete->name.'" name="google_drive_delete_listFile[]" value="'.$slozkaDelete->id.'">
+                                     <label class="form-check-label" style="font-size:16px;margin-top:1px;" for="'.$slozkaDelete->name.'">&nbsp;'.$slozkaDelete->name.'</label>
+                                </div></center>';
             }
-
-        }catch (Exception $e){
         }
-        return response()->json(['html'=>$html]);
+        /* Zaslani obsahu do modalniho okna */
+        return response()->json(['out' => $out]);
     }
 
+    /* Nazev funkce: deleteFileGoogleDrive
+      Argumenty: request - soubory ci slozky ke smazani na Google Drive
+      Ucel: odstraneni souboru ci slozek z Google Drive slozky firmy */
     public function deleteFileGoogleDrive(Request $request){
-        if($request->google_drive_delete_listFile != NULL){
-           /* $emailAddress = 'tozondoservices@tozondo-drive.iam.gserviceaccount.com';
-          $role = 'organizer';
-
-          $userPermission = new Google_Service_Drive_Permission(array(
-              'type' => 'user',
-              'role' => $role,
-              'emailAddress' => $emailAddress
-          ));*/
-
-          $keyFileLocation =storage_path('app/credentials.json');
-          /*ID složky, do které chceme soubory nahrávat*/
-            $client = new Google_Client();
-            $httpClient = $client->getHttpClient();
-            $config = $httpClient->getConfig();
-            $config['verify'] = false;
-            $client->setHttpClient(new Client($config));
-            $client->setApplicationName("BackupDrive");
-            try {
-                /*Inicializace klienta*/
-                $client->setAuthConfig($keyFileLocation);
-                $client->useApplicationDefaultCredentials();
-                $client->addScope([
-                    \Google_Service_Drive::DRIVE,
-                    \Google_Service_Drive::DRIVE_METADATA
-                ]);
-                $service = new \Google_Service_Drive($client);
-                foreach ($request->google_drive_delete_listFile as $slozka){
-                    $service->files->delete($slozka);
-                }
-
-            }catch (Exception $e){
-                file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
-                die();
-            }
-            if(count($request->google_drive_delete_listFile) == 1){
+        /* Pokud uzivatel vybral nejake soubory ci slozky */
+        if ($request->google_drive_delete_listFile != NULL) {
+            /* Cesta k autorizacnimu klici */
+            $authKey = storage_path('app/credentials.json');
+            /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+            $httpClient = new Client(['verify' => false]);
+            /* Inicializace Google Drive klienta */
+            $GoogleClient = new Google_Client();
+            /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+            $GoogleClient->setHttpClient($httpClient);
+            /* Nastaveni prihlaseni ke Google Drive API */
+            $GoogleClient->setAuthConfig($authKey);
+            /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+            $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+            $googleServ = new Google_Service_Drive($GoogleClient);
+            /* Postupne odstranovani souboru */
+            foreach ($request->google_drive_delete_listFile as $slozka){ $googleServ->files->delete($slozka); }
+            /* Odeslani hlasky o uspechu uzivateli */
+            if (count($request->google_drive_delete_listFile) == 1) {
                 session()->flash('success', 'Soubor byl úspešně smazán!');
             }else{
                 session()->flash('success', 'Soubory byly úspešně smazány!');
             }
-        }else{
-                session()->flash('fail', 'Nevybral jste žádný soubor!');
+        }else { // pokud nevybral zadny soubor ci slozku
+            session()->flash('fail', 'Nevybral jste žádný soubor!');
         }
+        /* Presmerovani zpet */
         return redirect()->back();
     }
 
+    /* Nazev funkce: addEmployee
+      Argumenty: request - udaje zadane firmou o novem zamestnanci
+      Ucel: vytvoreni noveho zamestnance */
     public function addEmployee(Request $request){
         $user = Auth::user();
+        /* Zvalidovani udaju */
         $this->validator($request->all(),-1,-1,2);
-        $uzivatel = $request->employee_login;
 
-        \App\Models\Employee::create([
-            'employee_name' => $request->employee_name,
-            'employee_surname' => $request->employee_surname,
-            'employee_phone' => $request->employee_phone,
-            'email' => $request->employee_email,
-            'employee_note' => $request->employee_note,
-            'employee_position' => $request->employee_position,
-            'employee_city' => $request->employee_city,
-            'employee_street' => $request->employee_street,
-            'employee_login' => $request->employee_login,
-            'password' => Hash::make($request->employee_password),
-            'employee_company' => $user->company_id
-        ]);
+        /* Ziskani prihlasovaciho jmena zamestnance do promenne */
+        $uzivatel = $request->prihlasovaci_jmeno;
 
-        $employeeSearch = Employee::where('employee_login', '=',$uzivatel )->first();
+        /* Vytvoreni zamestnance */
+        Employee::create(['employee_name' => $request->krestni_jmeno, 'employee_surname' => $request->prijmeni, 'employee_birthday' => $request->narozeniny, 'employee_phone' => $request->telefon, 'email' => $request->email, 'employee_note' => $request->poznamka, 'employee_position' => $request->pozice, 'employee_city' => $request->mesto_bydliste,
+            'employee_street' => $request->ulice_bydliste, 'employee_login' => $request->prihlasovaci_jmeno, 'password' => Hash::make($request->heslo), 'employee_company' => $user->company_id, 'employee_url' => ""]);
+
+        /* Ziskani zamestnance */
+        $employeeSearch = Employee::where('employee_login', '=',$uzivatel)->first();
+        /* Vytvoreni jazyku zamestnance podle vyberu firmy */
         if($request->jazyky != ""){
-            for($i = 0;$i < count($request->jazyky);$i++){
-                \App\Models\Employee_Language::create([
-                    'language_id' => $request->jazyky[$i],
-                    'employee_id' => $employeeSearch->employee_id,
-                ]);
+            for($i = 0; $i < count($request->jazyky); $i++){
+                Employee_Language::create(['language_id' => $request->jazyky[$i], 'employee_id' => $employeeSearch->employee_id,]);
             }
         }
-
-        if($request->hasFile('employee_picture')){
-            $nazev = $request->employee_picture->getClientOriginalName();
-            $pripona = explode(".",$nazev);
-            if($pripona[1] == "jpg" || $pripona[1] == "png" || $pripona[1] == "jpeg"){
-                if($employeeSearch->employee_picture){
-                    Storage::delete('/public/employee_images/'.$employeeSearch->employee_picture);
-                }
-                $tokenUnique = Str::random(20);
-                $request->employee_picture->storeAs('employee_images',$tokenUnique.$nazev,'public');
-                $employeeSearch->update(['employee_picture' => $tokenUnique.$nazev]);
+        /* Usek kodu zabyvajici se nahranim profiloveho obrazku zamestnanci */
+        if($request->hasFile('profilovy_obrazek')){
+            $validator = Validator::make($request->all(),['profilovy_obrazek' => 'required|mimes:jpg,jpeg,png|max:8096',]);
+            if($validator->fails()){
+                session()->flash('obrazekZpravaFail', 'Zadejte platný formát obrázku! [png, jpg, jpeg], maximální velikost obrázku je 8MB!');
+                return redirect()->back();
             }
+            if($employeeSearch->employee_picture != NULL){ Storage::delete('/public/employee_images/'.$employeeSearch->employee_picture); }
+            $tokenUnique = Str::random(20);
+            $tokenUnique2 = Str::random(5);
+            $tokenUnique3 = Str::random(10);
+            $request->profilovy_obrazek->storeAs('employee_images',$tokenUnique.$tokenUnique2.$tokenUnique3,'public');
+            $employeeSearch->update(['employee_picture' => $tokenUnique.$tokenUnique2.$tokenUnique3]);
         }
 
-        /*Pozadovany nazev slozky v GoogleDrive, u nás jméno brigádníka*/
-        $soubor = $request->employee_name.' '.$request->employee_surname;
-
-        /*Cesta k autorizačnímu klíči*/
-        $keyFileLocation =storage_path('app/credentials.json');
-        /*ID složky, do které chceme soubory nahrávat*/
-        $folderId = $user->company_url;
-        $client = new Google_Client();
-        $httpClient = $client->getHttpClient();
-        $config = $httpClient->getConfig();
-        $config['verify'] = false;
-        $client->setHttpClient(new Client($config));
-        $client->setApplicationName("BackupDrive");
-        try {
-            /*Inicializace klienta*/
-            $client->setAuthConfig($keyFileLocation);
-            $client->useApplicationDefaultCredentials();
-            $client->addScope([
-                \Google_Service_Drive::DRIVE,
-                \Google_Service_Drive::DRIVE_METADATA
-            ]);
-            $service = new \Google_Service_Drive($client);
-            /*Vytvoření složky*/
-            $file = new Google_Service_Drive_DriveFile();
-            $file->setName($soubor);
-            $mimeType = 'application/vnd.google-apps.folder';
-            $file->setMimeType($mimeType);
-            /*Nasměrování do zvolené složky*/
-
-            $file->setParents(array($folderId));
-
-            /*Odeslání dat*/
-            $createdFile = $service->files->create($file, array(
-                'mimeType' => $mimeType,
-                'uploadType' => "multipart"
-            ));
-
-            $fileId = $createdFile->id;
-          /*  $role = 'writer';
-            $userEmail = $request->employee_email;
-
-
-            $userPermission = new Google_Service_Drive_Permission(array(
-                'type' => 'user',
-                'role' => $role,
-                'emailAddress' => $userEmail
-            ));
-
-            $request = $service->permissions->create(
-                $fileId, $userPermission, array('fields' => 'id')
-            );*/
-
-        } catch (Exception $e) {
-            file_put_contents("error.log", date("Y-m-d H:i:s") . ": " . $e->getMessage() . "\n\n", FILE_APPEND);
-            die();
+        /*Pozadovany nazev slozky v Google Drive */
+        $nazev_slozky = $request->krestni_jmeno.' '.$request->prijmeni;
+        /* Cesta k autorizacnimu klici */
+        $authKey = storage_path('app/credentials.json');
+        /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+        $httpClient = new Client(['verify' => false]);
+        /* Inicializace Google Drive klienta */
+        $GoogleClient = new Google_Client();
+        /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+        $GoogleClient->setHttpClient($httpClient);
+        /* Nastaveni prihlaseni ke Google Drive API */
+        $GoogleClient->setAuthConfig($authKey);
+        /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+        $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+        $googleServ = new Google_Service_Drive($GoogleClient);
+        /* Vytvoreni slozky */
+        $nova_slozka = new Google_Service_Drive_DriveFile();
+        /* Nastaveni jmena slozky */
+        $nova_slozka->setName($nazev_slozky);
+        /* Nastaveni typu MIME */
+        $nova_slozka->setMimeType('application/vnd.google-apps.folder');
+        /*Nasmerování do slozky firmy */
+        $nova_slozka->setParents([$user->company_url]);
+        /* Vytvoreni slozky na Google Drive */
+        $createdFolder = $googleServ->files->create($nova_slozka, ['mimeType' => 'application/vnd.google-apps.folder', 'uploadType' => "multipart"]);
+        /* Ulozeni identifikatoru nove slozky do promenne */
+        $folderId = $createdFolder->id;
+        /* Pokud firma zvolila, ze chce nasdilet zamestnancovu slozku */
+        if(isset($request->googleDriveRequest)) {
+            $userPermission = new Google_Service_Drive_Permission(['type' => 'user', 'role' => 'writer', 'emailAddress' => $request->email]);
+            $googleServ->permissions->create($folderId, $userPermission, ['emailMessage' => "Dobrý den, Vaše firma Vám nasdílela Vaši Google Drive složku."]);
+            /* Aktualizace identifikatoru slozky v databazi u konkretniho zamestnance */
+            $employeeSearch->update(['employee_url' => $folderId]);
         }
-        $employeeSearch->update(['employee_drive_url' => $fileId]);
-        session()->flash('success', 'Zaměstnanec '.$request->employee_name.' '.$request->employee_surname.' byl úspešně vytvořen!');
+        session()->flash('success', 'Zaměstnanec '.$request->krestni_jmeno.' '.$request->prijmeni.' byl úspešně vytvořen!');
         return redirect()->back();
     }
 
+    /* Nazev funkce: addShift
+      Argumenty: request - udaje zadane firmou o nove smene
+      Ucel: vytvoreni nove smeny */
     public function addShift(Request $request){
         $user = Auth::user();
-        $validator = Validator::make($request->all(), [
-            'shift_start' => ['required'],
-            'shift_end' =>  ['required'],
-            'shift_place' =>  ['required', 'string', 'max:255'],
-        ]);
-
-        $shift_start = new DateTime($request->shift_start);
-        $shift_end = new DateTime($request->shift_end);
-        $now = new DateTime();
+        /* Definice pravidel pro validaci a nasledne jeji provedeni*/
+        $validator = Validator::make($request->all(), ['zacatek_smeny' => ['required'], 'konec_smeny' =>  ['required'], 'lokace_smeny' =>  ['required', 'string', 'max:255'], 'poznamka' => ['max:180']]);
+        /* Ziskani udaju o smene */
+        $shift_start = new DateTime($request->zacatek_smeny);
+        $shift_end = new DateTime($request->konec_smeny);
         $chybaDatumy = array();
         $bool_datumy = 0;
-       // $difference_start = $shift_start->format('U') - $now->format('U');
-       // $difference_end = $shift_end->format('U') - $now->format('U');
-        $difference_shifts = $shift_end->format('U') - $shift_start->format('U');
 
+        /* Usek kodu, ktery slouzi k dodatecne validaci */
+        $difference_shifts = $shift_end->format('U') - $shift_start->format('U');
         $hodinyRozdil = $shift_end->diff($shift_start);
         $pocetDnu = $hodinyRozdil->d;
         $pocetHodin = $hodinyRozdil->h;
         $pocetMinut = $hodinyRozdil->i;
-
-        if($request->shift_start != NULL){
+        if($request->zacatek_smeny != NULL){
             if($difference_shifts <= 0){
                 array_push($chybaDatumy,'Konec směny je stejný buďto stejný jako její začátek, nebo je dříve než samotný začátek!');
                 $bool_datumy = 1;
             }
-
             if(($pocetHodin == 12 && $pocetMinut > 0) || $pocetHodin > 12 || $pocetDnu > 0){
                 array_push($chybaDatumy,'Maximální délka jedné směny je 12 hodin!');
                 $bool_datumy = 1;
             }
         }
-
-        foreach ($validator->errors()->all() as $valid){
-            array_push($chybaDatumy,$valid);
-        }
-
+        /* Naplneni hlasek do pole */
+        foreach ($validator->errors()->all() as $valid){ array_push($chybaDatumy,$valid); }
+        /* Pripadne odeslani chyb */
         if ($validator->fails() || $bool_datumy == 1) {
             session()->flash('erroryShift', $chybaDatumy);
             return redirect()->back();
         }
-
-        \App\Models\Shift::create([
-            'shift_start' => $request->shift_start,
-            'shift_end' => $request->shift_end,
-            'shift_place' =>  $request->shift_place,
-            'shift_importance_id' => $request->shiftImportance,
-            'shift_note' => $request->shift_note,
-            'company_id' => $user->company_id
-        ]);
-
+        /* Vytvoreni smeny v databazi */
+        Shift::create(['shift_start' => $request->zacatek_smeny, 'shift_end' => $request->konec_smeny, 'shift_place' =>  $request->lokace_smeny, 'shift_importance_id' => $request->dulezitost_smeny, 'shift_note' => $request->poznamka, 'company_id' => $user->company_id]);
+        /* Odeslani odpovedi uzivateli */
         session()->flash('success', 'Směna byla úspešně vytvořena!');
         return redirect()->back();
     }
 
-
+    /* Nazev funkce: getAllShifts
+      Argumenty: zadne
+      Ucel: Ziskani seznamu smen firmy */
     public function getAllShifts(){
         $user = Auth::user();
-        $html = '
- <input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavac" onkeyup="Search()" placeholder="Hledat směnu na základě ID, začátku, lokace, nebo konce směny ..." title="Zadejte údaje o směně">
+        /* Definice zahlavi tabulky a vyhledavace */
+        $out = '<input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavacSmenySmazani" placeholder="Hledat směnu dle začátku, lokace, nebo konce směny ...">
                     <table class="table table-dark" id="show_table_employee_delete" style="font-size: 16px;">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="width:25%;text-align: center;">Začátek</th>
-                            <th scope="col" style="width:25%;text-align: center;">Konec</th>
-                            <th scope="col" style="width:25%;text-align: center;">Lokace <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(2,this);"></i></th>
-                            <th scope="col" style="width:25%;text-align: center;">Počet zaměstnanců <i class="fa fa-sort-numeric-desc" style="margin-left: 5px" onclick="zmenaIkonkyCisla(this);sortTable(3,this);"></i></th>
-                            <th scope="col" style="width:25%;text-align: center;">Smazat</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-
-        $smeny = DB::table('table_shifts')
-            ->select('table_shifts.shift_start','table_shifts.shift_end',
-                'table_shifts.shift_place','table_shifts.shift_id')
-            ->where(['table_shifts.company_id' => $user->company_id])
-            ->orderByDesc('table_shifts.shift_start')
-            ->get();
-
+                        <thead>
+                            <tr>
+                                <th style="width:20%;text-align: center;">Začátek</th>
+                                <th style="width:20%;text-align: center;">Konec</th>
+                                <th style="width:20%;text-align: center;">Lokace</i></th>
+                                <th style="width:22%;text-align: center;">Počet zaměstnanců</i></th>
+                                <th style="width:18%;text-align: center;">Odstranit</th>
+                            </tr>
+                        </thead>
+                        <tbody>';
+        /* Ziskani vsech smen */
+        $smeny = Shift::getCompanyShiftsDesc($user->company_id);
+        /* Iterace skrze smeny */
         foreach ($smeny as $smena){
+            /* Zmena formatu datumu */
             $shift_start = new DateTime($smena->shift_start);
             $smena->shift_start = $shift_start->format('d.m.Y H:i');
             $shift_end = new DateTime($smena->shift_end);
             $smena->shift_end = $shift_end->format('d.m.Y H:i');
-
-            $pocet_zamestnancu = DB::table('table_employee_shifts')
-                ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
-                ->select('table_shifts.shift_start','table_shifts.shift_end',
-                    'table_shifts.shift_place','table_shifts.shift_id')
-                ->where(['table_employee_shifts.shift_id' => $smena->shift_id])
-                ->orderByDesc('table_shifts.shift_start')
-                ->count();
-
-            $html .= '<tr><td class="text-center">'.$smena->shift_start.'</td><td class="text-center"> '.$smena->shift_end.'</td>
+            /* Ziskani poctu zamestnancu na konkretni smene */
+            $pocet_zamestnancu = Employee_Shift::getEmployeesShiftCounts($smena->shift_id);
+            /* Zapis udaju ve formatu jazyka HTML do promenne out */
+            $out .= '<tr><td class="text-center">'.$smena->shift_start.'</td><td class="text-center"> '.$smena->shift_end.'</td>
                       <td class="text-center"> '.$smena->shift_place.'</td>
                       <td class="text-center"> '.$pocet_zamestnancu.'</td>
-                      <td class="text-center"><center><input type="checkbox" class="form-check-input"  id="smenyDeleteDashboard" name="smenyDeleteDashboard[]" value="'.$smena->shift_id.'"></center></td>';
+                      <td class="text-center"><input type="checkbox" class="form-check-input"  id="smenyDeleteDashboard" name="smenyDeleteDashboard[]" value="'.$smena->shift_id.'"></td>
+                     </tr>';
         }
-        $html .= '</tbody></table>
-           <script>
-            function zmenaIkonky(x) {
-                x.classList.toggle("fa-sort-alpha-desc");
-                x.classList.toggle("fa-sort-alpha-asc");
-            }
-
-            function zmenaIkonkyCisla(x) {
-                x.classList.toggle("fa-sort-numeric-asc");
-                x.classList.toggle("fa-sort-numeric-desc");
-            }
-
-            function Search() {
-                var input, filter, table, tr, td, td2, td3, td4, i, txtValue, txtValue2, txtValue3, txtValue4;
-                input = document.getElementById("vyhledavac");
-                filter = input.value.toUpperCase();
-                table = document.getElementById("show_table_employee_delete");
-                tr = table.getElementsByTagName("tr");
-
-                for (i = 0; i < tr.length; i++) {
-                    td3 = tr[i].getElementsByTagName("td")[0];
-                    td = tr[i].getElementsByTagName("td")[1];
-                    td2 = tr[i].getElementsByTagName("td")[2];
-                    td4 = tr[i].getElementsByTagName("td")[3];
-                    if (td || td2 || td3 || td4) {
-                        txtValue = td.textContent || td.innerText;
-                        txtValue2 = td2.textContent || td2.innerText;
-                        txtValue3 = td3.textContent || td3.innerText;
-                        txtValue4 = td4.textContent || td4.innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1
-                            || txtValue3.toUpperCase().indexOf(filter) > -1 || txtValue4.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = "";
-                        } else {
-                            tr[i].style.display = "none";
-                        }
-
-                    }
-
-                }
-            }
-
-            function sortTable(n,ikonka) {
-                var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-                table = document.getElementById("show_table_employee_delete");
-                switching = true;
-                dir = "asc";
-                while (switching) {
-                    switching = false;
-                    rows = table.rows;
-
-                    for (i = 1; i < (rows.length - 1); i++) {
-                        shouldSwitch = false;
-                        x = rows[i].getElementsByTagName("TD")[n];
-                        y = rows[i + 1].getElementsByTagName("TD")[n];
-
-                        if (dir == "asc") {
-                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                                shouldSwitch= true;
-                                break;
+        $out .= '</tbody></table>'; // ukonceni tabulky
+        $out .= '<script>
+              /* Implementace vyhledavace v ramci hledani smen */
+              $(document).ready(function(){
+                  $("#vyhledavacSmenySmazani").on("keyup", function() { // po zapsani znaku ve vyhledavani
+                    var retezec = $("#vyhledavacSmenySmazani").val(); // ziskani hodnoty ve vyhledavaci
+                    var vysledek = retezec.toUpperCase(); // transformace hodnoty na velka pismena
+                    var radkyTabulky = $("#show_table_employee_delete tr"); // ziskani radku tabulek
+                    radkyTabulky.each(function () { // iterace skrze radky tabulky
+                        var bunka = $(this).find("td"); // ziskani hodnoty bunky
+                        bunka.each(function () { // iterace skrz bunky
+                            var obsahBunky = $(this).text(); // ulozeni hodnoty bunky
+                            if((obsahBunky.toUpperCase().includes(vysledek) == false) == false){ // kontrola zdali hledany retezec je podmnozinou nejake hodnoty v tabulce
+                                  $(this).closest("tr").toggle(true); // radek je ponechan
+                                  return false; // pokracovani dalsim radkem
+                            }else{
+                                  $(this).closest("tr").toggle(false); // schovani radku tabulky, v ktere se nachazi aktualni bunka
+                                  return true; // pokracovani dalsi bunkou radku
                             }
-                        } else if (dir == "desc") {
-                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                                shouldSwitch = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (shouldSwitch) {
-                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                        switching = true;
-                        switchcount ++;
-                    } else {
-                        if (switchcount == 0 && dir == "asc") {
-                            dir = "desc";
-                            switching = true;
-                        }
-                    }
-                }
-            }
+                        });
+                     });
+                  });
+                });
         </script>';
-        return response()->json(['html'=>$html]);
+        return response()->json(['out' => $out]);
     }
 
+    /* Nazev funkce: deleteShift
+      Argumenty: request - vybrane smeny
+      Ucel: smazani vybranych smen */
     public function deleteShift(Request  $request){
+        $user = Auth::user();
+        /* Pokud uzivatel vybral nejakou smenu */
         if($request->smenyDeleteDashboard != NULL){
-            foreach ($request->smenyDeleteDashboard as $smena){
-                DB::table('table_shifts')
-                    ->where(['table_shifts.shift_id' => $smena])
-                    ->delete();
-
-                DB::table('table_employee_shifts')
-                    ->where(['table_employee_shifts.shift_id' => $smena])
-                    ->delete();
+            /* Iterace skrze tyto smeny, pri kazde iterace se provede smazani dane smeny */
+            foreach ($request->smenyDeleteDashboard as $id_smeny){
+                /* Ziskani smeny */
+                $smena = Shift::find($id_smeny);
+                /* Ziskani zamestnancu na smene */
+                $zamestnanci = Shift::getAllEmployeesAtShift($id_smeny);
+                $employee_ids = array();
+                /* Naplneni identifikatoru zamestnancu do pole */
+                foreach ($zamestnanci as $zamestnanec) { array_push($employee_ids, $zamestnanec->employee_id); }
+                /* Realizace smazani z OLAP sekce systemu */
+                OlapETL::deleteRecordFromShiftInfoDimension($employee_ids, $user->company_id, $smena->shift_start, $smena->shift_end);
+                /* Smazani smeny z databaze*/
+                DB::table('table_shifts')->where(['table_shifts.shift_id' => $id_smeny])->delete();
             }
+            /* Nastaveni hlasky, ktera se odesle uzivateli */
             if(count($request->smenyDeleteDashboard) == 1){
                 session()->flash('success', 'Směna byla úspešně smazána!');
             }else{
                 session()->flash('success', 'Směny byly úspešně smazány!');
             }
+
         }else{
             session()->flash('fail', 'Vyberte nějakou směnu!');
         }
         return redirect()->back();
     }
 
+    /* Nazev funkce: getAllEmployees
+       Argumenty: zadne
+       Ucel: Ziskani seznamu zamestnancu firmy */
     public function getAllEmployees(){
         $user = Auth::user();
-        $html = '<input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavac" onkeyup="Search()" placeholder="Hledat zaměstnance na základě jeho jména, příjmení, pozice, nebo počtu směn ..." title="Zadejte údaje o směně">
+        $out = '<input type="text" class="form-control" style="margin-bottom:15px;" id="vyhledavacZamestnanciSmazani" onkeyup="Search()" placeholder="Hledat zaměstnance na základě jeho jména, příjmení, pozice, nebo počtu směn ..." title="Zadejte údaje o směně">
                     <table class="table table-dark" id="show_table" style="font-size: 16px;">
-                    <thead>
-                        <tr>
-                            <th scope="col" style="width:25%;text-align: center;">Jméno <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(0,this);"></i></th>
-                            <th scope="col" style="width:25%;text-align: center;">Příjmení <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(1,this);"></i></th>
-                            <th scope="col" style="width:25%;text-align: center;">Pozice <i class="fa fa-sort-alpha-asc" style="margin-left: 5px" onclick="zmenaIkonky(this);sortTable(2,this);"></i></th>
-                            <th scope="col" style="width:25%;text-align: center;">Počet směn <i class="fa fa-sort-numeric-desc" style="margin-left: 5px" onclick="zmenaIkonkyCisla(this);sortTable(3,this);"></i></th>
-                            <th scope="col" style="width:25%;text-align: center;">Smazat</th>
-                        </tr>
-                    </thead>
-                    <tbody>';
-
-        $zamestnanci = DB::table('table_employees')
-            ->select('table_employees.employee_id','table_employees.employee_name','table_employees.employee_surname',
-                'table_employees.employee_position')
-            ->where(['table_employees.employee_company' => $user->company_id])
-            ->orderByDesc('table_employees.employee_surname')
-            ->get();
-
+                        <thead>
+                            <tr>
+                                <th style="width:25%;text-align: center;">Jméno</th>
+                                <th style="width:25%;text-align: center;">Příjmení</th>
+                                <th style="width:25%;text-align: center;">Pozice</th>
+                                <th style="width:25%;text-align: center;">Počet směn</th>
+                                <th style="width:25%;text-align: center;">Odstranit</th>
+                            </tr>
+                        </thead>
+                        <tbody>';
+        /* Ziskani zamestnancu */
+        $zamestnanci = Employee::getCompanyEmployees($user->company_id);
+        /* Iterace skrze zamestnance */
         foreach ($zamestnanci as $zamestnanec){
-
-            $pocet_smen = DB::table('table_employee_shifts')
-                ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
-                ->where(['table_employee_shifts.employee_id' => $zamestnanec->employee_id])
-                ->count();
-
-            $html .= '<tr><td class="text-center">'.$zamestnanec->employee_name.'</td><td class="text-center"> '.$zamestnanec->employee_surname.'</td>
+            /* Ziskani poctu smen */
+            $pocet_smen = Employee_Shift::getEmployeeShiftsCounts($zamestnanec->employee_id);
+            /* Vyplneni udaju do promenne out ve formatu HTML */
+            $out .= '<tr><td class="text-center">'.$zamestnanec->employee_name.'</td><td class="text-center"> '.$zamestnanec->employee_surname.'</td>
                       <td class="text-center"> '.$zamestnanec->employee_position.'</td>
                       <td class="text-center"> '.$pocet_smen.'</td>
                       <td class="text-center"><center><input type="checkbox" class="form-check-input"  id="zamestnanciDeleteDashboard" name="zamestnanciDeleteDashboard[]" value="'.$zamestnanec->employee_id.'"></center></td>';
         }
-        $html .= '</tbody></table>
-        <script>
-            function zmenaIkonky(x) {
-                x.classList.toggle("fa-sort-alpha-desc");
-                x.classList.toggle("fa-sort-alpha-asc");
-            }
-
-            function zmenaIkonkyCisla(x) {
-                x.classList.toggle("fa-sort-numeric-asc");
-                x.classList.toggle("fa-sort-numeric-desc");
-            }
-
-            function Search() {
-                var input, filter, table, tr, td, td2, td3, td4, i, txtValue, txtValue2, txtValue3, txtValue4;
-                input = document.getElementById("vyhledavac");
-                filter = input.value.toUpperCase();
-                table = document.getElementById("show_table");
-                tr = table.getElementsByTagName("tr");
-
-                for (i = 0; i < tr.length; i++) {
-                    td3 = tr[i].getElementsByTagName("td")[0];
-                    td = tr[i].getElementsByTagName("td")[1];
-                    td2 = tr[i].getElementsByTagName("td")[2];
-                    td4 = tr[i].getElementsByTagName("td")[3];
-                    if (td || td2 || td3 || td4) {
-                        txtValue = td.textContent || td.innerText;
-                        txtValue2 = td2.textContent || td2.innerText;
-                        txtValue3 = td3.textContent || td3.innerText;
-                        txtValue4 = td4.textContent || td4.innerText;
-                        if (txtValue.toUpperCase().indexOf(filter) > -1 || txtValue2.toUpperCase().indexOf(filter) > -1
-                            || txtValue3.toUpperCase().indexOf(filter) > -1 || txtValue4.toUpperCase().indexOf(filter) > -1) {
-                            tr[i].style.display = "";
-                        } else {
-                            tr[i].style.display = "none";
-                        }
-
-                    }
-
-                }
-            }
-
-            function sortTable(n,ikonka) {
-                var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-                table = document.getElementById("show_table");
-                switching = true;
-                dir = "asc";
-                while (switching) {
-                    switching = false;
-                    rows = table.rows;
-
-                    for (i = 1; i < (rows.length - 1); i++) {
-                        shouldSwitch = false;
-                        x = rows[i].getElementsByTagName("TD")[n];
-                        y = rows[i + 1].getElementsByTagName("TD")[n];
-
-                        if (dir == "asc") {
-                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
-                                shouldSwitch= true;
-                                break;
+        $out .= '</tbody></table>'; // ukonceni tabulky
+        $out .= '<script>
+              /* Implementace vyhledavace v ramci hledani smen */
+              $(document).ready(function(){
+                  $("#vyhledavacZamestnanciSmazani").on("keyup", function() { // po zapsani znaku ve vyhledavani
+                    var retezec = $("#vyhledavacZamestnanciSmazani").val(); // ziskani hodnoty ve vyhledavaci
+                    var vysledek = retezec.toUpperCase(); // transformace hodnoty na velka pismena
+                    var radkyTabulky = $("#show_table_employee_delete tr"); // ziskani radku tabulek
+                    radkyTabulky.each(function () { // iterace skrze radky tabulky
+                        var bunka = $(this).find("td"); // ziskani hodnoty bunky
+                        bunka.each(function () { // iterace skrz bunky
+                            var obsahBunky = $(this).text(); // ulozeni hodnoty bunky
+                            if((obsahBunky.toUpperCase().includes(vysledek) == false) == false){ // kontrola zdali hledany retezec je podmnozinou nejake hodnoty v tabulce
+                                  $(this).closest("tr").toggle(true); // radek je ponechan
+                                  return false; // pokracovani dalsim radkem
+                            }else{
+                                  $(this).closest("tr").toggle(false); // schovani radku tabulky, v ktere se nachazi aktualni bunka
+                                  return true; // pokracovani dalsi bunkou radku
                             }
-                        } else if (dir == "desc") {
-                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
-                                shouldSwitch = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (shouldSwitch) {
-                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                        switching = true;
-                        switchcount ++;
-                    } else {
-                        if (switchcount == 0 && dir == "asc") {
-                            dir = "desc";
-                            switching = true;
-                        }
-                    }
-                }
-            }
+                        });
+                     });
+                  });
+                });
         </script>';
-        return response()->json(['html'=>$html]);
+        /* Odeslani obsahu do modalniho okna */
+        return response()->json(['out' => $out]);
     }
 
+    /* Nazev funkce: deleteEmployee
+       Argumenty: request - vybrani zamestnanci
+       Ucel: smazani vybranych zamestnancu */
     public function deleteEmployee(Request $request){
+        /* Pokud uzivatel vybral nejake zamestnance */
         if($request->zamestnanciDeleteDashboard != NULL){
+            /* Iterace skrz vybrane zamestnance a jejich postupne odstranovani z databaze a OLAP sekce systemu */
             foreach ($request->zamestnanciDeleteDashboard as $zamestnanec){
-                DB::table('table_employees')
-                    ->where(['table_employees.employee_id' => $zamestnanec])
-                    ->delete();
-
-                DB::table('table_employee_shifts')
-                    ->where(['table_employee_shifts.employee_id' => $zamestnanec])
-                    ->delete();
+                /* Odstraneni zamestnance z OLAP sekce systemu a databaze */
                 OlapETL::deleteRecordFromEmployeeDimension($zamestnanec);
+                DB::table('table_employees')->where(['table_employees.employee_id' => $zamestnanec])->delete();
             }
+            /* Nastaveni hlasky pro uzivatele */
             if(count($request->zamestnanciDeleteDashboard) == 1){
                 session()->flash('success', 'Zaměstnanec byl úspešně smazán!');
             }else{
@@ -1116,4 +854,5 @@ class UserCompanyController extends Controller
         }
         return redirect()->back();
     }
+
 }

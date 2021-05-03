@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-/*
+/* Tento soubor je soucasti frameworku Laravel
 |--------------------------------------------------------------------------
 | Check If Application Is Under Maintenance
 |--------------------------------------------------------------------------

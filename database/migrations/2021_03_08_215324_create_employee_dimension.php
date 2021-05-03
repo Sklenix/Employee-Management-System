@@ -4,15 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateEmployeeDimension extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+class CreateEmployeeDimension extends Migration {
+    /* Nazev souboru: CreateEmployeeDimension.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato migrace slouzi pro vytvoreni dimenze zamestnancu v ramci OLAP sekce systemu
+       Migrace detailneji: https://laravel.com/docs/8.x/migrations.
+    */
+
+    /* Definice tabulky (pro vytvoreni) */
+    public function up(){
         Schema::create('employee_dimension', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id('employee_id');
@@ -23,13 +23,8 @@ class CreateEmployeeDimension extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
+    /* Odstraneni dimenze */
+    public function down(){
         Schema::dropIfExists('employee_dimension');
     }
 }

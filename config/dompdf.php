@@ -2,7 +2,7 @@
 
 return array(
 
-    /*
+    /* Soubor knihovny DOMPDF Wrapper for Laravel, ktera slouzi ke generovani souboru ve formatu PDF.
     |--------------------------------------------------------------------------
     | Settings
     |--------------------------------------------------------------------------

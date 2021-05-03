@@ -1,0 +1,162 @@
+/* Nazev souboru: styly.css
+   Autor: Pavel Sklenář
+   Tento soubor slouzi pro stylovani elementu webovych stranek
+   Nektere styly byly inspirovany z externich zdroju (podrobnosti nize) */
+
+/* Samotny efekt je inspirovan z https://codepen.io/maheshambure21/pen/QwXaRw, licence viz níže */
+
+/* Sekce pro vybarveni polozek z menu ci seznamu v postrannim panelu */
+.efektMenu .list-group a, nav.efektMenu ul li a, .efektMenu .list-group .hoverList  { position: relative; }
+
+.efektMenu .list-group a:before, nav.efektMenu ul li a:before, .efektMenu .list-group .hoverList:before { display: block; }
+
+.efektMenu .list-group a:after, nav.efektMenu ul li a:after, .efektMenu .list-group .hoverList:after { position: absolute;left: 0;bottom: 0;right: 0;content: "";color: transparent; margin:auto; }
+
+.efektMenu .list-group a:hover, nav.efektMenu ul li a:hover, .efektMenu .list-group .hoverList:hover { z-index: 2; }
+
+.efektMenu .list-group a:hover:after, nav.efektMenu ul li a:hover:after, .efektMenu .list-group .hoverList:hover:after { animation-name: vyplneni; animation-duration: 1s; animation-fill-mode: forwards; z-index: -20; }
+
+@keyframes vyplneni {
+    0% { width: 0%; }
+    40% { width: 100%; height: 0.5px;background-color: #6495ED; }
+    60% { width: 100%; width: 100%;background-color: #6495ED; }
+    100% { background-color: #6495ED; width: 100%; height: 100%; }
+}
+
+/*
+Copyright (c) 2021 - MAHESH AMBURE - https://codepen.io/maheshambure21/pen/QwXaRw
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of
+the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall
+be included in all copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+*/
+
+
+/* Nastylovani polozek v postrannim panelu */
+.list-group a, .list-group .hoverList { text-decoration: none; text-transform: uppercase; }
+
+/* Definice barvy pozadi aktivni zalozky v postrannim panelu */
+.list-group .active { background:#d9534f;}
+
+/* Zmena fontu u loga */
+.navbar-brand{ font-family: 'Pacifico', cursive; }
+
+/* Realizace zaobleni u trid card*/
+.card, .card-header, .card-body, .card-footer{ border-radius:35px; !important;}
+
+/* Definice vzhledu modalnich oken */
+.oknoBarvaPozadi{ background-color: #1a202c; }
+.tlacitkoZavreniOkna, .tlacitkoPotvrzeniOkna{ background-color: #4aa0e6; }
+.tlacitkoZavreniOkna:hover{ background-color: #c51f1a; }
+.tlacitkoPotvrzeniOkna:hover{ background-color: green; }
+
+/* Definice efektu pri vyberu obrazku */
+.nahratTlacitko label:hover{ transform: scale(1.03); }
+
+/* Definice zmeny okraje v ramci tlacitek pri zmene rozliseni nad FULL HD*/
+@media only screen and (max-width: 1920px) {
+    .tlacitkoZobrazit, .tlacitkoSmazat {margin-bottom: 5px;}
+    .tlacitkoPriraditSeznamZamestnancu{margin-top: 5px;}
+    .tlacitkoZrusitZadostNemoc, .tlacitkoSmazatNahlaseni, .tlacitkoZrusitZadostDovolena,
+    .tlacitkoPrecteno, .tlacitkoPrectenoNahlaseni, .tlacitkoOdeslanoNahlaseni, .tlacitkoPrectenoDovolene, .tlacitkoPriraditSeznamSmen{margin-top:6px;}
+}
+
+/* Definice velikosti pisma v ramci oznaceni prvku formularu a samotnych poli formularu */
+.formularLabels{font-size: 16px;}
+.formularInputs{font-size: 15px;}
+.formularLabelsAjaxAdd{font-size: 15px;}
+
+/* Definice zmeny okraju na domovske strance pro zarizeni s mensim rozlisenim */
+@media only screen and (max-width: 800px) { .menuAdmin, .menuZamestnanec, .menuFirma{margin-left:25px;margin-right:10px;} }
+
+/* Zaobleni pozadi posuvniku a barva pozadi posuvniku */
+.posuvnik {background-color: #F5F5F5;border-radius: 1vh;}
+
+/* Definice kolecka posuvniku pro renderovaci enginy WebKit a Blink (Chrome, Edge, Safari, Opera) */
+.posuvnik::-webkit-slider-thumb {background-color: #4aa0e6;appearance: none;width: 2.5vh;height: 2.5vh;border-radius: 3vh;}
+
+/* Definice posuvniku pro prohlizec Mozilla Firefox */
+.posuvnik::-moz-range-thumb {background-color: #4aa0e6;width: 2.5vh;height: 2.5vh;border-radius: 3vh;}
+
+/* Definice ramecku u moznosti na domovske strance */
+.ramecek{border-style: solid;margin-bottom:15px;margin-right: 15px;border-width: thin;}
+
+/* Cara pod logem v ramci domovskych stranek jednotlivych roli v informacnim systemu */
+hr.caraPodNazvem {border: 1px solid white;margin-bottom: 0;}
+
+/* Definice stylu postranniho panelu */
+/* Inspirace stylu postranniho panelu z: https://startbootstrap.com/template/simple-sidebar licence viz níže */
+#obsah { background-color: #F5F5F5; overflow-x: hidden; }
+#postranniPanel { transition: 0.4s ease;min-height: 105vh; }
+#postranniPanel .sekceLogo { padding: 15px 10px; }
+#postranniPanel .list-group {width: 310px;}
+@media (min-width: 768px) {
+    #navigaceDashboard {width: 100%;}
+    #obsah.toggled #postranniPanel {margin-left: -310px;}
+}
+@media (max-width: 767px) {
+    #navigaceDashboard {width: 100%;}
+    #obsah.toggled #postranniPanel {margin-left: -310px;}
+}
+/*
+The MIT License (MIT)
+
+Copyright (c) 2013-2021 Start Bootstrap LLC
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+ */
+
+
+/* Zmena velikosti zahlavi tabulky pri schovani postranniho panelu viz https://datatables.net/forums/discussion/56716/table-header-is-not-resizing-when-sidebar-is-hidden, odpoved od infexo, rok napsani: 2019 */
+.dataTables_scrollHeadInner, .table_companies, .employee_current_shifts_table, .diseases_employee_table,
+.employee_injuries_table, .employee_reports_table, .employee_allShifts_table, .employee_vacations_table,
+.table_attendances, .company_diseases_table, .employees_list_table, .company_injuries_table,
+.company_ratings_table, .company_reports_table, .company_shifts_table, .company_vacations_table{ width:100%!important; }
+
+/* Definice stylu pro cerne typy tabulek */
+.employee_reports_table.dataTable thead, .employee_current_shifts_table.dataTable thead,
+.employee_vacations_table.dataTable thead, .diseases_employee_table.dataTable thead, .table_companies.dataTable thead,
+.company_ratings_table.dataTable thead, .table_attendances.dataTable thead,  .company_vacations_table.dataTable thead, .company_diseases_table.dataTable thead,
+.company_reports_table.dataTable thead{ background-color: #333; color:white; }
+
+.employee_current_shifts_table.dataTable tbody tr:hover, .employee_reports_table.dataTable tbody tr:hover,
+.diseases_employee_table.dataTable tbody tr:hover, .employee_vacations_table.dataTable tbody tr:hover, .table_companies.dataTable tbody tr:hover,
+.company_ratings_table.dataTable tbody tr:hover, .table_attendances.dataTable tbody tr:hover, .company_injuries_table.dataTable tbody tr:hover, .company_vacations_table.dataTable tbody tr:hover,
+.company_diseases_table.dataTable tbody tr:hover, .company_reports_table.dataTable tbody tr:hover{ background-color: #A9A9A9; }
+
+/* Definice stylu pro cervene typy tabulek */
+.employee_allShifts_table.dataTable thead, .employee_injuries_table.dataTable thead, .employees_list_table.dataTable thead,
+.company_shifts_table.dataTable thead,.company_injuries_table.dataTable thead{ background-color: #8B0000; color:white; }
+
+.employee_injuries_table.dataTable tbody tr:hover, .employee_allShifts_table.dataTable tbody tr:hover,
+.company_shifts_table.dataTable tbody tr:hover, .employees_list_table.dataTable tbody tr:hover{ background-color: #FFE4E1; }

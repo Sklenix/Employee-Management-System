@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\Disease
- *
  * @property int $disease_id
  * @property string|null $disease_name
  * @property string|null $disease_from
@@ -33,22 +32,24 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|Disease whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Disease extends Model
-{
-    use HasFactory;
+class Disease extends Model {
+    /* Nazev souboru: Disease.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida je modelem k tabulce table_diseases */
 
+    use HasFactory;
+    /* Urceni primarniho klice tabulky, nazvu tabulky */
     protected $primaryKey = 'disease_id';
     protected $table = 'table_diseases';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    /* Definice atributu tabulky, s kterymi model pracuje */
     protected $fillable = [
         'disease_name', 'disease_from','disease_to', 'disease_state', 'disease_note', 'employee_id'
     ];
 
+    /* Nazev funkce: getEmployeeDiseases
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani nemocenskych zamestnance */
     public static function getEmployeeDiseases($employee_id){
         return DB::table('table_diseases')
             ->select('table_diseases.disease_id','table_diseases.disease_name',
@@ -59,6 +60,9 @@ class Disease extends Model
             ->get();
     }
 
+    /* Nazev funkce: getEmployeeDiseasesCount
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu nemocenskych zamestnance */
     public static function getEmployeeDiseasesCount($employee_id){
         return DB::table('table_diseases')
             ->select('table_diseases.disease_id','table_diseases.disease_name',
@@ -69,6 +73,9 @@ class Disease extends Model
             ->count();
     }
 
+    /* Nazev funkce: getCompanyDiseasesCount
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani poctu nemocenskych v ramci firmy */
     public static function getCompanyDiseasesCount($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $id_zamestnancu = array();
@@ -85,6 +92,9 @@ class Disease extends Model
             ->count();
     }
 
+    /* Nazev funkce: getCompanyDiseasesByMonths
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani poctu nemocenskych dle mesicu v ramci firmy */
     public static function getCompanyDiseasesByMonths($company_id){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci = Employee::getCompanyEmployees($company_id);
@@ -93,47 +103,51 @@ class Disease extends Model
             array_push($id_zamestnancu,$zamestnanec->employee_id);
         }
         $nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("COUNT(*) as count_disease"))
+            ->selectRaw('COUNT(*) as count_disease')
             ->whereIn('table_diseases.employee_id',$id_zamestnancu)
             ->whereYear('table_diseases.disease_from', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('count_disease');
-
+            ->groupByRaw('MONTH(table_diseases.disease_from)')
+            ->get();
         $mesice_nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("Month(table_diseases.disease_from) as month_disease"))
+            ->selectRaw('MONTH(table_diseases.disease_from) as month_disease')
             ->whereIn('table_diseases.employee_id',$id_zamestnancu)
             ->whereYear('table_diseases.disease_from', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('month_disease');
-        $data_diseases = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nemocenske as $index => $month_shift){
-            $data_diseases[$month_shift - 1] = $nemocenske[$index];
+            ->groupByRaw('MONTH(table_diseases.disease_from)')
+            ->get();
+        $statistikaNemocenske = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_nemocenske); $i++){
+            $statistikaNemocenske[$mesice_nemocenske[$i]->month_disease - 1] = $nemocenske[$i]->count_disease;
         }
-        return $data_diseases;
+        return $statistikaNemocenske;
     }
 
+    /* Nazev funkce: getEmployeeDiseasesByMonths
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu nemocenskych dle mesicu v pripade konkretniho zamestnance */
     public static function getEmployeeDiseasesByMonths($employee_id){
         date_default_timezone_set('Europe/Prague');
         $nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("COUNT(*) as count_disease"))
+            ->selectRaw('COUNT(*) as count_disease')
             ->where(['table_diseases.employee_id' => $employee_id])
             ->whereYear('table_diseases.disease_from', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('count_disease');
-
+            ->groupByRaw('MONTH(table_diseases.disease_from)')
+            ->get();
         $mesice_nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("Month(table_diseases.disease_from) as month_disease"))
+            ->selectRaw('MONTH(table_diseases.disease_from) as month_disease')
             ->where(['table_diseases.employee_id' => $employee_id])
             ->whereYear('table_diseases.disease_from', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('month_disease');
-        $data_diseases = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nemocenske as $index => $month_shift){
-            $data_diseases[$month_shift - 1] = $nemocenske[$index];
+            ->groupByRaw('MONTH(table_diseases.disease_from)')
+            ->get();
+        $statistikaNemocenske = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_nemocenske); $i++){
+            $statistikaNemocenske[$mesice_nemocenske[$i]->month_disease - 1] = $nemocenske[$i]->count_disease;
         }
-        return $data_diseases;
+        return $statistikaNemocenske;
     }
 
+    /* Nazev funkce: getCompanyEmployeesDiseases
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani nemocenskych konkretni firmy */
     public static function getCompanyEmployeesDiseases($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $id_zamestnancu = array();
@@ -150,6 +164,6 @@ class Disease extends Model
             ->whereNotIn('table_diseases.disease_state',[0])
             ->orderBy('table_diseases.disease_from', 'asc')
             ->get();
-
     }
+
 }

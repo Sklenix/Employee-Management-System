@@ -3,15 +3,13 @@
 namespace App\Models;
 
 use DateTime;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticate;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 
 /**
  * App\Models\Employee
- *
  * @property int $employee_id
  * @property string $employee_name
  * @property string $employee_surname
@@ -63,51 +61,27 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Eloquent\Builder|Employee whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Employee extends Authenticatable
-{
+class Employee extends Authenticate {
+    /* Nazev souboru: Employee.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida je modelem k tabulce table_employees */
     use HasFactory, Notifiable;
-
+    /* Urceni primarniho klice tabulky, nazvu tabulky */
     protected $primaryKey = 'employee_id';
     protected $table = 'table_employees';
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    /* Definice atributu tabulky, s kterymi model pracuje */
     protected $fillable = [
-       'employee_name', 'employee_surname','employee_phone', 'email','employee_note','employee_position','employee_city','employee_street',
-        'employee_reliability','employee_absence','employee_workindex','employee_drive_url','employee_login','password','employee_company','employee_picture'
+       'employee_name', 'employee_surname','employee_phone', 'email','employee_note','employee_position','employee_city','employee_street', 'employee_birthday',
+        'employee_reliability','employee_absence','employee_workindex','employee_url','employee_login','password','employee_company','employee_picture'
     ];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
+    /* Atributy, ktere maji byt schovany pri vraceni udaju z databaze (pro bezpecnost) */
     protected $hidden = [
         'password', 'remember_token',
     ];
 
-    public function deleteData($id)
-    {
-        return static::find($id)->delete();
-    }
-
-    public function findData($id)
-    {
-        return static::find($id);
-    }
-
-    public function updateData($id, $input)
-    {
-        return static::find($id)->update($input);
-    }
-
-    public function storeData($input)
-    {
-        return static::create($input);
-    }
-
+    /* Nazev funkce: getCompanyEmployees
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani zamestnancu konkretni firmy */
     public static function getCompanyEmployees($company_id){
         return DB::table('table_employees')
           ->select('table_employees.employee_name','table_employees.employee_surname',
@@ -119,6 +93,9 @@ class Employee extends Authenticatable
           ->get();
     }
 
+    /* Nazev funkce: getCompanyEmployeesAssigned
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani prirazenych smen zamestnancu v ramci firmy */
     public static function getCompanyEmployeesAssigned($company_id){
         return DB::table('table_employee_shifts')
             ->select('table_employees.employee_name','table_employees.employee_surname',
@@ -131,6 +108,9 @@ class Employee extends Authenticatable
             ->get();
     }
 
+    /* Nazev funkce: getCompanyEmployeesCount
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani poctu zamestnancu firmy */
     public static function getCompanyEmployeesCount($company_id){
         return DB::table('table_employees')
             ->select('table_employees.employee_id')
@@ -138,6 +118,9 @@ class Employee extends Authenticatable
             ->count();
     }
 
+    /* Nazev funkce: getShiftsEmployee
+       Argumenty: shift_id - identifikator smeny
+       Ucel: ziskani zamestnancu na konkretni smene */
     public static function getShiftsEmployee($shift_id){
         return DB::table('table_employee_shifts')
             ->select('table_employees.employee_id','table_employees.employee_name','table_employees.employee_surname','table_employees.employee_position',
@@ -147,6 +130,9 @@ class Employee extends Authenticatable
             ->get();
     }
 
+    /* Nazev funkce: getEmployeeTotalShiftsHour
+    Argumenty: employee_id - identifikator zamestnance
+    Ucel: ziskani delek zamestnancovych smen ve formatu xhxm napriklad 8h2m */
     public static function getEmployeeTotalShiftsHour($employee_id){
         date_default_timezone_set('Europe/Prague');
        $smeny = Shift::getEmployeeShiftsWithEmployeeInformation($employee_id);
@@ -173,6 +159,9 @@ class Employee extends Authenticatable
         }
     }
 
+    /* Nazev funkce: getEmployeeWeekShiftsHour
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu hodin v ramci aktualniho tydne ve formatu xhxm napriklad 8h2m */
     public static function getEmployeeWeekShiftsHour($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentShifts($employee_id);
@@ -199,6 +188,9 @@ class Employee extends Authenticatable
         }
     }
 
+    /* Nazev funkce: getEmployeeWeekShiftsHourWithoutMinutesExtension
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu hodin v ramci aktualniho tydne bez formatu xhxm */
     public static function getEmployeeWeekShiftsHourWithoutMinutesExtension($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentShifts($employee_id);
@@ -214,6 +206,9 @@ class Employee extends Authenticatable
         return round($smenyPocetHodin, 2);
     }
 
+    /* Nazev funkce: getEmployeeMonthShiftsHour
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu hodin v ramci aktualniho mesice ve formatu xhxm (napriklad 8h2m) */
     public static function getEmployeeMonthShiftsHour($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentMonthShifts($employee_id);
@@ -240,6 +235,9 @@ class Employee extends Authenticatable
         }
     }
 
+    /* Nazev funkce: getEmployeeMonthShiftsHourWithoutMinutesExtension
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu hodin v ramci aktualniho mesice bez formatu xhxm */
     public static function getEmployeeMonthShiftsHourWithoutMinutesExtension($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentMonthShifts($employee_id);
@@ -255,22 +253,17 @@ class Employee extends Authenticatable
        return round($smenyPocetHodin, 2);
     }
 
+    /* Nazev funkce: getEmployeeWorkedTotalShiftsHour
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu celkove odpracovanych hodin konkretniho zamestnance ve formatu xhxm (napriklad 8h1m) */
     public static function getEmployeeWorkedTotalShiftsHour($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeShiftsWithEmployeeInformation($employee_id);
         $celkove_odpracovano = 0;
-        foreach ($smeny as $smena){
-            $dochazka = DB::table('table_attendances')
-                ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
-                ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-                ->select('table_attendances.attendance_came','table_attendances.absence_reason_id',
-                    'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                    'table_attendances.attendance_check_out_company')
-                ->where(['table_attendances.shift_id' => $smena->shift_id,'table_attendances.employee_id' => $employee_id])
-                ->get();
+        foreach ($smeny as $smena){ // iterace skrze smeny
+            $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena->shift_id, $employee_id);
             if($dochazka->isEmpty()){
-            }else{
+            }else{ // sekce kodu pro vypocet odpracovanych hodin
                 if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
                     if($dochazka[0]->attendance_check_in != NULL || $dochazka[0]->attendance_check_out != NULL){
                         $checkin = new DateTime($dochazka[0]->attendance_check_in);
@@ -285,7 +278,7 @@ class Employee extends Authenticatable
                     $celkove_odpracovano = $celkove_odpracovano + $hodinyRozdilCheck->h + $hodinyRozdilCheck->i/60;
                 }
             }
-        }
+        } // sekce kodu pro vytvoreni formatu xhxm
         $cas_odpracovano_arr = explode(".", $celkove_odpracovano);
         if(sizeof($cas_odpracovano_arr) > 1){
             $cas_odpracovano_arr[1] = substr($cas_odpracovano_arr[1],0,2);
@@ -300,21 +293,16 @@ class Employee extends Authenticatable
         }
     }
 
+    /* Nazev funkce: getEmployeeWorkedTotalShiftsHourWithoutMinutesExtension
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu celkove odpracovanych hodin konkretniho zamestnance bez formatu xhxm (napriklad 8h1m) */
     public static function getEmployeeWorkedTotalShiftsHourWithoutMinutesExtension($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeShiftsWithEmployeeInformation($employee_id);
         $celkove_odpracovano = 0;
         foreach ($smeny as $smena){
-            $dochazka = DB::table('table_attendances')
-                ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
-                ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-                ->select('table_attendances.attendance_came','table_attendances.absence_reason_id',
-                    'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                    'table_attendances.attendance_check_out_company')
-                ->where(['table_attendances.shift_id' => $smena->shift_id,'table_attendances.employee_id' => $employee_id])
-                ->get();
-            if($dochazka->isEmpty()){
+            $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena->shift_id, $employee_id);
+            if($dochazka->isEmpty()){ // pokud dochazka neexistuje, nejsou vypocitany hodiny, pokud existuje pokracuje se vypoctem danych odpracovanych hodin
             }else{
                 if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
                     if($dochazka[0]->attendance_check_in != NULL || $dochazka[0]->attendance_check_out != NULL){
@@ -334,20 +322,15 @@ class Employee extends Authenticatable
        return round($celkove_odpracovano, 3);
     }
 
+    /* Nazev funkce: getEmployeeWorkedWeekShiftsHour
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu odpracovanych hodin na smenach zamestnance za aktualni tyden ve formatu xhxm (napriklad 8h1m) */
     public static function getEmployeeWorkedWeekShiftsHour($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentShifts($employee_id);
         $celkove_odpracovano = 0;
         foreach ($smeny as $smena){
-            $dochazka = DB::table('table_attendances')
-                ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
-                ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-                ->select('table_attendances.attendance_came','table_attendances.absence_reason_id',
-                    'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                    'table_attendances.attendance_check_out_company')
-                ->where(['table_attendances.shift_id' => $smena->shift_id,'table_attendances.employee_id' => $employee_id])
-                ->get();
+            $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena->shift_id, $employee_id);
             if($dochazka->isEmpty()){
             }else{
                 if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
@@ -379,20 +362,15 @@ class Employee extends Authenticatable
         }
     }
 
+    /* Nazev funkce: getEmployeeWorkedWeekShiftsHourWithoutMinutesExtension
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu odpracovanych hodin na smenach zamestnance za aktualni tyden bez formatu xhxm (napriklad 8h1m) */
     public static function getEmployeeWorkedWeekShiftsHourWithoutMinutesExtension($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentShifts($employee_id);
         $celkove_odpracovano = 0;
         foreach ($smeny as $smena){
-            $dochazka = DB::table('table_attendances')
-                ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
-                ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-                ->select('table_attendances.attendance_came','table_attendances.absence_reason_id',
-                    'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                    'table_attendances.attendance_check_out_company')
-                ->where(['table_attendances.shift_id' => $smena->shift_id,'table_attendances.employee_id' => $employee_id])
-                ->get();
+            $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena->shift_id, $employee_id);
             if($dochazka->isEmpty()){
             }else{
                 if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
@@ -413,20 +391,15 @@ class Employee extends Authenticatable
        return round($celkove_odpracovano, 3);
     }
 
+    /* Nazev funkce: getEmployeeWorkedMonthShiftsHour
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu odpracovanych hodin na smenach zamestnance za aktualni mesic ve formatu xhxm (napriklad 8h1m) */
     public static function getEmployeeWorkedMonthShiftsHour($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentMonthShifts($employee_id);
         $celkove_odpracovano = 0;
         foreach ($smeny as $smena){
-            $dochazka = DB::table('table_attendances')
-                ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
-                ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-                ->select('table_attendances.attendance_came','table_attendances.absence_reason_id',
-                    'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                    'table_attendances.attendance_check_out_company')
-                ->where(['table_attendances.shift_id' => $smena->shift_id,'table_attendances.employee_id' => $employee_id])
-                ->get();
+            $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena->shift_id, $employee_id);
             if($dochazka->isEmpty()){
             }else{
                 if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
@@ -458,20 +431,15 @@ class Employee extends Authenticatable
         }
     }
 
+    /* Nazev funkce: getEmployeeWorkedMonthShiftsHourWithoutMinutesExtension
+       Argumenty: employee_id - identifikator zamestnance
+       Ucel: ziskani poctu odpracovanych hodin na smenach zamestnance za aktualni mesic bez formatu xhxm (napriklad 8h1m) */
     public static function getEmployeeWorkedMonthShiftsHourWithoutMinutesExtension($employee_id){
         date_default_timezone_set('Europe/Prague');
         $smeny = Shift::getEmployeeCurrentMonthShifts($employee_id);
         $celkove_odpracovano = 0;
         foreach ($smeny as $smena){
-            $dochazka = DB::table('table_attendances')
-                ->join('table_employees', 'table_attendances.employee_id', '=', 'table_employees.employee_id')
-                ->join('table_shifts', 'table_attendances.shift_id', '=', 'table_shifts.shift_id')
-                ->join('table_employee_shifts', 'table_shifts.shift_id', '=', 'table_employee_shifts.shift_id')
-                ->select('table_attendances.attendance_came','table_attendances.absence_reason_id',
-                    'table_attendances.attendance_check_in', 'table_attendances.attendance_check_out','table_attendances.attendance_check_in_company',
-                    'table_attendances.attendance_check_out_company')
-                ->where(['table_attendances.shift_id' => $smena->shift_id,'table_attendances.employee_id' => $employee_id])
-                ->get();
+            $dochazka = Attendance::getEmployeeShiftParticularAttendance($smena->shift_id, $employee_id);
             if($dochazka->isEmpty()){
             }else{
                 if ($dochazka[0]->attendance_check_in_company == NULL || $dochazka[0]->attendance_check_out_company == NULL){
@@ -492,232 +460,164 @@ class Employee extends Authenticatable
        return round($celkove_odpracovano, 3);
     }
 
-    public static function changeShiftsAssignedYear($employee_id, $rok)
-    {
+    /* Nazev funkce: changeShiftsAssignedYear
+       Argumenty: employee_id - identifikator zamestnance, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu prirazenych smen dle mesicu */
+    public static function changeShiftsAssignedYear($employee_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("COUNT(*) as count_shift"))
+            ->selectRaw('COUNT(*) as count_shifts')
             ->join('shift_facts', 'shift_info_dimension.shift_info_id', '=', 'shift_facts.shift_info_id')
             ->where(['shift_facts.employee_id' => $employee_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('count_shift');
-
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
         $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_shifts')
             ->join('shift_facts', 'shift_info_dimension.shift_info_id', '=', 'shift_facts.shift_info_id')
             ->where('shift_facts.employee_id', $employee_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        foreach ($mesice_smeny as $index => $month_shift) {
-            $data_shifts[$month_shift - 1] = $smeny[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_smeny); $i++){
+            $statistikaSmen[$mesice_smeny[$i]->month_shifts - 1] = $smeny[$i]->count_shifts;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalHoursYear
+       Argumenty: employee_id - identifikator zamestnance, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu hodin smen zamestnance dle mesicu */
     public static function changeShiftsTotalHoursYear($employee_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_hodiny = DB::table('shift_info_dimension')
-            ->select(DB::raw("SUM(IFNULL(shift_total_hours,0)) as sum_shift_total_hours"))
+            ->selectRaw('SUM(IFNULL(shift_total_hours,0)) as sum_shift_total_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.employee_id' => $employee_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('sum_shift_total_hours');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $mesice_hodiny = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_shift_total_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.employee_id', $employee_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = round($smeny_hodiny[$index], 2);
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_hodiny); $i++){
+            $statistikaSmen[$mesice_hodiny[$i]->month_shift_total_hours - 1] = round($smeny_hodiny[$i]->sum_shift_total_hours, 3);
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalWorkedHoursYear
+       Argumenty: employee_id - identifikator zamestnance, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu odpracovanych hodin na smenach zamestnance dle mesicu */
     public static function changeShiftsTotalWorkedHoursYear($employee_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_odpracovane_hodiny = DB::table('shift_info_dimension')
-            ->select(DB::raw("SUM(IFNULL(total_worked_hours,0)) as sum_shift_total_worked_hours"))
+            ->selectRaw('SUM(IFNULL(total_worked_hours,0)) as sum_shift_total_worked_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.employee_id' => $employee_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('sum_shift_total_worked_hours');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $mesice_odpracovane = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_total_worked_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.employee_id', $employee_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_odpracovane_hodiny[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_odpracovane); $i++){
+            $statistikaSmen[$mesice_odpracovane[$i]->month_total_worked_hours - 1] = round($smeny_odpracovane_hodiny[$i]->sum_shift_total_worked_hours, 4);
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalLateHoursYear
+       Argumenty: employee_id - identifikator zamestnance, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu hodin zpozdeni na smenach zamestnance dle mesicu */
     public static function changeShiftsTotalLateHoursYear($employee_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_zpozdeni_hodiny = DB::table('shift_info_dimension')
-            ->select(DB::raw("SUM(IFNULL(late_total_hours,0)) as sum_shift_late_total_hours"))
+            ->selectRaw('SUM(IFNULL(late_total_hours,0)) as sum_shift_late_total_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.employee_id' => $employee_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('sum_shift_late_total_hours');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $mesice_zpozdeni = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_late_total_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.employee_id', $employee_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_zpozdeni_hodiny[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_zpozdeni); $i++){
+            $statistikaSmen[$mesice_zpozdeni[$i]->month_late_total_hours - 1] = round($smeny_zpozdeni_hodiny[$i]->sum_shift_late_total_hours, 3);
         }
-        for ($i = 0; $i < sizeof($data_shifts); $i++){
-            $data_shifts[$i] = round($data_shifts[$i],3);
-        }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalLateFlagsCountYear
+       Argumenty: employee_id - identifikator zamestnance, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu zpozdeni na smenach zamestnance dle mesicu */
     public static function changeShiftsTotalLateFlagsCountYear($employee_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_late_flagy = DB::table('shift_info_dimension')
-            ->select(DB::raw("COUNT(employee_late_flag) as count_employee_late_flags"))
+            ->selectRaw('COUNT(employee_late_flag) as count_employee_late_flags')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.employee_id' => $employee_id])
             ->where(['shift_facts.employee_late_flag' => 1])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('count_employee_late_flags');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $mesice_zpozdeni = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_employee_late_flags')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.employee_id', $employee_id)
             ->where(['shift_facts.employee_late_flag' => 1])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_late_flagy[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_zpozdeni); $i++){
+            $statistikaSmen[$mesice_zpozdeni[$i]->month_employee_late_flags - 1] = $smeny_late_flagy[$i]->count_employee_late_flags;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalInjuriesFlagsCountYear
+       Argumenty: employee_id - identifikator zamestnance, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu zraneni na smenach zamestnance dle mesicu */
     public static function changeShiftsTotalInjuriesFlagsCountYear($employee_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $zraneni = DB::table('table_injuries')
-            ->select(DB::raw("COUNT(*) as count_injuries"))
+            ->selectRaw('COUNT(*) as count_injuries')
             ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
             ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
             ->where(['table_employees.employee_id' => $employee_id])
             ->whereYear('table_injuries.injury_date', $rok)
-            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
-            ->pluck('count_injuries');
-
+            ->groupByRaw('MONTH(table_injuries.injury_date)')
+            ->get();
         $mesice_zraneni = DB::table('table_injuries')
-            ->select(DB::raw("Month(table_injuries.injury_date) as month_injury"))
+            ->selectRaw('MONTH(table_injuries.injury_date) as month_injury')
             ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
             ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
             ->where(['table_employees.employee_id' => $employee_id])
             ->whereYear('table_injuries.injury_date', $rok)
-            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
-            ->pluck('month_injury');
-
-        $data_injuries = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_zraneni as $index => $month_shift){
-            $data_injuries[$month_shift - 1] = $zraneni[$index];
+            ->groupByRaw('MONTH(table_injuries.injury_date)')
+            ->get();
+        $statistikaZraneni = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_zraneni); $i++){
+            $statistikaZraneni[$mesice_zraneni[$i]->month_injury - 1] = $zraneni[$i]->count_injuries;
         }
-        return $data_injuries;
-    }
-
-    public static function changeVacationsYear($employee_id, $rok){
-        date_default_timezone_set('Europe/Prague');
-        $dovolene = DB::table('table_vacations')
-            ->select(DB::raw("COUNT(*) as count_vacations"))
-            ->join('table_employees','table_vacations.employee_id','=','table_employees.employee_id')
-            ->where(['table_vacations.employee_id' => $employee_id])
-            ->whereYear('table_vacations.vacation_start', $rok)
-            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
-            ->pluck('count_vacations');
-
-        $mesice_dovolene = DB::table('table_vacations')
-            ->select(DB::raw("Month(table_vacations.vacation_start) as month_vacation"))
-            ->where(['table_vacations.employee_id' => $employee_id])
-            ->whereYear('table_vacations.vacation_start', $rok)
-            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
-            ->pluck('month_vacation');
-        $data_vacations = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_dovolene as $index => $month_shift){
-            $data_vacations[$month_shift - 1] = $dovolene[$index];
-        }
-        return $data_vacations;
-    }
-
-    public static function changeDiseasesYear($employee_id, $rok){
-        date_default_timezone_set('Europe/Prague');
-        $nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("COUNT(*) as count_disease"))
-            ->where(['table_diseases.employee_id',$employee_id])
-            ->whereYear('table_diseases.disease_from', $rok)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('count_disease');
-
-        $mesice_nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("Month(table_diseases.disease_from) as month_disease"))
-            ->where(['table_diseases.employee_id',$employee_id])
-            ->whereYear('table_diseases.disease_from', $rok)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('month_disease');
-        $data_diseases = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nemocenske as $index => $month_shift){
-            $data_diseases[$month_shift - 1] = $nemocenske[$index];
-        }
-        return $data_diseases;
-    }
-
-    public static function changeReportsYear($employee_id, $rok){
-        date_default_timezone_set('Europe/Prague');
-        $nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("COUNT(*) as count_reports"))
-            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
-            ->where(['table_reports.employee_id',$employee_id])
-            ->whereYear('table_reports.created_at', $rok)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('count_reports');
-
-        $mesice_nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("Month(table_reports.created_at) as month_report"))
-            ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
-            ->where(['table_reports.employee_id',$employee_id])
-            ->whereYear('table_reports.created_at', $rok)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('month_report');
-
-        $data_reports = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nahlaseni as $index => $month_shift){
-            $data_reports[$month_shift - 1] = $nahlaseni[$index];
-        }
-        return $data_reports;
+        return $statistikaZraneni;
     }
 
 }

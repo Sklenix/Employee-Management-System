@@ -1,9 +1,15 @@
 @extends('layouts.company_dashboard')
 @section('title') - Zaměstnanci @endsection
-@section('content2')
+@section('content')
+    <!-- Nazev souboru: employee_list.blade.php -->
+    <!-- Autor: Pavel Sklenář (xsklen12) -->
+    <!-- Tento soubor reprezentuje moznost "Seznam zaměstnanců" v ramci uctu s roli firmy -->
+    <!-- K inspiraci prace s datovymi tabulky slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020
+         Modalni okna viz dokumentace Bootstrap: https://getbootstrap.com/docs/4.0/components/modal/ -->
     <center>
-        <br><br>
+        <br>
         <div class="col-lg-11 col-md-10 col-sm-10">
+            <!-- Usek kodu pro definici hlasek za pomoci Session -->
             @if(Session::has('obrazekZpravaFail'))
                 <div class="alert alert-danger">
                     <button type="button" class="close" data-dismiss="alert">x</button>
@@ -16,32 +22,34 @@
                     {{ Session::get('obrazekZpravaSuccess') }}
                 </div>
             @endif
-            @if($message = Session::get('success'))
+            @if($zprava = Session::get('success'))
                 <div class="alert alert-success alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
-            @if($message = Session::get('fail'))
+            @if($zprava = Session::get('fail'))
                 <div class="alert alert-danger alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
+            <!-- Tento div slouzi k zobrazeni chyb v ramci AJAXovych pozadavku -->
             <div class="flash-message text-center">
             </div>
-            <table class="table-responsive employee_list">
+
+            <table class="employees_list_table">
                 <thead>
-                <tr>
-                    <th width="5%">Fotka</th>
-                    <th width="6%">Jméno</th>
-                    <th width="10%">Příjmení</th>
-                    <th width="10%">Email</th>
-                    <th width="10%">Telefon</th>
-                    <th width="8%">Pozice</th>
-                    <th width="5%">Směna obsazena</th>
-                    <th width="10%">Akce <button style="float:right;font-weight: 200;" class="btn btn-dark btn-md" type="button"  data-toggle="modal" data-target="#CreateArticleModal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Vytvořit</button></th>
-                </tr>
+                    <tr>
+                        <th width="5%">Fotka</th>
+                        <th width="15%">Jméno</th>
+                        <th width="15%">Příjmení</th>
+                        <th width="20%">Email</th>
+                        <th width="15%">Telefon</th>
+                        <th width="10%">Pozice</th>
+                        <th width="5%">Směna obsazena</th>
+                        <th width="15%">Akce <button style="float:right;font-weight: 200;" class="btn btn-dark btn-md" type="button"  data-toggle="modal" data-target="#CreateEmployeeForm"><i class="fa fa-plus-square-o"></i> Vytvořit</button></th>
+                    </tr>
                 </thead>
                 <tbody>
                 </tbody>
@@ -49,190 +57,197 @@
         </div>
     </center>
 
-    <!-- Smazani zamestnance -->
-    <div id="confirmModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro smazani zamestnance -->
+    <div id="DeleteEmployeeForm" class="modal fade" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení smazání zaměstnance</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení smazání zaměstnance</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete smazat tohoto zaměstnance?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6">Opravdu si přejete smazat tohoto zaměstnance?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="ok_button" style="color:white;" id="ok_button" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" name="SubmitDeleteEmployee" style="color:white;" id="SubmitDeleteEmployee" class="btn tlacitkoPotvrzeniOkna"  >Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Profil zamestnance -->
-    <div class="modal fade" id="EditArticleModal">
+    <!-- Modalni okno pro editaci zamestnance -->
+    <div class="modal fade" id="EmployeeEditForm">
         <div class="modal-dialog" style="max-width: 1050px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h4 class="modal-title" style="color:white;">Profil zaměstnance</h4>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color:#4aa0e6;">Profil zaměstnance</h4>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body" style="color:white;">
                     <div class="chyby alert alert-danger" style="text-decoration: none;">
                     </div>
-
-                    <div id="EditArticleModalBody">
+                    <div id="ArticleEditContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitEditArticleForm">Aktualizovat</button>
-                    <button type="button" class="btn btn-modalClose modelClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitEditArticleForm">Aktualizovat</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Vytvoreni zamestnance -->
-    <div class="modal fade" id="CreateArticleModal">
-        <div class="modal-dialog" style="max-width: 750px;">
-            <div class="modal-content">
+    <!-- Modalni okno pro pridani zamestnance -->
+    <div class="modal fade" id="CreateEmployeeForm">
+        <div class="modal-dialog" style="max-width: 800px;">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title" style="color:white;">Vytvoření zaměstnance</h5>
-                    <button type="button" style="color:white;" class="close modelClose" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color:#4aa0e6;">Vytvoření zaměstnance</h4>
+                    <button type="button" style="color:white;" class="close" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body" style="color:white;">
                     <div class="alert alert-danger chyby_add" role="alert">
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
                     </div>
                     <div class="alert alert-danger" role="alert" style="font-size: 16px;">
                         Položky označené (<span style="color:red;">*</span>) jsou povinné.
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Jméno(<span class="text-danger">*</span>)</label>
+                            <label for="first_name_add" class="col-md-2 text-left formularLabelsAjaxAdd">Křestní jméno(<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-user"></i></div>
                                     </div>
-                                    <input id="first_name_add" placeholder="Zadejte křestní jméno zaměstnance..." type="text" class="form-control" name="first_name_add" value="{{ old('first_name_add') }}"  autocomplete="first_name_add" autofocus>
+                                    <input id="first_name_add" placeholder="Zadejte křestní jméno zaměstnance..." type="text" class="form-control" name="first_name_add" autocomplete="on" autofocus>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Příjmení(<span class="text-danger">*</span>)</label>
+                            <label for="surname_add" class="col-md-2 text-left formularLabelsAjaxAdd">Příjmení (<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-user"></i></div>
                                     </div>
-                                    <input id="surname_add" placeholder="Zadejte příjmení zaměstnance..." type="text" class="form-control" name="surname_add" value="{{ old('surname_add') }}"  autocomplete="surname_add">
+                                    <input id="surname_add" placeholder="Zadejte příjmení zaměstnance..." type="text" class="form-control" name="surname_add" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Email(<span class="text-danger">*</span>)</label>
+                            <label for="employee_birthday" class="col-md-2 text-left">Datum narození</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-envelope " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-birthday-cake"></i></div>
                                     </div>
-                                    <input id="email_add" placeholder="Zadejte email zaměstnance..." type="text" class="form-control" name="email_add" value="{{ old('email_add') }}"  autocomplete="email_add">
+                                    <input type="date" class="form-control" name="employee_birthday" id="employee_birthday">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Telefon(<span class="text-danger">*</span>)</label>
+                            <label for="email_add" class="col-md-2 text-left formularLabelsAjaxAdd">Emailová adresa(<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-phone " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-envelope "></i></div>
                                     </div>
-                                    <input id="phone_add" placeholder="Zadejte telefon zaměstnance..." type="text" class="form-control" name="phone_add" value="{{ old('phone_add') }}"  autocomplete="phone_add">
+                                    <input id="email_add" placeholder="Zadejte emailovou adresu zaměstnance..." type="text" class="form-control" name="email_add" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Pozice(<span class="text-danger">*</span>)</label>
+                            <label for="phone_add" class="col-md-2 text-left formularLabelsAjaxAdd">Telefonní číslo(<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-child" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-phone "></i></div>
                                     </div>
-                                    <input id="position_add" placeholder="Zadejte pozici zaměstnance..." type="text" class="form-control" name="position_add" value="{{ old('position_add') }}"  autocomplete="position_add">
+                                    <input id="phone_add" placeholder="Zadejte telefonní číslo zaměstnance ve tvaru +420 XXX XXX XXX či XXX XXX XXX ..." type="text" class="form-control" name="phone_add" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Město bydliště(<span class="text-danger">*</span>)</label>
+                            <label for="position_add" class="col-md-2 text-left formularLabelsAjaxAdd">Pozice (<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-child"></i></div>
                                     </div>
-                                    <input id="city_add" placeholder="Zadejte město bydliště zaměstnance..." type="text" class="form-control" name="city_add" value="{{ old('city_add') }}"  autocomplete="city_add">
-
+                                    <input id="position_add" placeholder="Zadejte pozici zaměstnance..." type="text" class="form-control" name="position_add" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Ulice bydliště</label>
+                            <label for="city_add" class="col-md-2 text-left formularLabelsAjaxAdd">Město bydliště(<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-building-o" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-building-o"></i></div>
                                     </div>
-                                    <input id="street_add" placeholder="Zadejte město bydliště zaměstnance..." type="text" class="form-control" name="street_add" value="{{ old('street_add') }}"  autocomplete="street_add">
+                                    <input id="city_add" placeholder="Zadejte město bydliště zaměstnance..." type="text" class="form-control" name="city_add" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Login(<span class="text-danger">*</span>)</label>
+                            <label for="street_add" class="col-md-2 text-left formularLabelsAjaxAdd">Ulice bydliště</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-building-o"></i></div>
                                     </div>
-                                    <input id="login_add" placeholder="Zadejte login zaměstnance..." type="text" class="form-control" name="login_add" value="{{ old('login_add') }}"  autocomplete="login_add">
+                                    <input id="street_add" placeholder="Zadejte ulici bydliště zaměstnance..." type="text" class="form-control" name="street_add" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
-
+                    <div class="form-group">
+                        <div class="row">
+                            <label for="login_add" class="col-md-2 text-left formularLabelsAjaxAdd">Uživatelské jméno(<span class="text-danger">*</span>)</label>
+                            <div class="col-md-10">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <div class="input-group-text"><i class="fa fa-user"></i></div>
+                                    </div>
+                                    <input id="login_add" placeholder="Zadejte uživatelské jméno zaměstnance..." type="text" class="form-control" name="login_add" autocomplete="on">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-12">
-                            <input type="button" style="margin-bottom: 15px;" class="btn btn-sm btn-warning pull-right" value="Generovat heslo" onClick="generator_add();">
+                            <input type="button" style="margin-bottom: 15px;" class="btn btn-sm btn-warning pull-right" value="Generovat heslo" onClick="generatorEmployeePassword();">
                         </div>
                     </div>
-
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Heslo(<span class="text-danger">*</span>)</label>
+                            <label for="password_add" class="col-md-2 text-left formularLabelsAjaxAdd">Heslo (<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-lock"></i></div>
                                     </div>
-                                    <input id="password_add" placeholder="Zadejte heslo zaměstnance..." type="password" class="form-control" name="password_add" value="{{ old('password_add') }}"  autocomplete="password_add">
+                                    <input id="password_add" placeholder="Zadejte heslo zaměstnance..." type="password" class="form-control" name="password_add">
                                 </div>
-                                <span toggle="#password_add" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword_add"></span>
+                                <span toggle="#password_add" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-eye zobrazHeslo"></span>
                                 <script>
-                                    $(".showpassword_add").click(function() {
+                                    /* Skryti/odkryti hesla */
+                                    $(".zobrazHeslo").click(function() {
                                         $(this).toggleClass("fa-eye fa-eye-slash");
                                         var input = $($(this).attr("toggle"));
                                         if (input.attr("type") == "password") {
@@ -241,31 +256,59 @@
                                             input.attr("type", "password");
                                         }
                                     });
+                                    /* Tento jquery kod spolecne s elementem span (ktery byl upraven) byl prevzat dle licencnich podminek, viz nize.
+                                           Copyright (c) 2021 - Sohail Aj. - www.codepen.io/Sohail05/pen/yOpeBm
+
+                                           Permission is hereby granted, free of charge, to any person
+                                           obtaining a copy of this software and associated documentation
+                                           files (the "Software"), to deal in the Software without restriction,
+                                            including without limitation the rights to use, copy, modify,
+                                           merge, publish, distribute, sublicense, and/or sell copies of
+                                           the Software, and to permit persons to whom the Software is
+                                           furnished to do so, subject to the following conditions:
+
+                                           The above copyright notice and this permission notice shall
+                                           be included in all copies or substantial portions of the Software.
+
+                                           THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+                                           EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                           OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+                                           NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+                                           HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+                                           WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                           OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+                                           DEALINGS IN THE SOFTWARE.
+                                           */
                                 </script>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Heslo znovu(<span class="text-danger">*</span>)</label>
+                            <label for="password_repeat_add" class="col-md-2 text-left formularLabelsAjaxAdd">Heslo znovu(<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-lock"></i></div>
                                     </div>
-                                    <input id="password_repeat_add" placeholder="Zadejte heslo zaměstnance..." type="password" class="form-control" name="password_repeat_add" value="{{ old('password_repeat_add') }}"  autocomplete="password_repeat_add">
+                                    <input id="password_repeat_add" placeholder="Zadejte heslo zaměstnance..." type="password" class="form-control" name="password_repeat_add">
                                 </div>
-                                <span toggle="#password_repeat_add" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpasswordverify_add"></span>
+                                <span toggle="#password_repeat_add" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-eye zobrazOvereni"></span>
                                 <script>
-                                    function generator_add() {
+                                    /* Funkce pro generovani hesel do text inputu */
+                                    function generatorEmployeePassword() {
                                         var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
-                                        var password_tmp = "";
-                                        for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
-                                        password_add.value = password_tmp;
-                                        password_repeat_add.value = password_tmp;
+                                        var heslo = "";
+                                        var i = 0;
+                                        while(i < 10){
+                                            heslo += znaky.charAt(Math.floor(Math.random()*znaky.length));
+                                            i++;
+                                        }
+                                        document.getElementById("password_add").value = heslo;
+                                        document.getElementById("password_repeat_add").value = heslo;
                                     }
-
-                                    $(".showpasswordverify_add").click(function() {
+                                    /* Skryti/odkryti hesla */
+                                    $(".zobrazOvereni").click(function() {
                                         $(this).toggleClass("fa-eye fa-eye-slash");
                                         var input = $($(this).attr("toggle"));
                                         if (input.attr("type") == "password") {
@@ -274,20 +317,42 @@
                                             input.attr("type", "password");
                                         }
                                     });
+                                    /* Tento jquery kod spolecne s elementem span (ktery byl upraven) byl prevzat dle licencnich podminek, viz nize.
+                                           Copyright (c) 2021 - Sohail Aj. - www.codepen.io/Sohail05/pen/yOpeBm
+
+                                           Permission is hereby granted, free of charge, to any person
+                                           obtaining a copy of this software and associated documentation
+                                           files (the "Software"), to deal in the Software without restriction,
+                                            including without limitation the rights to use, copy, modify,
+                                           merge, publish, distribute, sublicense, and/or sell copies of
+                                           the Software, and to permit persons to whom the Software is
+                                           furnished to do so, subject to the following conditions:
+
+                                           The above copyright notice and this permission notice shall
+                                           be included in all copies or substantial portions of the Software.
+
+                                           THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+                                           EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                           OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+                                           NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+                                           HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+                                           WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                           OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+                                           DEALINGS IN THE SOFTWARE.
+                                           */
                                 </script>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left formularLabelsAjaxAdd">Poznámka</label>
+                            <label for="note_add" class="col-md-2 text-left formularLabelsAjaxAdd">Poznámka</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-sticky-note-o" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-sticky-note-o"></i></div>
                                     </div>
-                                    <textarea name="note_add" placeholder="Zadejte poznámku k zaměstnanci..." id="note_add" class="form-control" value="{{ old('note_add') }}"  autocomplete="note_add"></textarea>
-
+                                    <textarea name="note_add" placeholder="Zadejte poznámku k zaměstnanci [maximálně 180 znaků]..." id="note_add" class="form-control"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -304,154 +369,160 @@
                             <label class="form-check-label" style="font-size: 16px;" for="jazyky"> {{$moznost->language_name}}</label><br>
                         @endforeach
                     </div>
+                    <div class="form-check text-center" style="color:white;margin-top:10px;margin-bottom:5px;">
+                        <input type="checkbox" class="form-check-input" id="povoleniGoogleDrive" name="povoleniGoogleDrive[]" value="1">
+                        <label class="form-check-label" style="font-size: 16px;" for="povoleniGoogleDrive"> Nasdílet zaměstnanci jeho Google Drive složku. </label><br>
+                    </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitCreateArticleForm">Vytvořit</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="EmployeeCreationClicked">Vytvořit</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Hodnoceni zamestnance -->
-    <div class="modal fade" id="RateEmployeeModal" style="color:white;">
+    <!-- Modalni okno slouzici pro hodnoceni zamestnance -->
+    <div class="modal fade" id="EmployeeRatingForm" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Hodnocení zaměstnance</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Hodnocení zaměstnance</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
-                    <div id="RateEmployeeModalBody">
+                    <div id="EmployeeRatingContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitRateEmployee">Hodnotit</button>
-                    <button type="button" class="btn btn-modalClose rateClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitRateEmployee">Hodnotit</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Prirazeni smen k zamestnancum -->
-    <div class="modal fade" id="AssignShiftModal" style="color:white;">
+    <!-- Modalni okno slouzici pro prirazeni zamestnance ke smenam -->
+    <div class="modal fade" id="AssignShiftForm" style="color:white;">
         <div class="modal-dialog" style="max-width: 800px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Přiřazení směn k zaměstnancovi</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Přiřazení směn k zaměstnancovi</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
-                    <div id="AssignShiftBody">
+                    <div id="AssignShiftContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitAssignShift">Přiřadit</button>
-                    <button type="button" class="btn btn-modalClose assignClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitAssignShift">Přiřadit</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Nabídka docházky -->
-    <div class="modal fade" id="ShowAttendanceOptionsModal" style="color:white;">
+    <!-- Modalni okno slouzici pro nabidku moznosti dochazky -->
+    <div class="modal fade" id="AttendanceOptionsForm" style="color:white;">
         <div class="modal-dialog" style="max-width: 800px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Možnosti docházky</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Možnosti docházky</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-info alert-block text-center">
-                        <strong>Vyberte směnu, u které chcete vyplnit check-in, check-out, status, nebo poznámku.</strong>
+                        <strong>Vyberte směnu, u které chcete vyplnit příchod, odchod, status nebo poznámku.</strong>
                     </div>
                     <div class="attendancesuccess text-center">
                     </div>
-                    <div id="ShowAttendanceOptionsBody">
+                    <div id="ShowAttendanceOptionsContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalClose assignClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Nabídka docházky - Check-in -->
-    <div class="modal fade" id="ShowAttendanceCheckinModal" style="color:white;">
+    <!-- Modalni okno pro zapsani prichodu v ramci dochazky -->
+    <div class="modal fade" id="ShowAttendanceCheckinForm" style="color:white;">
         <div class="modal-dialog" style="max-width: 800px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Check-in</h5>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Příchod</h5>
                 </div>
                 <div class="modal-body">
                     <div class="chyby_checkin">
                     </div>
-                    <div id="ShowAttendanceCheckinBody">
+                    <div id="ShowAttendanceCheckinContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitShowAttendanceCheckin">Uložit</button>
-                    <button type="button" class="btn btn-modalClose assignClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitShowAttendanceCheckin">Uložit</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Nabídka docházky - Check-out -->
-    <div class="modal fade" id="ShowAttendanceCheckoutModal" style="color:white;">
+    <!-- Modalni okno pro zapsani odchodu v ramci dochazky -->
+    <div class="modal fade" id="ShowAttendanceCheckoutForm" style="color:white;">
         <div class="modal-dialog" style="max-width: 800px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Check-out</h5>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Odchod</h5>
                 </div>
                 <div class="modal-body">
                     <div class="chyby_checkout">
                     </div>
-                    <div id="ShowAttendanceCheckoutBody">
+                    <div id="ShowAttendanceCheckoutContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitShowAttendanceCheckout">Uložit</button>
-                    <button type="button" class="btn btn-modalClose assignClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitShowAttendanceCheckout">Uložit</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Nabídka docházky - Důvod absence -->
-    <div class="modal fade" id="ShowAttendanceAbsenceModal" style="color:white;">
+    <!-- Modalni okno pro zapsani statusu dochazky -->
+    <div class="modal fade" id="ShowAttendanceAbsenceForm" style="color:white;">
         <div class="modal-dialog" style="max-width: 800px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Status</h5>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Status</h5>
                 </div>
                 <div class="modal-body">
-                    <div id="ShowAttendanceAbsenceBody">
+                    <div id="ShowAttendanceAbsenceContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitShowAttendanceAbsence">Uložit</button>
-                    <button type="button" class="btn btn-modalClose assignClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitShowAttendanceAbsence">Uložit</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Nabídka docházky - Poznámka -->
-    <div class="modal fade" id="ShowAttendanceNoteModal" style="color:white;">
+    <!-- Modalni okno pro zapsani poznamky k dochazce -->
+    <div class="modal fade" id="ShowAttendanceNoteForm" style="color:white;">
         <div class="modal-dialog" style="max-width: 800px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Poznámka</h5>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Poznámka</h5>
                 </div>
                 <div class="modal-body">
-                    <div id="ShowAttendanceNoteBody">
+                    <div class="chyby_poznamka">
+                    </div>
+                    <div id="ShowAttendanceNoteContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitShowAttendanceNote">Uložit</button>
-                    <button type="button" class="btn btn-modalClose assignClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitShowAttendanceNote">Uložit</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
@@ -459,78 +530,64 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            $('#CreateArticleModal').on('hidden.bs.modal', function () {
+            /* K inspiraci prace s datovymi tabulkami slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020,
+               pro inspiraci prace s modalnimi okny (udalosti) slouzil clanek https://www.tutorialspoint.com/hidden-bs-modal-Bootstrap-Event, ktery napsal David Meador v roce 2018 */
+
+            /* Usek kodu starajici se o schovani chybovych hlaseni pri zavreni modalniho okna, inspirace z: https://www.tutorialspoint.com/hidden-bs-modal-Bootstrap-Event */
+            $('#CreateEmployeeForm').on('hidden.bs.modal', function () {
                 $('.chyby_add').hide();
-                $('#first_name_add').val('');
-                $('#surname_add').val('');
-                $('#phone_add').val('');
-                $('#email_add').val('');
-                $('#note_add').val('');
-                $('#position_add').val('');
-                $('#city_add').val('');
-                $('#street_add').val('');
-                $('#login_add').val('');
-                $('#password_add').val('');
-                $('#password_repeat_add').val('');
-                $('.jazyky').attr('checked', false);
             })
 
-            $('#EditArticleModal').on('hidden.bs.modal', function () {
+            $('#EmployeeEditForm').on('hidden.bs.modal', function () {
                 $('.chyby').hide();
             })
 
-            $('#ShowAttendanceOptionsModal').on('hidden.bs.modal', function () {
+            $('#AttendanceOptionsForm').on('hidden.bs.modal', function () {
                 $('.attendancesuccess').hide();
             })
 
-            $('#ShowAttendanceCheckinModal').on('hidden.bs.modal', function () {
+            $('#ShowAttendanceCheckinForm').on('hidden.bs.modal', function () {
                 $('.chyby_checkin').hide();
             })
 
-            $('#ShowAttendanceCheckoutModal').on('hidden.bs.modal', function () {
+            $('#ShowAttendanceCheckoutForm').on('hidden.bs.modal', function () {
                 $('.chyby_checkout').hide();
             })
 
+            /* Usek kodu pro schovani chybovych hlaseni pri nacteni webove stranky */
             $('.chyby').hide();
             $('.chyby_checkin').hide();
             $('.chyby_checkout').hide();
             $('.chyby_add').hide();
 
-            /* Zobrazení datatable */
-            var dataTable = $('.employee_list').DataTable({
-                processing: true,
+            /* Nastaveni zobrazeni datove tabulky a odeslani do controlleru za pomoci AJAX pozadavku
+             Odkaz na yajra datove tabulky: https://yajrabox.com/docs/laravel-datatables/master/installation
+             Odkaz na datove tabulky jQuery: https://datatables.net/ a manual k nim https://datatables.net/manual/ a jednotlive moznosti k nim https://datatables.net/reference/option/.
+             K prepsani pravidel pro datovou tabulku slouzila tato dokumentace https://legacy.datatables.net/usage/i18n.
+            */
+            $('.employees_list_table').DataTable({
                 serverSide: true,
-                responsive: true,
-                scrollX: true,
+                paging: true,
                 autoWidth: true,
-                jQueryUI: true,
-                scrollCollapse: true,
-                oLanguage: {
-                    "sSearch": ""
-                },
+                pageLength: 12,
+                scrollX: true,
+                oLanguage: {"sSearch": "", sZeroRecords: "Nebyl nalezen žádný zaměstnanec."},
                 language: {
                     searchPlaceholder: "Vyhledávání ... ",
-                    emptyTable: "Nemáte zaevidované žádné zaměstnance.",
-                    paginate: {
-                        previous: "Předchozí",
-                        next: "Další",
-                    }
+                    emptyTable: "Nemáte vytvořené žádné zaměstnance.",
+                    paginate: { previous: "Předchozí", next: "Další"}
                 },
-                bLengthChange: false,
-                pageLength: 12,
                 bInfo: false,
-                order: [[ 1, "asc" ]],
-                dom: '<"pull-left"f><"pull-right"l>tip',
-                ajax: "{{ route('employees.list') }}",
-                columns: [
-                    { data: 'employee_picture', name: 'employee_picture',
-                        render: function(data, type, full, meta){
-                            if(data === null){
-                                return "<img src={{ URL::to('/') }}/images/ikona_profil.png width='60' />";
-                            }
-                            return "<img src={{ URL::to('/') }}/storage/employee_images/" + data + " width='60' height='50' style='max-width:100%;height:auto;' />";
+                bLengthChange: false,
+                order: [[2, "asc"]],
+                ajax: "{{ route('employees.list') }}", // nastaveni a odeslani AJAX pozadavku viz https://datatables.net/reference/option/ajax
+                columns: [ // definice dat viz https://datatables.net/reference/option/data
+                    { data: 'employee_picture', name: 'employee_picture',  // vyrenderovani profiloveho obrazku zamestnance
+                        render: function(odpoved){ // viz https://datatables.net/reference/option/columns.render
+                            if(odpoved === null){ return "<img src={{ URL::to('/') }}/images/ikona_profil.png width='60'/>";} // Ikonku vytvoril icon king1, odkaz: https://freeicons.io/essential-collection-5/user-icon-icon-4#
+                            return "<img src={{ URL::to('/') }}/storage/employee_images/" + odpoved + " width='60' height='50' style='max-width:100%;height:auto;'/>";
                         }, orderable: false},
-                    { data: 'employee_name', name: 'employee_name',sClass:'text-center'},
+                    { data: 'employee_name', name: 'employee_name',sClass:'text-center'}, // atribut sClass viz. https://legacy.datatables.net/usage/columns
                     { data: 'employee_surname', name: 'employee_surname',sClass:'text-center'},
                     { data: 'email', name: 'email',sClass:'text-center'},
                     { data: 'employee_phone', name: 'employee_phone'},
@@ -540,588 +597,444 @@
                 ]
             });
 
-
-            $('.btn-modalClose').click(function(e) {
-                $('.chyby_add').hide();
-            });
-
-            /* Vytvoreni zamestnance */
-            $('#SubmitCreateArticleForm').click(function(e) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Po stisknuti tlacitka "Vytvořit" dojde k pridani zamestnance do databaze */
+            $('#EmployeeCreationClicked').click(function() {
                 $.ajax({
                     url: "{{ route('employeesactions.store') }}",
                     method: 'POST',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
                     data: {
-                        employee_name: $('#first_name_add').val(),
-                        employee_surname: $('#surname_add').val(),
-                        employee_phone: $('#phone_add').val(),
+                        jmeno: $('#first_name_add').val(),
+                        prijmeni: $('#surname_add').val(),
+                        narozeniny: $('#employee_birthday').val(),
+                        telefon: $('#phone_add').val(),
                         email: $('#email_add').val(),
-                        employee_note: $('#note_add').val(),
-                        employee_position: $('#position_add').val(),
-                        employee_city: $('#city_add').val(),
-                        employee_street: $('#street_add').val(),
-                        employee_login: $('#login_add').val(),
-                        password: $('#password_add').val(),
-                        password_confirm: $('#password_repeat_add').val(),
+                        poznamka: $('#note_add').val(),
+                        pozice: $('#position_add').val(),
+                        mesto_bydliste: $('#city_add').val(),
+                        ulice_bydliste: $('#street_add').val(),
+                        prihlasovaci_jmeno: $('#login_add').val(),
+                        heslo: $('#password_add').val(),
+                        heslo_overeni: $('#password_repeat_add').val(),
                         jazyky: $('.jazyky:checked').serialize(),
+                        googleDriveRequest: $('#povoleniGoogleDrive').is(':checked')
                     },
-                    success: function(result) {
-                        if(result.errors) {
-                            $('.chyby_add').html('');
-                            $.each(result.errors, function(key, value) {
-                                $('.chyby_add').show();
-                                $('.chyby_add').append('<strong><li>'+value+'</li></strong>');
-                            });
-                        } else {
+                    beforeSend:function(){ $('#EmployeeCreationClicked').text('Vytváření...'); }, // zmena textu pred odeslanim
+                    success: function(odpoved) {
+                        if(odpoved.success) {
+                            /* Usek kodu pro vyresetovani hodnot formularovych prvku */
                             $('.chyby_add').hide();
-                            $('#first_name_add').val(''),
-                                $('#surname_add').val(''),
-                                $('#phone_add').val(''),
-                                $('#email_add').val(''),
-                                $('#note_add').val(''),
-                                $('#position_add').val(''),
-                                $('#city_add').val(''),
-                                $('#street_add').val(''),
-                                $('#login_add').val(''),
-                                $('#password_add').val(''),
-                                $('#password_repeat_add').val(''),
-                                $(":checkbox").attr("checked", false);
-                            $('.employee_list').DataTable().ajax.reload();
-                            var succadd = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ result.success +
-                                '</div>';
-                            $('.flash-message').html(succadd);
-                            $('#CreateArticleModal').modal('hide');
+                            $('#first_name_add').val('');
+                            $('#surname_add').val('');
+                            $('#phone_add').val('');
+                            $('#email_add').val('');
+                            $('#note_add').val('');
+                            $('#position_add').val('');
+                            $('#city_add').val('');
+                            $('#street_add').val('');
+                            $('#login_add').val('');
+                            $('#employee_birthday').val('');
+                            $('#password_add').val('');
+                            $('#password_repeat_add').val('');
+                            $(":checkbox").attr("checked", false);
+                            /* Refresh datove tabulky */
+                            $('.employees_list_table').DataTable().ajax.reload();
+                            var successAdd = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                            $('.flash-message').html(successAdd); // nastaveni hlasky o uspechu
+                            $('#EmployeeCreationClicked').text('Vytvořit');
+                            $('#CreateEmployeeForm').modal('hide'); // schovani modalniho okna
+                        } else {
+                            $('#EmployeeCreationClicked').text('Přidat firmu');
+                            $('.chyby_add').html('');
+                            /* Iterace skrze chyby a postupne pridavani jich do elementu chyby_add */
+                            odpoved.fail.forEach(function (polozka){
+                                $('.chyby_add').append('<strong>'+polozka+'</strong><br>');
+                            });
+                            /* Zobrazeni chyb */
+                            $('.chyby_add').show();
                         }
                     }
                 });
             });
 
-            /* Smazání zaměstnance */
-            var deleteID;
-            $('body').on('click', '#getDeleteId', function(){
-                deleteID = $(this).data('id');
-                $('#confirmModal').modal('show');
-                $("#confirmModal").modal({backdrop: false});
-            })
-            $('#ok_button').click(function(e) {
-                e.preventDefault();
-                var id = deleteID;
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Modalni okno slouzici pro smazani zamestnance (po stisknuti tlacitka "Smazat") */
+            var zamestnanec_id_delete;
+            $('body').on('click', '#obtainDeleteEmployee', function(){
+                zamestnanec_id_delete = $(this).data('id');
+                $('#DeleteEmployeeForm').modal('show');
+                $("#DeleteEmployeeForm").modal({backdrop: false});
+            });
+
+            /* Realizace smazani zamestnance z databaze za pomoci tlacitka "Smazat" */
+            $('#SubmitDeleteEmployee').click(function() {
                 $.ajax({
-                    url: "/company/employeesactions/"+deleteID,
+                    url: "/company/employeesactions/"+zamestnanec_id_delete,
                     method: 'DELETE',
-                    beforeSend:function(){
-                        $('#ok_button').text('Mazání...');
-                    },
-                    success:function(data)
-                    {
-                        var successHtml = '<div class="alert alert-success">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                            '</div>';
-
-                        $('.flash-message').html(successHtml);
-
-                        setTimeout(function(){
-                            $('.employee_list').DataTable().ajax.reload();
-                            $('#ok_button').text('Ano');
-                            $("#confirmModal").modal('hide');
-                        }, 200);
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
+                    beforeSend:function(){$('#SubmitDeleteEmployee').text('Odstraňování...');}, // zmena textu pri kliknuti na tlacitko
+                    success:function(odpoved){
+                        var successHtml = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                        $('.flash-message').html(successHtml); // nastaveni hlasky o uspechu
+                        $('.employees_list_table').DataTable().ajax.reload(); // refresh datove tabulky
+                        $('#SubmitDeleteEmployee').text('Ano');
+                        $("#DeleteEmployeeForm").modal('hide'); // schovani modalniho okna
                     }
                 })
             });
 
-            /* Náhled do profilu zaměstnance */
-            $('.modelClose').on('click', function(){
-                $('#EditArticleModal').hide();
-            });
-            var id;
-            $('body').on('click', '#getEditArticleData', function(e) {
-                $('.chyby').html('');
-                $('.chyby').hide();
-                id = $(this).data('id');
+            /* Zobrazeni profilu zamestnance po stisknuti tlacitka "Zobrazit" */
+            var zamestnanec_id_profil;
+            $('body').on('click', '#obtainEditEmployee',function() {
+                zamestnanec_id_profil = $(this).data('id');
                 $.ajax({
-                    url: "/company/employeesactions/"+id+"/edit",
+                    url: "/company/employeesactions/"+zamestnanec_id_profil+"/edit",
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#EditArticleModalBody').html(result.html);
-                        $('#EditArticleModal').show();
+                    success: function(odpoved) {
+                        $('#ArticleEditContent').html(odpoved.out); // vlozeni obsahu do modalniho okna
+                        $('#EmployeeEditForm').show(); // zobrazeni modalniho okna
                     }
                 });
             });
 
-            /* Ulozeni hodnot profilu zamestnance do databaze */
-            $('#SubmitEditArticleForm').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni hodnot v profilu zamestnance do databaze */
+            $('#SubmitEditArticleForm').click(function() {
                 $.ajax({
-                    url: "/company/employeesactions/"+id,
+                    url: "/company/employeesactions/"+zamestnanec_id_profil,
                     method: 'PUT',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
                     data: {
-                        employee_name: $('#edit_first_name').val(),
-                        employee_surname: $('#edit_surname').val(),
-                        employee_phone: $('#edit_phone_number').val(),
+                        jmeno: $('#edit_first_name').val(),
+                        prijmeni: $('#edit_surname').val(),
+                        telefon: $('#edit_phone_number').val(),
                         email: $('#edit_email').val(),
-                        employee_position: $('#edit_position').val(),
-                        employee_city: $('#edit_city').val(),
-                        employee_street: $('#edit_street').val(),
-                        employee_login: $('#edit_login').val(),
-                        employee_note: $('#edit_note').val(),
-                        password: $('#password_edit').val(),
-                        password_repeat: $('#password_edit_confirm').val(),
+                        narozeniny: $('#employee_birthday_edit').val(),
+                        pozice: $('#edit_position').val(),
+                        mesto_bydliste: $('#edit_city').val(),
+                        ulice_bydliste: $('#edit_street').val(),
+                        prihlasovaci_jmeno: $('#edit_login').val(),
+                        poznamka: $('#edit_note').val(),
+                        heslo: $('#password_edit').val(),
+                        heslo_overeni: $('#password_edit_confirm').val(),
                         jazyky_edit: $('.jazyky_edit:checked').serialize(),
                     },
-                    beforeSend:function(){
-                        $('#SubmitEditArticleForm').text('Aktualizace...');
-                    },
-                    success: function(data) {
-                        if(data.errors) {
-                            $('.chyby').show();
-                            $('.chyby').html('');
-                            $('#SubmitEditArticleForm').text('Aktualizovat');
-                            $.each(data.errors, function(key, value) {
-                                $('.chyby').append('<strong><li>'+value+'</li></strong>');
-                            });
-                        } else {
-                            $('.employee_list').DataTable().ajax.reload();
-                            var succ;
-                            if(data.success != "0"){
-                                succ = '<div class="alert alert-success">'+
-                                    '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                    '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                    '</div>';
+                    beforeSend:function(){$('#SubmitEditArticleForm').text('Aktualizace...');}, // zobrazeni textu po zakliknuti tlacitka
+                    success: function(odpoved) {
+                        if(odpoved.success) {
+                            $('.employees_list_table').DataTable().ajax.reload(); // refresh datove tabulky
+                            var successUpdate;
+                            if(odpoved.success != "0"){
+                                successUpdate = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.success + '</strong></div>';
                             }
-                            $('#SubmitEditArticleForm').text('Aktualizovat');
-                            $('.flash-message').html(succ);
-                            $("#EditArticleModal").modal('hide');
-                        }
-                    }
-                });
-            });
-
-            var realibility;
-            var absence;
-            var work;
-
-            /* Náhled do hodnocení zaměstnance */
-            $('.rateClose').on('click', function(){
-                $('#RateEmployeeModal').hide();
-            });
-            var id;
-            $('body').on('click', '#getEmployeeRate', function(e) {
-                $('.alert-danger').html('');
-                $('.alert-danger').hide();
-                id = $(this).data('id');
-                $.ajax({
-                    url: "/company/employees/rate/" + id,
-                    method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#RateEmployeeModalBody').html(result.html);
-
-                        $('#RateEmployeeModal').show();
-                        realibility = document.getElementById("realibitySlider");
-                        var realibilityView = document.getElementById("viewRealibility");
-                        realibilityView.innerHTML = realibility.value;
-
-                        absence = document.getElementById("absenceSlider");
-                        var absenceView = document.getElementById("viewAbsence");
-                        absenceView.innerHTML = absence.value;
-
-                        work = document.getElementById("workSlider");
-                        var workView = document.getElementById("viewWork");
-                        workView.innerHTML = work.value;
-
-                        realibility.oninput = function() {
-                            realibilityView.innerHTML = this.value;
-                        }
-
-                        absence.oninput = function() {
-                            absenceView.innerHTML = this.value;
-                        }
-
-                        work.oninput = function() {
-                            workView.innerHTML = this.value;
-                        }
-                    }
-                });
-            });
-
-            /* Ulozeni hodnot slideru do databaze*/
-            $('#SubmitRateEmployee').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-                $.ajax({
-                    url: "/company/employees/rate/edit/" + id,
-                    method: 'PUT',
-                    data: {
-                        employee_absence: absence.value,
-                        employee_reliability: realibility.value,
-                        employee_workindex: work.value,
-                    },
-                    beforeSend:function(){
-                        $('#SubmitRateEmployee').text('Aktualizace...');
-                    },
-                    success: function(data) {
-                        if(data.errors) {
-                            $('#SubmitRateEmployee').text('Hodnotit');
+                            $('#SubmitEditArticleForm').text('Aktualizovat'); // zmena textu
+                            $('.flash-message').html(successUpdate); // nastaveni hlasky o uspechu
+                            $("#EmployeeEditForm").modal('hide'); // schovani modalniho okna
                         } else {
-                            $('.employee_list').DataTable().ajax.reload();
-                            var succ = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
-                            $('#SubmitRateEmployee').text('Hodnotit');
-                            $('.flash-message').html(succ);
-                            $("#RateEmployeeModal").modal('hide');
+                            $('#SubmitEditArticleForm').text('Aktualizovat');
+                            $('.chyby').html('');
+                            /* Iterace skrze chyby a postupne pridavani jich do elementu chyby_add */
+                            odpoved.fail.forEach(function (polozka){
+                                $('.chyby').append('<strong>'+polozka+'</strong><br>');
+                            });
+                            /* Zobrazeni chyb */
+                            $('.chyby').show();
                         }
                     }
                 });
             });
 
-            /* Prirazeni smeny zamestnancum */
-            $('.assignClose').on('click', function(){
-                $('#AssignShiftModal').hide();
-            });
-            var id;
-            $('body').on('click', '#getEmployeeAssign', function(e) {
-                id = $(this).data('id');
+            /* Nahled do hodnoceni zamestnance */
+            var id_hodnoceni_zamestnanec;
+            $('body').on('click', '#obtainEmployeeRate', function() {
+                id_hodnoceni_zamestnanec = $(this).data('id');
                 $.ajax({
-                    url: "/company/employees/assign/" + id,
+                    url: "/company/employees/rate/" + id_hodnoceni_zamestnanec,
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#AssignShiftBody').html(result.html);
-                        $('#AssignShiftModal').show();
+                    success: function(odpoved) {
+                        $('#EmployeeRatingContent').html(odpoved.out); /* Vlozeni obsahu do modalniho okna */
+                        $('#EmployeeRatingForm').show(); /* Zobrazeni modalniho okna */
+
+                        /* Usek kodu slouzici pro snimani a zobrazovani aktualnich hodnot posuvniku */
+                        /* Pro posuvnik spolehlivosti */
+                        $("#viewRealibility").html($("#realibitySlider").val());
+                        /* Pro posuvnik dochvilnosti */
+                        $("#viewAbsence").html($("#absenceSlider").val());
+                        /* Pro posuvnik pracovitosti */
+                        $("#viewWork").html($("#workSlider").val());
+
+                        /* Zobrazovani aktualnich hodnot posuvniku */
+                        $("#realibitySlider").on('input', function() {$("#viewRealibility").html($("#realibitySlider").val());});
+                        $("#absenceSlider").on('input', function() {$("#viewAbsence").html($("#absenceSlider").val());});
+                        $("#workSlider").on('input', function() {$("#viewWork").html($("#workSlider").val());});
                     }
                 });
             });
 
-            /* Ulozeni hodnot prirazeni smen zamestnancum do databaze */
-            $('#SubmitAssignShift').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            /* Ulozeni hodnot posuvniku do databaze */
+            $('#SubmitRateEmployee').click(function() {
+                $.ajax({
+                    url: "/company/employees/rate/edit/" + id_hodnoceni_zamestnanec,
+                    method: 'PUT',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
+                    data: {
+                        employee_absence: $("#absenceSlider").val(),
+                        employee_reliability: $("#realibitySlider").val(),
+                        employee_workindex:$("#workSlider").val(),
+                    },
+                    beforeSend:function(){$('#SubmitRateEmployee').text('Aktualizace...');},
+                    success: function(odpoved) {
+                        if(odpoved.success) {
+                            $('.employees_list_table').DataTable().ajax.reload(); // refresh datove tabulky
+                            var successRating = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                            $('#SubmitRateEmployee').text('Hodnotit'); // nastaveni textu tlacitka
+                            $('.flash-message').html(successRating); // vlozeni hlasky o uspechu
+                            $("#EmployeeRatingForm").modal('hide'); // schovani modalniho okna
+                        } else {
+                            $('#SubmitRateEmployee').text('Hodnotit'); // zmena textu
+                        }
                     }
                 });
+            });
+
+            /* Zobrazeni modalniho okna pro prirazeni smen */
+            var zamestnanec_prirazeni_id;
+            $('body').on('click', '#obtainEmployeeAssign',function() {
+                /* ziskani ID zamestnance */
+                zamestnanec_prirazeni_id = $(this).data('id');
                 $.ajax({
-                    url: "/company/employees/assign/edit/" + id,
+                    url: "/company/employees/assign/" + zamestnanec_prirazeni_id,
+                    method: 'GET',
+                    success: function(odpoved) {
+                        $('#AssignShiftContent').html(odpoved.out); // vlozeni obsahu do modalniho okna
+                        $('#AssignShiftForm').show(); // zobrazeni modalniho okna
+                    }
+                });
+            });
+
+            /* Ulozeni prirazenych smen k zamestnanci do databaze */
+            $('#SubmitAssignShift').click(function(){
+                $.ajax({
+                    url: "/company/employees/assign/edit/" + zamestnanec_prirazeni_id,
                     method: 'PUT',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
                     data: {
                         shifts_ids: $('.shift_shift_assign_id:checked').serialize()
                     },
-                    beforeSend:function(){
-                        $('#SubmitAssignShift').text('Přiřazování...');
-                    },
-                    success: function(data) {
-                        if(data.errors) {
+                    beforeSend:function(){$('#SubmitAssignShift').text('Přiřazování...');}, // po zmacknuti tlacitka zmena textu
+                    success: function(odpoved) {
+                        if(odpoved.success) {
+                            $('.employees_list_table').DataTable().ajax.reload(); // refresh datove tabulky
+                            var successAssign = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
                             $('#SubmitAssignShift').text('Přiřadit');
+                            $('.flash-message').html(successAssign); // vlozeni obsahu do flash message
+                            $("#AssignShiftForm").modal('hide'); // schovani modalniho okna
                         } else {
-                            $('.employee_list').DataTable().ajax.reload();
-                            var succ = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
                             $('#SubmitAssignShift').text('Přiřadit');
-                            $('.flash-message').html(succ);
-                            $("#AssignShiftModal").modal('hide');
                         }
                     }
                 });
             });
 
-            /* Zobrazení možností docházky */
-            $('.modelClose').on('click', function(){
-                $('#ShowAttendanceOptionsModal').hide();
-            });
-            var id;
-            $('body').on('click', '#getShiftsOptions', function(e) {
-                $('.chyby').html('');
-                $('.chyby').hide();
-                id = $(this).data('id');
+            /* Zobrazení moznosti dochazky v modalnim okne */
+            var id_zamestnance_dochazka;
+            $('body').on('click', '#obtainAttendanceOptions', function() {
+                /* Ziskani ID zamestnance */
+                id_zamestnance_dochazka = $(this).data('id');
                 $.ajax({
-                    url: "/employee/attendance/options/"+id,
+                    url: "/employee/attendance/options/"+id_zamestnance_dochazka,
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#ShowAttendanceOptionsBody').html(result.html);
-                        $('#ShowAttendanceOptionsModal').show();
+                    success: function(odpoved) {
+                        $('#ShowAttendanceOptionsContent').html(odpoved.out); // zapsani obsahu do modalniho okna
+                        $('#AttendanceOptionsForm').show(); // zobrazeni modalniho okna
                     }
                 });
             });
 
-            /* Check-in v možnostech docházky(zobrazení) */
-            $('.modelClose').on('click', function(){
-                $('#ShowAttendanceCheckinModal').hide();
-            });
-
+            /* Prichod v moznostech dochazky (zobrazeni) */
             var zamestnanec_id;
             var smena_id;
-            $('body').on('click', '#getCheckInShift', function(e) {
-                $('.chyby').html('');
-                $('.chyby').hide();
+            $('body').on('click', '#obtainCheckInShift', function() {
+                /* Ziskani ID smeny a ID zamestnance */
                 smena_id = $('#vybrana_smena option:selected').attr('id');
                 zamestnanec_id = $(this).data('id');
                 $.ajax({
                     url: "/employee/attendance/options/checkin/"+zamestnanec_id+"/"+smena_id,
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#ShowAttendanceCheckinBody').html(result.html);
-                        $('#ShowAttendanceCheckinModal').show();
+                    success: function(odpoved) {
+                        $('#ShowAttendanceCheckinContent').html(odpoved.out); // zapsani obsahu do modalniho okna
+                        $('#ShowAttendanceCheckinForm').show(); // zobrazeni modalniho okna
                     }
                 });
             });
 
-            /* Ulozeni check-in*/
-            $('#SubmitShowAttendanceCheckin').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni zapsani prichodu do databaze */
+            $('#SubmitShowAttendanceCheckin').click(function() {
                 $.ajax({
                     url: "/employee/attendance/options/checkin/update/"+zamestnanec_id+"/"+smena_id,
                     method: 'PUT',
-                    data: {
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
+                    data: { // definice dat
                         employee_id: zamestnanec_id,
                         shift_id: smena_id,
                         attendance_check_in_company: $('#attendance_create_checkin').val(),
                     },
-                    beforeSend:function(){
-                        $('#SubmitShowAttendanceCheckin').text('Aktualizace...');
-                    },
-                    success: function(data) {
-                        if(data.fail) {
-                            $('#SubmitShowAttendanceCheckin').text('Uložit');
-                            var failHtml = '<div class="alert alert-danger">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                                '</div>';
-                            $('.chyby_checkin').html(failHtml);
-                            $('.chyby_checkin').show();
-                        } else {
-                            $('.shift_list').DataTable().ajax.reload();
-                            var successHtml = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
-
-                            $('.attendancesuccess').html(successHtml);
+                    beforeSend:function(){$('#SubmitShowAttendanceCheckin').text('Aktualizace...');}, // zmena textu pri zmacknuti tlacitka
+                    success: function(odpoved) {
+                        if(odpoved.success) {
+                            $('.employees_list_table').DataTable().ajax.reload(); // refresh datove tabulky
+                            var successHtml = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                            $('.attendancesuccess').html(successHtml); // nastaveni hlasky o uspechu a jeji zobrazeni
                             $('.attendancesuccess').show();
                             $('#SubmitShowAttendanceCheckin').text('Uložit');
-
-                            $("#ShowAttendanceCheckinModal").modal('hide');
+                            $("#ShowAttendanceCheckinForm").modal('hide'); // schovani modalniho okna
+                        } else {
+                            $('#SubmitShowAttendanceCheckin').text('Uložit');
+                            /* Definice chybove hlasky */
+                            var failHtml = '<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.fail + '</strong></div>';
+                            $('.chyby_checkin').html(failHtml); // vlozeni chybove hlasky do chyby_checkin
+                            /* Zobrazeni chybove hlasky */
+                            $('.chyby_checkin').show();
                         }
                     }
                 });
             });
 
-            /* Check-out v možnostech docházky(zobrazení) */
-            $('.modelClose').on('click', function(){
-                $('#ShowAttendanceCheckoutModal').hide();
-            });
-
+            /* Odchod v moznostech dochazky (zobrazeni) */
             var zamestnanec_id;
             var smena_id;
-            $('body').on('click', '#getCheckOutShift', function(e) {
-                $('.chyby').html('');
-                $('.chyby').hide();
+            $('body').on('click', '#obtainCheckOutShift', function() {
+                /* Ziskani ID smeny a ID zamestnance */
                 smena_id = $('#vybrana_smena option:selected').attr('id');
                 zamestnanec_id = $(this).data('id');
                 $.ajax({
                     url: "/employee/attendance/options/checkout/"+zamestnanec_id+"/"+smena_id,
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#ShowAttendanceCheckoutBody').html(result.html);
-                        $('#ShowAttendanceCheckoutModal').show();
+                    success: function(odpoved) {
+                        $('#ShowAttendanceCheckoutContent').html(odpoved.out); // vyplneni modalniho okna obsahem
+                        $('#ShowAttendanceCheckoutForm').show(); // zobrazeni modalniho okna
                     }
                 });
             });
 
-            /* Ulozeni check-out*/
-            $('#SubmitShowAttendanceCheckout').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni zapsani odchodu do databaze */
+            $('#SubmitShowAttendanceCheckout').click(function() {
                 $.ajax({
                     url: "/employee/attendance/options/checkout/update/"+zamestnanec_id+"/"+smena_id,
                     method: 'PUT',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
                     data: {
                         employee_id: zamestnanec_id,
                         shift_id: smena_id,
                         attendance_check_out_company: $('#attendance_create_checkout').val(),
                     },
-                    beforeSend:function(){
-                        $('#SubmitShowAttendanceCheckout').text('Aktualizace...');
-                    },
-                    success: function(data) {
-                        if(data.fail) {
+                    beforeSend:function(){ $('#SubmitShowAttendanceCheckout').text('Aktualizace...'); }, // zmena textu pri kliknuti na tlacitko "Uložit"
+                    success: function(odpoved) {
+                        if(odpoved.success) {
+                            $('.shift_list').DataTable().ajax.reload();
+                            var successHtml = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                            $('.attendancesuccess').html(successHtml); // nastaveni hlasky o uspechu
+                            $('.attendancesuccess').show(); // zobrazeni hlasky
                             $('#SubmitShowAttendanceCheckout').text('Uložit');
-                            var failHtml = '<div class="alert alert-danger">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                                '</div>';
+                            $("#ShowAttendanceCheckoutForm").modal('hide'); // schovani modalniho okna
+                        } else {
+                            $('#SubmitShowAttendanceCheckout').text('Uložit');
+                            /* Nastaveni a zobrazeni chybove hlasky */
+                            var failHtml = '<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.fail + '</strong></div>';
                             $('.chyby_checkout').html(failHtml);
                             $('.chyby_checkout').show();
-                        } else {
-                            $('.shift_list').DataTable().ajax.reload();
-                            var successHtml = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
-
-                            $('.attendancesuccess').html(successHtml);
-                            $('.attendancesuccess').show();
-                            $('#SubmitShowAttendanceCheckout').text('Uložit');
-                            $("#ShowAttendanceCheckoutModal").modal('hide');
                         }
                     }
                 });
             });
 
-            /* Absence v možnostech docházky(zobrazení) */
-            $('.modelClose').on('click', function(){
-                $('#ShowAttendanceAbsenceModal').hide();
-            });
-
+            /* Absence v moznostech dochazky (zobrazeni) */
             var zamestnanec_id;
             var smena_id;
-            $('body').on('click', '#getAbsenceReasonAttendance', function(e) {
-                $('.chyby').html('');
-                $('.chyby').hide();
+            $('body').on('click', '#obtainAbsenceReasonAttendance',function() {
+                /* Ziskani ID smeny a ID zamestnance */
                 smena_id = $('#vybrana_smena option:selected').attr('id');
                 zamestnanec_id = $(this).data('id');
                 $.ajax({
                     url: "/employee/attendance/options/absence/"+zamestnanec_id+"/"+smena_id,
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#ShowAttendanceAbsenceBody').html(result.html);
-                        $('#ShowAttendanceAbsenceModal').show();
+                    success: function(odpoved) {
+                        $('#ShowAttendanceAbsenceContent').html(odpoved.out);
+                        $('#ShowAttendanceAbsenceForm').show();
                     }
                 });
             });
 
-            /* Ulozeni absence do databaze */
-            $('#SubmitShowAttendanceAbsence').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni vybraneho statusu do databaze */
+            $('#SubmitShowAttendanceAbsence').click(function() {
                 $.ajax({
                     url: "/employee/attendance/options/absence/update/"+zamestnanec_id+"/"+smena_id,
                     method: 'PUT',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
                     data: {
                         employee_id: zamestnanec_id,
                         shift_id: smena_id,
                         attendance_absence_reason_id: $('#duvody_absence').val(),
                     },
-                    beforeSend:function(){
-                        $('#SubmitShowAttendanceAbsence').text('Aktualizace...');
-                    },
-                    success: function(data) {
-                        if(data.errors) {
+                    beforeSend:function(){ $('#SubmitShowAttendanceAbsence').text('Aktualizace...'); }, // zmena textu pri kliknuti na "Uložit"
+                    success: function(odpoved) { // zpracovani odpovedi
+                        if(odpoved.success) {
+                            $('.employees_list_table').DataTable().ajax.reload(); // refresh datove tabulky
+                            var successHtml = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                            $('.attendancesuccess').html(successHtml); // nastaveni hlasky o uspechu
+                            $('.attendancesuccess').show(); // zobrazeni hlasky o uspechu
                             $('#SubmitShowAttendanceAbsence').text('Uložit');
+                            $("#ShowAttendanceAbsenceForm").modal('hide'); // schovani modalniho okna
                         } else {
-                            $('.shift_list').DataTable().ajax.reload();
-                            var successHtml = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
-
-                            $('.attendancesuccess').html(successHtml);
-                            $('.attendancesuccess').show();
                             $('#SubmitShowAttendanceAbsence').text('Uložit');
-                            $("#ShowAttendanceAbsenceModal").modal('hide');
                         }
                     }
                 });
             });
 
             /* Poznámka v možnostech docházky(zobrazení) */
-            $('.modelClose').on('click', function(){
-                $('#ShowAttendanceNoteModal').hide();
-            });
-
             var zamestnanec_id;
             var smena_id;
-            $('body').on('click', '#getNoteAttendance', function(e) {
-                $('.chyby').html('');
-                $('.chyby').hide();
+            $('body').on('click', '#obtainNoteAttendance', function() {
+                /* Vymazani a schovani chybove hlasky */
+                $('.chyby_poznamka').html('');
+                $('.chyby_poznamka').hide();
+                /* Ziskani ID smeny a ID zamestnance */
                 smena_id = $('#vybrana_smena option:selected').attr('id');
                 zamestnanec_id = $(this).data('id');
                 $.ajax({
                     url: "/employee/attendance/options/note/"+zamestnanec_id+"/"+smena_id,
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#ShowAttendanceNoteBody').html(result.html);
-                        $('#ShowAttendanceNoteModal').show();
+                    success: function(odpoved) {
+                        $('#ShowAttendanceNoteContent').html(odpoved.out); // nastaveni obsahu modalniho okna
+                        $('#ShowAttendanceNoteForm').show(); // zobrazeni modalniho okna
                     }
                 });
             });
 
-            /* Ulozeni poznámky do databaze */
-            $('#SubmitShowAttendanceNote').click(function(e) {
-                e.preventDefault();
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni poznamky k dochazce do databaze */
+            $('#SubmitShowAttendanceNote').click(function() {
                 $.ajax({
                     url: "/employee/attendance/options/note/update/"+zamestnanec_id+"/"+smena_id,
                     method: 'PUT',
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
                     data: {
                         employee_id: zamestnanec_id,
                         shift_id: smena_id,
-                        attendance_note: $('#attendance_note').val(),
+                        poznamka: $('#attendance_note').val(),
                     },
-                    beforeSend:function(){
-                        $('#SubmitShowAttendanceNote').text('Aktualizace...');
-                    },
-                    success: function(data) {
-                        if(data.errors) {
+                    beforeSend:function(){$('#SubmitShowAttendanceNote').text('Aktualizace...');}, // zmena textu pri kliknuti na tlacitko "Uložit"
+                    success: function(odpoved) {
+                        if(odpoved.success) {
+                            $('.employees_list_table').DataTable().ajax.reload(); // aktualizace datove tabulky
+                            var successHtml = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong></div>';
+                            $('.attendancesuccess').html(successHtml); // nastaveni hlasky o uspechu
+                            $('.attendancesuccess').show(); // zobrazeni hlasky
+                            $('#SubmitShowAttendanceNote').text('Uložit'); // zmena textu u tlacitka
+                            $("#ShowAttendanceNoteForm").modal('hide'); // schovani modalniho okna
+                        } else { // pokud poznamka presahla 180 znaku
                             $('#SubmitShowAttendanceNote').text('Uložit');
-                        } else {
-                            $('.shift_list').DataTable().ajax.reload();
-                            var successHtml = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
-
-                            $('.attendancesuccess').html(successHtml);
-                            $('.attendancesuccess').show();
-                            $('#SubmitShowAttendanceNote').text('Uložit');
-                            $("#ShowAttendanceNoteModal").modal('hide');
+                            var failHtml = '<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.fail + '</div>';
+                            $('.chyby_poznamka').html(failHtml);
+                            $('.chyby_poznamka').show();
                         }
                     }
                 });

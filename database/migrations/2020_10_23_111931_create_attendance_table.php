@@ -4,15 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateAttendanceTable extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+class CreateAttendanceTable extends Migration {
+    /* Nazev souboru: CreateAttendanceTable.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato migrace slouzi pro vytvoreni tabulky pro evidenci jednotlivych dochazek zamestnancu na konkretni smeny
+       Migrace detailneji: https://laravel.com/docs/8.x/migrations.
+    */
+
+    /* Definice tabulky (pro vytvoreni) */
+    public function up(){
         Schema::create('table_attendances', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id('attendance_id');
@@ -34,13 +34,8 @@ class CreateAttendanceTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
+    /* Odstraneni tabulky */
+    public function down(){
         Schema::dropIfExists('table_attendances');
     }
 }

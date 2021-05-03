@@ -7,9 +7,9 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
 class Kernel extends ConsoleKernel
 {
+    /* Tato trida je soucasti frameworku Laravel */
     /**
      * The Artisan commands provided by your application.
-     *
      * @var array
      */
     protected $commands = [

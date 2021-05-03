@@ -1,5 +1,8 @@
-<p>Dotaz od {{$data['name']}}</p>
-<p>Telefonní číslo: {{$data['phone']}}</p>
-<p>Email: {{$data['email']}}</p>
-<p>Text zprávy: {{$data['message']}}</p>
+<!-- Nazev souboru: email_welcome.blade.php -->
+<!-- Autor: Pavel Sklenář (xsklen12) -->
+<!-- Definice emailove zpravy odeslane skrze formular na uvodni strane informacniho systemu -->
+<p>Dotaz od {{$udaje['jmeno']}}</p>
+<p>Telefonní číslo: {{$udaje['telefon']}}</p>
+<p>Email: {{$udaje['email']}}</p>
+<p>Text zprávy: {{$udaje['zprava']}}</p>
 

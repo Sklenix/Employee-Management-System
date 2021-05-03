@@ -6,33 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\ConfirmsPasswords;
 
-class ConfirmPasswordController extends Controller
-{
-    /*
-    |--------------------------------------------------------------------------
-    | Confirm Password Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password confirmations and
-    | uses a simple trait to include the behavior. You're free to explore
-    | this trait and override any functions that require customization.
-    |
-    */
+class ConfirmPasswordController extends Controller{
+    /* Tato trida je soucasti autentizacniho a autorizacniho balicku frameworku Laravel, v tomto projektu neni vyuzita. Slouzi pro potvrzeni hesel uzivatelu */
 
     use ConfirmsPasswords;
 
-    /**
-     * Where to redirect users when the intended url fails.
-     *
-     * @var string
-     */
+    /* Tato promenna reprezentuje cestu kam budou presmerovani uzivatele, pokud nebude mozne otevrit stranku s url pro zmenu hesla */
     protected $redirectTo = RouteServiceProvider::HOME;
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
+    /* Konstruktor, pro pouziti teto tridy je potreba byt prihlaseny */
     public function __construct()
     {
         $this->middleware('auth');

@@ -10,39 +10,22 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Foundation\Auth\VerifiesEmails;
 use Illuminate\Http\Request;
 
-class VerificationController extends Controller
-{
-    /*
-    |--------------------------------------------------------------------------
-    | Email Verification Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling email verification for any
-    | user that recently registered with the application. Emails may also
-    | be re-sent if the user didn't receive the original email message.
-    |
-    */
-
+class VerificationController extends Controller{
+    /* Nazev souboru: VerificationController.php */
+    /* Tato trida slouzi k rozesilani overovacich emailu a take k samotnemu overeni emailovych adres. Je soucasti autentizacniho a autorizacniho balicku frameworku Laravel. Metoda verify byla upravena.
+    Autor upravy: Pavel Sklenář (xsklen12) */
     use VerifiesEmails;
 
-    /**
-     * Where to redirect users after verification.
-     *
-     * @var string
-     */
+    /* Tato promenna reprezentuje kam budou uzivatele presmerovani po overeni jejich emailove adresy */
     protected $redirectTo = '/company/dashboard';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
+    public function __construct(){
         $this->middleware('throttle:6,1')->only('verify', 'resend');
     }
 
-    /* Prepsani metody verify z VerifiesEmails.php kvuli notifikaci nove registrovane firmy */
+    /* Nazev funkce: verify
+       Argumenty: request
+       Ucel: Prepsani metody verify z VerifiesEmails.php kvuli notifikaci nove registrovane firmy a take k jejimu automatickemu prihlaseni */
     public function verify(Request $request){
         $company = Company::find($request->route('id'));
         $user = Auth::user();
@@ -53,7 +36,7 @@ class VerificationController extends Controller
             return redirect($this->redirectPath());
         }
         if ($company->markEmailAsVerified()) {
-            event(new Verified($request->user()));
+            event(new Verified($company));
         }
         return redirect($this->redirectPath())->with('verified', true)->with('success', 'Ověření emailové adresy proběhlo v pořádku, nyní můžete svůj účet používat.');
     }

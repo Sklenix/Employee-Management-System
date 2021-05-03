@@ -7,29 +7,22 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class AdminFactory extends Factory
-{
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
+class AdminFactory extends Factory {
+    /* Nazev souboru: AdminFactory.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida slouzi jako tovarna pro vyrobu zaznamu admina */
+
+    /* Napojeni na model */
     protected $model = Admin::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
-    {
+    /* Definice samotneho zaznamu */
+    public function definition(){
         return [
             'admin_name' => 'Admin',
             'admin_surname' => 'Admin',
             'admin_email' => 'admin@gmail.com',
-            'admin_password' => Hash::make('admin'),
-            'admin_login' => 'admin',
-            'remember_token' => Str::random(10),
+            'password' => Hash::make('admin'),
+            'admin_login' => 'admin'
         ];
     }
 }

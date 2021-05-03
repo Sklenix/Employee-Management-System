@@ -6,15 +6,12 @@ use Carbon\Carbon;
 use DateTime;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User as Authenticate;
 use Illuminate\Notifications\Notifiable;
-use App\Notifications\VerifyEmail;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 /**
  * App\Models\Company
- *
  * @property int $company_id
  * @property string $company_name
  * @property string $company_user_name
@@ -56,45 +53,39 @@ use Illuminate\Support\Str;
  * @method static \Illuminate\Database\Eloquent\Builder|Company whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class Company extends Authenticatable implements  MustVerifyEmail
-{
-    use HasFactory, Notifiable;
+class Company extends Authenticate implements MustVerifyEmail {
+    /* Nazev souboru: Company.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida je modelem k tabulce table_companies */
 
+    use HasFactory, Notifiable;
+    /* Urceni primarniho klice tabulky, nazvu tabulky */
     protected $primaryKey = 'company_id';
     protected $table = 'table_companies';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
+    /* Definice atributu tabulky, s kterymi model pracuje */
     protected $fillable = [
         'company_name', 'company_user_name', 'company_user_surname','email','company_phone','company_login','password','company_url','company_picture','company_city','company_street','company_ico','company_dic'
     ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
+    /* Atributy, ktere maji byt schovany pri vraceni udaju z databaze (pro bezpecnost) */
     protected $hidden = [
         'company_password', 'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
+    /* Urceni defaultniho formatu atributu email_verified_at */
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
 
-    public function sendEmailVerificationNotification()
-    {
+    /* Funkce pro odeslani overovaciho emailu (vestavena v Laravelu) */
+    public function sendEmailVerificationNotification(){
         $this->notify(new VerifyEmailNotification());
     }
 
+    /* Nazev funkce: getAverageEmployeeScore
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani prumerneho skore zamestnance firmy */
     public static function getAverageEmployeeScore($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $skore = array();
@@ -113,6 +104,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round($sum/sizeof($skore),2);
     }
 
+    /* Nazev funkce: getAverageEmployeeReliabilityScore
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani prumerne spolehlivosti zamestnance */
     public static function getAverageEmployeeReliabilityScore($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $skore = array();
@@ -131,6 +125,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round($sum/sizeof($skore),2);
     }
 
+    /* Nazev funkce: getAverageEmployeeAbsenceScore
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani prumerne dochvilnosti zamestnance */
     public static function getAverageEmployeeAbsenceScore($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $skore = array();
@@ -149,6 +146,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round($sum/sizeof($skore),2);
     }
 
+    /* Nazev funkce: getAverageEmployeeWorkScore
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani prumerne pracovitosti zamestnance */
     public static function getAverageEmployeeWorkScore($company_id){
         $zamestnanci = Employee::getCompanyEmployees($company_id);
         $skore = array();
@@ -167,6 +167,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round($sum/sizeof($skore),2);
     }
 
+    /* Nazev funkce: getAverageShiftHour
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani prumerne delky smeny firmy */
     public static function getAverageShiftHour($company_id){
         $smeny = Shift::getCompanyShifts($company_id);
         $delka = array();
@@ -187,6 +190,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round($sum/sizeof($delka),2);
     }
 
+    /* Nazev funkce: getMaxShiftHour
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani delky nejdelsi smeny firmy */
     public static function getMaxShiftHour($company_id){
         $smeny = Shift::getCompanyShifts($company_id);
         $delka = array();
@@ -203,6 +209,9 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round(max($delka),2);
     }
 
+    /* Nazev funkce: getMinShiftHour
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani delky nejkratsi smeny firmy */
     public static function getMinShiftHour($company_id){
         $smeny = Shift::getCompanyShifts($company_id);
         $delka = array();
@@ -219,251 +228,261 @@ class Company extends Authenticatable implements  MustVerifyEmail
         return round(min($delka),2);
     }
 
+    /* Nazev funkce: getNewEmployeesCountByMonths
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani poctu novych zamestnancu firmy dle mesicu */
     public static function getNewEmployeesCountByMonths($company_id){
         $zamestnanci = DB::table('table_employees')
-            ->select(DB::raw("COUNT(*) as count"))
-            ->where('employee_company', $company_id)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('count');
-
-        $mesice = DB::table('table_employees')
-            ->select(DB::raw("Month(created_at) as month"))
-            ->where('employee_company', $company_id)
-            ->whereYear('created_at', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('month');
-
-        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice as $index => $month){
-            $data_employees[$month - 1] = $zamestnanci[$index];
+                    ->selectRaw('COUNT(*) as count_employees')
+                    ->where('employee_company', $company_id)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->groupByRaw('MONTH(created_at)')
+                    ->get();
+        $mesice_zamestnanci = DB::table('table_employees')
+                    ->selectRaw('MONTH(created_at) as month_employees')
+                    ->where('employee_company', $company_id)
+                    ->whereYear('created_at', Carbon::now()->year)
+                    ->groupByRaw('MONTH(created_at)')
+                    ->get();
+        $statistikaZamestnanci = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_zamestnanci); $i++){
+            $statistikaZamestnanci[$mesice_zamestnanci[$i]->month_employees - 1] = $zamestnanci[$i]->count_employees;
         }
-        return $data_employees;
+        return $statistikaZamestnanci;
     }
 
+    /* Nazev funkce: getNewShiftsCountByMonths
+       Argumenty: company_id - identifikator firmy
+       Ucel: ziskani poctu vypsanych smen firmy dle mesicu */
     public static function getNewShiftsCountByMonths($company_id){
         $smeny = DB::table('table_shifts')
-            ->select(DB::raw("COUNT(*) as count_shift"))
+            ->selectRaw('COUNT(*) as count_shifts')
             ->where('company_id', $company_id)
             ->whereYear('shift_start', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(shift_start)"))
-            ->pluck('count_shift');
-
+            ->groupByRaw('MONTH(shift_start)')
+            ->get();
         $mesice_smeny = DB::table('table_shifts')
-            ->select(DB::raw("Month(shift_start) as month_shift"))
+            ->selectRaw('MONTH(shift_start) as month_shifts')
             ->where('company_id',$company_id)
             ->whereYear('shift_start', Carbon::now()->year)
-            ->groupBy(DB::raw("Month(shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny[$index];
+            ->groupByRaw('MONTH(shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_smeny); $i++){
+            $statistikaSmen[$mesice_smeny[$i]->month_shifts - 1] = $smeny[$i]->count_shifts;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
-    public static function changeShiftsYear($company_id, $rok){
+    /* Nazev funkce: changeShiftsYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu vypsanych smen dle mesicu */
+    public static function changeShiftsYear($company_id, $rok) {
         $smeny = DB::table('table_shifts')
-            ->select(DB::raw("COUNT(*) as count_shift"))
+            ->selectRaw('COUNT(*) as count_shifts')
             ->where('company_id', $company_id)
             ->whereYear('shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_start)"))
-            ->pluck('count_shift');
-
+            ->groupByRaw('MONTH(shift_start)')
+            ->get();
         $mesice_smeny = DB::table('table_shifts')
-            ->select(DB::raw("Month(shift_start) as month_shift"))
+            ->selectRaw('MONTH(shift_start) as month_shifts')
             ->where('company_id', $company_id)
             ->whereYear('shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_start)"))
-            ->pluck('month_shift');
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny[$index];
+            ->groupByRaw('MONTH(shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_smeny); $i++){
+            $statistikaSmen[$mesice_smeny[$i]->month_shifts - 1] = $smeny[$i]->count_shifts;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeEmployeesYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu novych zamestnancu firmy dle mesicu */
     public static function changeEmployeesYear($company_id, $rok){
         $zamestnanci = DB::table('table_employees')
-            ->select(DB::raw("COUNT(*) as count"))
+            ->selectRaw('COUNT(*) as count_employees')
             ->where('employee_company', $company_id)
             ->whereYear('created_at', $rok)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('count');
-
-        $mesice = DB::table('table_employees')
-            ->select(DB::raw("Month(created_at) as month"))
+            ->groupByRaw('MONTH(created_at)')
+            ->get();
+        $mesice_zamestnanci = DB::table('table_employees')
+            ->selectRaw('MONTH(created_at) as month_employees')
             ->where('employee_company', $company_id)
             ->whereYear('created_at', $rok)
-            ->groupBy(DB::raw("Month(created_at)"))
-            ->pluck('month');
-
-        $data_employees = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice as $index => $month){
-            $data_employees[$month - 1] = $zamestnanci[$index];
+            ->groupByRaw('MONTH(created_at)')
+            ->get();
+        $statistikaZamestnancu = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_zamestnanci); $i++){
+            $statistikaZamestnancu[$mesice_zamestnanci[$i]->month_employees - 1] = $zamestnanci[$i]->count_employees;
         }
-        return $data_employees;
+        return $statistikaZamestnancu;
     }
 
-    public static function changeShiftsAssignedYear($company_id, $rok)
-    {
+    /* Nazev funkce: changeShiftsAssignedYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu prirazenych smen v ramci firmy dle mesicu */
+    public static function changeShiftsAssignedYear($company_id, $rok) {
         date_default_timezone_set('Europe/Prague');
         $smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("COUNT(*) as count_shift"))
+            ->selectRaw('COUNT(*) as count_shifts')
             ->join('shift_facts', 'shift_info_dimension.shift_info_id', '=', 'shift_facts.shift_info_id')
             ->where(['shift_facts.company_id' => $company_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('count_shift');
-
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
         $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_shifts')
             ->join('shift_facts', 'shift_info_dimension.shift_info_id', '=', 'shift_facts.shift_info_id')
             ->where('shift_facts.company_id', $company_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-        foreach ($mesice_smeny as $index => $month_shift) {
-            $data_shifts[$month_shift - 1] = $smeny[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_smeny); $i++){
+            $statistikaSmen[$mesice_smeny[$i]->month_shifts - 1] = $smeny[$i]->count_shifts;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalHoursYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu celkovych delek smen dle mesicu */
     public static function changeShiftsTotalHoursYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_hodiny = DB::table('shift_info_dimension')
-            ->select(DB::raw("SUM(IFNULL(shift_total_hours,0)) as sum_shift_total_hours"))
+            ->selectRaw('SUM(IFNULL(shift_total_hours,0)) as sum_shift_total_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.company_id' => $company_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('sum_shift_total_hours');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $smeny_hodiny_mesice = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_shift_total_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.company_id', $company_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_hodiny[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($smeny_hodiny_mesice); $i++){
+            $statistikaSmen[$smeny_hodiny_mesice[$i]->month_shift_total_hours - 1] = $smeny_hodiny[$i]->sum_shift_total_hours;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalHoursYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu celkove odpracovanych hodin na smenach dle mesicu */
     public static function changeShiftsTotalWorkedHoursYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_odpracovane_hodiny = DB::table('shift_info_dimension')
-            ->select(DB::raw("SUM(IFNULL(total_worked_hours,0)) as sum_shift_total_worked_hours"))
+            ->selectRaw('SUM(IFNULL(total_worked_hours,0)) as sum_shift_total_worked_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.company_id' => $company_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('sum_shift_total_worked_hours');
-
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
         $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_shifts_total_worked_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.company_id', $company_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_odpracovane_hodiny[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_smeny); $i++){
+            $statistikaSmen[$mesice_smeny[$i]->month_shifts_total_worked_hours - 1] = $smeny_odpracovane_hodiny[$i]->sum_shift_total_worked_hours;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalLateHoursYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu celkovych hodin zpozdeni na smenach dle mesicu */
     public static function changeShiftsTotalLateHoursYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_zpozdeni_hodiny = DB::table('shift_info_dimension')
-            ->select(DB::raw("SUM(IFNULL(late_total_hours,0)) as sum_shift_late_total_hours"))
+            ->selectRaw('SUM(IFNULL(late_total_hours,0)) as sum_shift_late_total_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.company_id' => $company_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('sum_shift_late_total_hours');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $mesice_smeny_zpozdeni = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_shifts_late_hours')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.company_id', $company_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_zpozdeni_hodiny[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_smeny_zpozdeni); $i++){
+            $statistikaSmen[$mesice_smeny_zpozdeni[$i]->month_shifts_late_hours - 1] = round($smeny_zpozdeni_hodiny[$i]->sum_shift_late_total_hours, 3);
         }
-        for ($i = 0; $i < sizeof($data_shifts); $i++){
-            $data_shifts[$i] = round($data_shifts[$i],3);
-        }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalLateFlagsCountYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu zpozdeni na smenach dle mesicu */
     public static function changeShiftsTotalLateFlagsCountYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $smeny_late_flagy = DB::table('shift_info_dimension')
-            ->select(DB::raw("COUNT(employee_late_flag) as count_employee_late_flags"))
+            ->selectRaw('COUNT(employee_late_flag) as count_employee_late_flags')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.company_id' => $company_id])
             ->where(['shift_facts.employee_late_flag' => 1])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('count_employee_late_flags');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $mesice_smeny_zpozdeni = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_shifts_late')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.company_id', $company_id)
             ->where(['shift_facts.employee_late_flag' => 1])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_shifts = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_shifts[$month_shift - 1] = $smeny_late_flagy[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSmen = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_smeny_zpozdeni); $i++){
+            $statistikaSmen[$mesice_smeny_zpozdeni[$i]->month_shifts_late - 1] = $smeny_late_flagy[$i]->count_employee_late_flags;
         }
-        return $data_shifts;
+        return $statistikaSmen;
     }
 
+    /* Nazev funkce: changeShiftsTotalInjuriesFlagsCountYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu zraneni na smenach dle mesicu */
     public static function changeShiftsTotalInjuriesFlagsCountYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $zraneni = DB::table('table_injuries')
-            ->select(DB::raw("COUNT(*) as count_injuries"))
+            ->selectRaw('COUNT(*) as count_injuries')
             ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
             ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
             ->where(['table_employees.employee_company' => $company_id])
             ->whereYear('table_injuries.injury_date', $rok)
-            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
-            ->pluck('count_injuries');
-
+            ->groupByRaw('MONTH(table_injuries.injury_date)')
+            ->get();
         $mesice_zraneni = DB::table('table_injuries')
-            ->select(DB::raw("Month(table_injuries.injury_date) as month_injury"))
+            ->selectRaw('MONTH(table_injuries.injury_date) as month_injuries')
             ->join('table_shifts','table_injuries.shift_id','=','table_shifts.shift_id')
             ->join('table_employees','table_injuries.employee_id','=','table_employees.employee_id')
             ->where(['table_employees.employee_company' => $company_id])
             ->whereYear('table_injuries.injury_date', $rok)
-            ->groupBy(DB::raw("Month(table_injuries.injury_date)"))
-            ->pluck('month_injury');
-
-        $data_injuries = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_zraneni as $index => $month_shift){
-            $data_injuries[$month_shift - 1] = $zraneni[$index];
+            ->groupByRaw('MONTH(table_injuries.injury_date)')
+            ->get();
+        $statistikaZraneni = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_zraneni); $i++){
+            $statistikaZraneni[$mesice_zraneni[$i]->month_injuries - 1] = $zraneni[$i]->count_injuries;
         }
-        return $data_injuries;
+        return $statistikaZraneni;
     }
 
+    /* Nazev funkce: changeVacationsYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu dovolenych dle mesicu */
     public static function changeVacationsYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci = Employee::getCompanyEmployees($company_id);
@@ -472,26 +491,28 @@ class Company extends Authenticatable implements  MustVerifyEmail
             array_push($id_zamestnancu,$zamestnanec->employee_id);
         }
         $dovolene = DB::table('table_vacations')
-            ->select(DB::raw("COUNT(*) as count_vacations"))
+            ->selectRaw('COUNT(*) as count_vacations')
             ->join('table_employees','table_vacations.employee_id','=','table_employees.employee_id')
             ->whereIn('table_vacations.employee_id',$id_zamestnancu)
             ->whereYear('table_vacations.vacation_start', $rok)
-            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
-            ->pluck('count_vacations');
-
+            ->groupByRaw('MONTH(table_vacations.vacation_start)')
+            ->get();
         $mesice_dovolene = DB::table('table_vacations')
-            ->select(DB::raw("Month(table_vacations.vacation_start) as month_vacation"))
+            ->selectRaw('MONTH(table_vacations.vacation_start) as month_vacation')
             ->whereIn('table_vacations.employee_id',$id_zamestnancu)
             ->whereYear('table_vacations.vacation_start', $rok)
-            ->groupBy(DB::raw("Month(table_vacations.vacation_start)"))
-            ->pluck('month_vacation');
-        $data_vacations = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_dovolene as $index => $month_shift){
-            $data_vacations[$month_shift - 1] = $dovolene[$index];
+            ->groupByRaw('MONTH(table_vacations.vacation_start)')
+            ->get();
+        $statistikaDovolene = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_dovolene); $i++){
+            $statistikaDovolene[$mesice_dovolene[$i]->month_vacation - 1] = $dovolene[$i]->count_vacations;
         }
-        return $data_vacations;
+        return $statistikaDovolene;
     }
 
+    /* Nazev funkce: changeDiseasesYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu nemocenskych dle mesicu */
     public static function changeDiseasesYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci = Employee::getCompanyEmployees($company_id);
@@ -500,25 +521,27 @@ class Company extends Authenticatable implements  MustVerifyEmail
             array_push($id_zamestnancu,$zamestnanec->employee_id);
         }
         $nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("COUNT(*) as count_disease"))
+            ->selectRaw('COUNT(*) as count_disease')
             ->whereIn('table_diseases.employee_id',$id_zamestnancu)
             ->whereYear('table_diseases.disease_from', $rok)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('count_disease');
-
+            ->groupByRaw('MONTH(table_diseases.disease_from)')
+            ->get();
         $mesice_nemocenske = DB::table('table_diseases')
-            ->select(DB::raw("Month(table_diseases.disease_from) as month_disease"))
+            ->selectRaw('MONTH(table_diseases.disease_from) as month_disease')
             ->whereIn('table_diseases.employee_id',$id_zamestnancu)
             ->whereYear('table_diseases.disease_from', $rok)
-            ->groupBy(DB::raw("Month(table_diseases.disease_from)"))
-            ->pluck('month_disease');
-        $data_diseases = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nemocenske as $index => $month_shift){
-            $data_diseases[$month_shift - 1] = $nemocenske[$index];
+            ->groupByRaw('MONTH(table_diseases.disease_from)')
+            ->get();
+        $statistikaNemocenskych = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_nemocenske); $i++){
+            $statistikaNemocenskych[$mesice_nemocenske[$i]->month_disease - 1] = $nemocenske[$i]->count_disease;
         }
-        return $data_diseases;
+        return $statistikaNemocenskych;
     }
 
+    /* Nazev funkce: changeReportsYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu poctu nahlaseni dle mesicu */
     public static function changeReportsYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci = Employee::getCompanyEmployees($company_id);
@@ -527,51 +550,50 @@ class Company extends Authenticatable implements  MustVerifyEmail
             array_push($id_zamestnancu,$zamestnanec->employee_id);
         }
         $nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("COUNT(*) as count_reports"))
+            ->selectRaw('COUNT(*) as count_reports')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
             ->whereIn('table_reports.employee_id',$id_zamestnancu)
             ->whereYear('table_reports.created_at', $rok)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('count_reports');
-
+            ->groupByRaw('MONTH(table_reports.created_at)')
+            ->get();
         $mesice_nahlaseni = DB::table('table_reports')
-            ->select(DB::raw("Month(table_reports.created_at) as month_report"))
+            ->selectRaw('MONTH(table_reports.created_at) as month_report')
             ->join('table_reports_importances','table_reports.report_importance_id','=','table_reports_importances.importance_report_id')
             ->whereIn('table_reports.employee_id',$id_zamestnancu)
             ->whereYear('table_reports.created_at', $rok)
-            ->groupBy(DB::raw("Month(table_reports.created_at)"))
-            ->pluck('month_report');
-
-        $data_reports = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_nahlaseni as $index => $month_shift){
-            $data_reports[$month_shift - 1] = $nahlaseni[$index];
+            ->groupByRaw('MONTH(table_reports.created_at)')
+            ->get();
+        $statistikaNahlaseni = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_nahlaseni); $i++){
+            $statistikaNahlaseni[$mesice_nahlaseni[$i]->month_report - 1] = $nahlaseni[$i]->count_reports;
         }
-        return $data_reports;
+        return $statistikaNahlaseni;
     }
 
+    /* Nazev funkce: changeAverageEmployeesScoresYear
+       Argumenty: company_id - identifikator firmy, rok - zvoleny rok
+       Ucel: zmena roku u grafu prumerneho skore zamestnance dle mesicu */
     public static function changeAverageEmployeesScoresYear($company_id, $rok){
         date_default_timezone_set('Europe/Prague');
         $zamestnanci_skore = DB::table('shift_info_dimension')
-            ->select(DB::raw("IFNULL(SUM(IFNULL(employee_overall,0)) / COUNT(employee_overall),0) as avg_employee_overall"))
+            ->selectRaw('IFNULL(SUM(IFNULL(employee_overall,0)) / COUNT(employee_overall),0) as avg_employee_overall')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where(['shift_facts.company_id' => $company_id])
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('avg_employee_overall');
-
-        $mesice_smeny = DB::table('shift_info_dimension')
-            ->select(DB::raw("Month(shift_info_dimension.shift_start) as month_shift"))
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $mesice_skore = DB::table('shift_info_dimension')
+            ->selectRaw('MONTH(shift_info_dimension.shift_start) as month_score')
             ->join('shift_facts','shift_info_dimension.shift_info_id','=','shift_facts.shift_info_id')
             ->where('shift_facts.company_id', $company_id)
             ->whereYear('shift_info_dimension.shift_start', $rok)
-            ->groupBy(DB::raw("Month(shift_info_dimension.shift_start)"))
-            ->pluck('month_shift');
-
-        $data_skore = array(0,0,0,0,0,0,0,0,0,0,0,0);
-        foreach ($mesice_smeny as $index => $month_shift){
-            $data_skore[$month_shift - 1] = $zamestnanci_skore[$index];
+            ->groupByRaw('MONTH(shift_info_dimension.shift_start)')
+            ->get();
+        $statistikaSkore = array(0,0,0,0,0,0,0,0,0,0,0,0);
+        for ($i = 0; $i < sizeof($mesice_skore); $i++){
+            $statistikaSkore[$mesice_skore[$i]->month_score - 1] = $zamestnanci_skore[$i]->avg_employee_overall;
         }
-        return $data_skore;
+        return $statistikaSkore;
     }
 
 }

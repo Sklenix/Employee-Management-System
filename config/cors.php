@@ -2,7 +2,7 @@
 
 return [
 
-    /*
+    /* Tento soubor je soucasti frameworku Laravel
     |--------------------------------------------------------------------------
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------

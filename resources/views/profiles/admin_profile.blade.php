@@ -1,132 +1,84 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <style>
-        [class*="col-"],[class^="col-"] { padding-left: 0; padding-right: 0; }
-        body { font-family: 'Roboto', sans-serif; }
-        .navbar-brand{ font-family: 'Pacifico', cursive; }
-        nav { width: 100%; box-shadow: 0px 6px 0px #dedede;}
-        html {
-            scroll-behavior: smooth;
-        }
-        nav ul li a { text-decoration: none; font-weight: 800; text-transform: uppercase; }
-        nav.fill ul li a { position: relative; }
-
-        nav.fill ul li a:after { position: absolute; bottom: 0; left: 0; right: 0; margin: auto;
-            width: 0%; content: '.'; color: transparent; height: 1px; }
-
-        nav.fill ul li a:hover { z-index: 1; }
-
-        nav.fill ul li a:hover:after { z-index: -10; animation: fill 1s forwards;
-            -webkit-animation: fill 1s forwards; -moz-animation: fill 1s forwards; opacity: 1; }
-
-        label{font-size: 17px;}
-
-        .modal-content {
-            background-color: #1a202c !important;
-
-        }
-        .modal-header h5{
-            color:rgba(255, 255, 255, 0.95);
-        }
-
-        .btn-modalClose{
-            background-color: #4aa0e6 !important;
-        }
-
-        .btn-modalClose:hover{
-            background-color: #c51f1a !important;
-        }
-
-        .btn-modalSuccess{
-            background-color: #4aa0e6 !important;
-        }
-
-        .btn-modalSuccess:hover{
-            background-color: green !important;
-        }
-
-
-        @-webkit-keyframes fill {
-            0% { width: 0%; height: 1px; }
-            50% { width: 100%; height: 1px; }
-            100% { width: 100%; height: 100%; background: #d9534f; }
-        }
-        .nav-stacked{
-            font-size: 16px;
-        }
-        .nahratTlacitko label:hover{
-            transform: scale(1.03);
-        }
-        .nahratTlacitko label span{
-            font-weight: normal;
-        }
-    </style>
-    <title>Tozondo - Profil</title>
+    <!-- Nazev souboru: admin_profile.blade.php -->
+    <!-- Autor: Pavel Sklenář (xsklen12) -->
+    <!-- Tento soubor reprezentuje profil admina. -->
+    <!-- definice metadat -->
+    <meta name="description" content="Tozondo - Systém pro rychlou a efektivní správu Vašich zaměstnanců.">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="keywords" content="system, zamestnanci, sprava zamestnancu">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="googlebot" content="index, follow"/>
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Pavel">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
-
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <!-- odkazy na favicony -->
     <link rel="icon" href="{{ asset('images/favicon16x16.png') }}" type="image/png" sizes="16x16"/>
     <link rel="icon" href="{{ asset('images/favicon32x32.png') }}" type="image/png" sizes="32x32"/>
     <link rel="icon" href="{{ asset('images/favicon96x96.png') }}" type="image/png" sizes="96x96"/>
-
+    <!-- import fontu -->
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <!-- import kaskadovych stylu, javascriptu a jQuery -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/styly.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/app.js') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <title>Tozondo - Profil</title>
+    <style>
+        body { font-family: 'Nunito', sans-serif; }
+        @keyframes vyplneni {
+            0% { width: 0%; }
+            40% { width: 100%; height: 1px;background-color: #d9534f; }
+            60% { width: 100%; width: 100%;background-color: #d9534f; }
+            100% { background-color: #d9534f; width: 100%; height: 100%; }
+        }
+    </style>
 </head>
-
-<body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-color:cadetblue">
-<nav class="fill navbar sticky-top navbar-light navbar-expand-sm " style="background-color: #F5F5F5" id="myScrollspy">
+<body style="background-color:cadetblue;">
+<!-- Definice menu -->
+<nav class="navbar navbar-light navbar-expand-sm efektMenu" style="background-color: #F5F5F5;box-shadow: 0px 5px 1px #DCDCDC;">
     <!-- Sekce logo -->
-    <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 25px;margin-left: 20px;"> <img src="{{ URL::asset('images/logo.png') }}" height="35" width="40" /> | Profil</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#dropdownMenu">
+    <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 25px;margin-left: 20px;"> <img src="{{ URL::asset('images/logo.png') }}" height="35" width="40" alt="Logo"/> | Profil</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#rozbalovaciNabidka">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="dropdownMenu">
-
+    <div class="collapse navbar-collapse" id="rozbalovaciNabidka">
         <ul class="navbar-nav navbar-collapse justify-content-end">
-            <li class="nav-item"><a href="{{route('homeAdmin')}}" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" >Dashboard</a> </li>
-            <li class="nav-item"><a href="{{ route('logout') }}" class="nav-link p-3" style="font-family: 'Roboto', sans-serif; font-size: 16px;" onclick="event.preventDefault();document.getElementById('logout-form').submit();">Odhlásit se</a> </li>
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                @csrf
-            </form>
+            <li class="nav-item"><a href="{{route('homeAdmin')}}" class="nav-link" style="font-family: 'Roboto', sans-serif;font-weight: bold;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;font-size: 16px;">DASHBOARD</a> </li>
+            <!-- realizace odhlasovani -->
+            <li class="nav-item"><a href="{{ route('adminLogOut') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 16px;font-weight: bold;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" onclick="event.preventDefault();document.getElementById('logoutform').submit();">ODHLÁSIT SE</a> </li>
+            <form id="logoutform" action="{{ route('adminLogOut') }}" method="POST">@csrf </form>
         </ul>
     </div>
 </nav>
 <br>
+<!-- Definice obsahu -->
 <div class="container" style="background-color: white;padding:30px;border-radius: 25px;">
     <div class="row">
-        <div class="col-12 text-center" style="margin-bottom: 15px;"><h1>{{ Auth::user()->admin_name}} {{Auth::user()->admin_surname}}</h1>
-            <hr></div>
+        <div class="col-12 text-center" style="margin-bottom: 15px;"><h1>{{ Auth::user()->jmeno}} {{Auth::user()->prijmeni}}</h1><hr></div>
     </div>
     <div class="row">
-        <div class="col-sm-12">
-            <button type="button" data-id="{{Auth::user()->admin_id}}" data-toggle="modal" style="margin-top:15px;" data-target="#confirmDeleteModal" class="pull-right btn btn-danger" id="getDeleteId" ><i class="fa fa-trash-o" aria-hidden="true"></i> Smazat účet</button>
-            <ul class="nav nav-stacked nav-pills" id="menuTabu">
+        <div class="col-12">
+            <button type="button" data-id="{{Auth::user()->admin_id}}" data-toggle="modal" style="margin-top:15px;" data-target="#AdminDeleteAccountForm" class="pull-right btn btn-danger"><i class="fa fa-trash-o"></i> Smazat účet</button>
+            <ul class="nav nav-stacked nav-pills">
                 <li class="nav-item">
-                    <a class="nav-link active" data-toggle="tab" href="#obecneUdaje">Obecné údaje</a>
+                    <a class="nav-link active" data-toggle="tab" href="#obecneUdaje" style="font-size: 16px;">Obecné údaje</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" href="#zmenaHesla" >Změna hesla</a>
+                    <a class="nav-link" data-toggle="tab" href="#zmenaHesla" style="font-size: 16px;">Změna hesla</a>
                 </li>
             </ul>
-            <script>
-                $(document).ready(function () {
-                  //  $('#menuTabu a[href="#{{ old('tab') }}"]').tab('show')
-                });
-            </script>
             <br>
-            @if(Session::has('message'))
+            <!-- Definice zprav -->
+            @if(Session::has('success'))
                 <div class="alert alert-success">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    {{ Session::get('message') }}
+                    {{ Session::get('success') }}
                 </div>
             @endif
-
             @if(Session::has('errorZprava'))
                 <div class="alert alert-danger">
                     <button type="button" class="close" data-dismiss="alert">x</button>
@@ -135,108 +87,94 @@
             @endif
 
             <div class="tab-content">
-                <div class="tab-pane active" id="obecneUdaje">
-                    <form class="form" action="{{ route('updateAdminProfileData') }}" method="post">
+                <div class="tab-pane active" id="obecneUdaje"> <!-- tab pro obecne udaje -->
+                    <div class="alert alert-danger" role="alert" style="font-size: 16px;">
+                        Položky označené <span style="color:red;">*</span> jsou povinné.
+                    </div>
+                    <form class="form" action="{{ route('updateAdminProfileData') }}" method="POST">
                         @csrf
                         <div class="form-group">
-                            <div class="col-xs-6">
-                                <label for="admin_name"><h4>Jméno</h4></label>
+                                <label for="jmeno"><h4>Křestní jméno <span class="text-danger" style="font-size: 18px;">*</span></h4></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-user"></i></div>
                                     </div>
-                                    <input type="text" class="form-control @error('admin_name') is-invalid @enderror" name="admin_name" value="{{ Auth::user()->admin_name }}" id="admin_name" placeholder="Vaše jméno ...">
-                                    @error('admin_name')
+                                    <input type="text" class="form-control @error('jmeno') is-invalid @enderror" name="jmeno" value="{{ Auth::user()->admin_name }}" id="jmeno" placeholder="Vaše křestní jméno ..." autocomplete="on" autofocus>
+                                    @error('jmeno')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
                                 </div>
                             </div>
-                        </div>
-
                         <div class="form-group">
-                            <div class="col-xs-6">
-                                <label for="admin_surname"><h4>Příjmení</h4></label>
+                                <label for="prijmeni"><h4>Příjmení <span class="text-danger" style="font-size: 18px;">*</span></h4></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-user"></i></div>
                                     </div>
-                                    <input type="text" class="form-control @error('admin_surname') is-invalid @enderror" name="admin_surname" value="{{ Auth::user()->admin_surname }}" id="admin_surname" placeholder="Vaše příjmení ...">
-                                    @error('admin_surname')
+                                    <input type="text" class="form-control @error('prijmeni') is-invalid @enderror" name="prijmeni" value="{{ Auth::user()->admin_surname }}" id="prijmeni" placeholder="Vaše příjmení ..." autocomplete="on">
+                                    @error('prijmeni')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
                                 </div>
-                            </div>
                         </div>
-
                         <div class="form-group">
-                            <div class="col-xs-6">
-                                <label for="admin_email"><h4>Email</h4></label>
+                                <label for="email"><h4>Emailová adresa <span class="text-danger" style="font-size: 18px;">*</span></h4></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-envelope " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-envelope"></i></div>
                                     </div>
-                                    <input type="email" class="form-control @error('admin_email') is-invalid @enderror" name="admin_email" id="admin_email" value="{{ Auth::user()->admin_email }}" placeholder="Váš email ...">
-                                    @error('admin_email')
+                                    <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" id="email" value="{{ Auth::user()->admin_email }}" placeholder="Vaše emailová adresa ..." autocomplete="on">
+                                    @error('email')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
                                 </div>
-                            </div>
                         </div>
-
                         <div class="form-group">
-                            <div class="col-xs-6">
-                                <label for="admin_login"><h4>Login</h4></label>
+                                <label for="prihlasovaci_jmeno"><h4>Uživatelské jméno <span class="text-danger" style="font-size: 18px;">*</span></h4></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-user" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-user"></i></div>
                                     </div>
-                                    <input type="text" class="form-control @error('admin_login') is-invalid @enderror" name="admin_login" value="{{ Auth::user()->admin_login }}" id="admin_login" placeholder="Váš login ...">
-                                    @error('admin_login')
+                                    <input type="text" class="form-control @error('prihlasovaci_jmeno') is-invalid @enderror" name="prihlasovaci_jmeno" value="{{ Auth::user()->admin_login }}" id="prihlasovaci_jmeno" placeholder="Vaše uživatelské jméno ..." autocomplete="on">
+                                    @error('prihlasovaci_jmeno')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
                                 </div>
-                            </div>
                         </div>
-
                         <div class="form-group">
-                            <div class="col-xs-12">
-                                <button type="submit" class="btn btn-primary btn-block btn-lg">
-                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Uložit
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-primary btn-block btn-lg"><i class="fa fa-floppy-o"></i> Uložit</button>
                         </div>
                     </form>
-                </div><!--/tab-pane-->
+                </div> <!-- tab pro zmenu hesla -->
                 <div class="tab-pane" id="zmenaHesla">
-                    <input type="button" class="btn btn-warning pull-right" value="Generovat heslo" onClick="generator();">
-                    <form class="form" action="{{ route('updateAdminProfilePassword') }}" method="post">
+                    <input type="button" class="btn btn-warning pull-right" value="Generovat heslo" onClick="generator_profile();">
+                    <form class="form" action="{{ route('updateAdminProfilePassword') }}" method="POST">
                         @csrf
                         <div class="form-group">
-
-                            <div class="col-xs-6">
-                                <label for="password"><h4>Heslo</h4></label>
+                                <label for="heslo"><h4>Heslo</h4></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-lock"></i></div>
                                     </div>
-                                    <input type="password" class="form-control @error('password') is-invalid @enderror" name="password" id="password" placeholder="Zadejte heslo..." title="Zadejte nové heslo.">
-                                    @error('password')
+                                    <input type="password" class="form-control @error('heslo') is-invalid @enderror" name="heslo" id="heslo" placeholder="Zadejte heslo..." title="Zadejte nové heslo.">
+                                    @error('heslo')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
                                 </div>
-                                <span toggle="#password" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpassword"></span>
+                                <span toggle="#heslo" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-eye zobrazHeslo"></span>
                                 <script>
-                                    $(".showpassword").click(function() {
+                                    /* Skryti/odkryti hesla */
+                                    $(".zobrazHeslo").click(function() {
                                         $(this).toggleClass("fa-eye fa-eye-slash");
                                         var input = $($(this).attr("toggle"));
                                         if (input.attr("type") == "password") {
@@ -245,34 +183,61 @@
                                             input.attr("type", "password");
                                         }
                                     });
+                                    /* Tento jquery kod spolecne s elementem span (ktery byl upraven) byl prevzat dle licencnich podminek, viz nize.
+                                          Copyright (c) 2021 - Sohail Aj. - www.codepen.io/Sohail05/pen/yOpeBm
+
+                                          Permission is hereby granted, free of charge, to any person
+                                          obtaining a copy of this software and associated documentation
+                                          files (the "Software"), to deal in the Software without restriction,
+                                           including without limitation the rights to use, copy, modify,
+                                          merge, publish, distribute, sublicense, and/or sell copies of
+                                          the Software, and to permit persons to whom the Software is
+                                          furnished to do so, subject to the following conditions:
+
+                                          The above copyright notice and this permission notice shall
+                                          be included in all copies or substantial portions of the Software.
+
+                                          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+                                          EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                          OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+                                          NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+                                          HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+                                          WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                          OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+                                          DEALINGS IN THE SOFTWARE.
+                                          */
                                 </script>
-                            </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-xs-6">
-                                <label for="password_verify"><h4>Zopakujte heslo</h4></label>
+                                <label for="heslo_overeni"><h4>Zopakujte heslo</h4></label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <div class="input-group-text"><i class="fa fa-lock" aria-hidden="true"></i></div>
                                     </div>
-                                    <input type="password" class="form-control @error('password_verify') is-invalid @enderror" name="password_verify" id="password_verify" placeholder="Zopakujte heslo ..." title="Znovu zadejte Vaše nové heslo.">
-                                    @error('password_verify')
+                                    <input type="password" class="form-control @error('heslo_overeni') is-invalid @enderror" name="heslo_overeni" id="heslo_overeni" placeholder="Zopakujte heslo ..." title="Znovu zadejte Vaše nové heslo.">
+                                    @error('heslo_overeni')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
                                     @enderror
                                 </div>
-                                <span toggle="#password_verify" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-fw fa-eye field-icon showpasswordverify"></span>
+                                <span toggle="#heslo_overeni" style="z-index: 3;float:right;margin-right: 12px;position: relative;bottom:25px;color:black;" class="fa fa-eye zobrazOvereniHesla"></span>
                                 <script>
-                                    function generator() {
+                                    /* Generator pro zmenu hesla v profilu uctu s roli admina */
+                                    function generator_profile() {
                                         var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
-                                        var password_tmp = "";
-                                        for (var x = 0; x < 10; ++x) { password_tmp += znaky.charAt(Math.floor(Math.random()*znaky.length));}
-                                        password.value = password_tmp;
-                                        password_verify.value = password_tmp;
+                                        var heslo = "";
+                                        var i = 0;
+                                        while(i < 10){
+                                            heslo += znaky.charAt(Math.floor(Math.random()*znaky.length));
+                                            i++;
+                                        }
+                                        document.getElementById("heslo").value = heslo;
+                                        document.getElementById("heslo_overeni").value = heslo;
                                     }
 
-                                    $(".showpasswordverify").click(function() {
+                                    /* Skryti/odkryti hesla */
+                                    $(".zobrazOvereniHesla").click(function() {
                                         $(this).toggleClass("fa-eye fa-eye-slash");
                                         var input = $($(this).attr("toggle"));
                                         if (input.attr("type") == "password") {
@@ -281,15 +246,35 @@
                                             input.attr("type", "password");
                                         }
                                     });
+                                    /* Tento jquery kod spolecne s elementem span (ktery byl upraven) byl prevzat dle licencnich podminek, viz nize.
+                                       Copyright (c) 2021 - Sohail Aj. - www.codepen.io/Sohail05/pen/yOpeBm
+
+                                       Permission is hereby granted, free of charge, to any person
+                                       obtaining a copy of this software and associated documentation
+                                       files (the "Software"), to deal in the Software without restriction,
+                                        including without limitation the rights to use, copy, modify,
+                                       merge, publish, distribute, sublicense, and/or sell copies of
+                                       the Software, and to permit persons to whom the Software is
+                                       furnished to do so, subject to the following conditions:
+
+                                       The above copyright notice and this permission notice shall
+                                       be included in all copies or substantial portions of the Software.
+
+                                       THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+                                       EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+                                       OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+                                       NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+                                       HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+                                       WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+                                       OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+                                       DEALINGS IN THE SOFTWARE.
+                                       */
                                 </script>
-                            </div>
                         </div>
                         <div class="form-group">
-                            <div class="col-xs-12">
-                                <button type="submit" class="btn btn-primary btn-block btn-lg">
-                                    <i class="fa fa-floppy-o" aria-hidden="true"></i> Změnit heslo
-                                </button>
-                            </div>
+                            <button type="submit" class="btn btn-primary btn-block btn-lg">
+                                <i class="fa fa-floppy-o"></i> Změnit heslo
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -297,26 +282,28 @@
         </div>
     </div>
 </div>
-<!-- Smazani uctu admina -->
-<div id="confirmDeleteModal" class="modal fade" style="color:white;" role="dialog">
+
+<!-- Definice modalniho okna pro odstraneni uctu s roli admina -->
+<div id="AdminDeleteAccountForm" class="modal fade" style="color:white;">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content oknoBarvaPozadi">
             <div class="modal-header">
-                <h5 class="modal-title">Potvrzení smazání Vašeho účtu</h5>
-                <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení smazání Vašeho účtu</h5>
+                <button type="button" class="close" style="color:white;" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
-                <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete smazat Váš účet?</p>
+                <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu si přejete smazat Váš účet?</p>
             </div>
             <div class="modal-footer d-flex justify-content-center">
-                <form method="post" action="{{route('deleteAdminProfile')}}">
+                <form method="POST" action="{{route('deleteAdminProfile')}}">
                     @csrf
-                    <button type="submit" name="confirm" style="color:white;" id="confirm" class="btn btn-modalSuccess">Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="submit" name="confirm" style="color:white;" id="confirm" class="btn tlacitkoPotvrzeniOkna">Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </form>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>

@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
-/*
+/* Tento soubor je soucasti frameworku Laravel
 |--------------------------------------------------------------------------
 | Console Routes
 |--------------------------------------------------------------------------
