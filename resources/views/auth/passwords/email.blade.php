@@ -1,7 +1,11 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="cs">
 <head>
-    <meta name="description" content="Tozondo - Open Source systém pro rychlou a efektivní správu Vašich zaměstnanců.">
+    <!-- Nazev souboru: email.blade.php -->
+    <!-- Tento soubor reprezentuje webovou stranku pro odeslani emailove zpravy na zadanou emailovou adresu za ucelem obnovy hesla -->
+    <!-- Tento soubor byl vygenerovan autentizacnim a autorizacnim balickem pro Laravel a byl nasledne upraven pro potreby webove aplikace -->
+    <!-- definice metadat -->
+    <meta name="description" content="Tozondo - Systém pro rychlou a efektivní správu Vašich zaměstnanců.">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="keywords" content="system, zamestnanci, sprava zamestnancu">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,110 +13,72 @@
     <meta name="robots" content="index, follow" />
     <meta name="author" content="Pavel">
     <meta charset="utf-8">
-
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- odkazy na favicony -->
     <link rel="icon" href="{{ URL::asset('images/favicon16x16.png') }}" type="image/png" sizes="16x16"/>
     <link rel="icon" href="{{ URL::asset('images/favicon32x32.png') }}" type="image/png" sizes="32x32"/>
     <link rel="icon" href="{{ URL::asset('images/favicon96x96.png') }}" type="image/png" sizes="96x96"/>
-
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <!-- import fontu -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-
+    <!-- import kaskadovych stylu, jQuery a javascriptu -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/styly.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/app.js') }}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <title>Tozondo - Reset</title>
-
     <style>
         body { font-family: 'Roboto', sans-serif; }
-        .navbar-brand{ font-family: 'Pacifico', cursive; }
-        nav { width: 100%; box-shadow: 0px 6px 0px #dedede;}
-
-        nav ul li a { text-decoration: none; font-weight: 800; text-transform: uppercase; }
-        nav.fill ul li a { position: relative; }
-
-        nav.fill ul li a:after { position: absolute; bottom: 0; left: 0; right: 0; margin: auto;
-            width: 0%; content: '.'; color: transparent; height: 1px; }
-
-        nav.fill ul li a:hover { z-index: 1; }
-
-        nav.fill ul li a:hover:after { z-index: -10; animation: fill 1s forwards;
-            -webkit-animation: fill 1s forwards; -moz-animation: fill 1s forwards; opacity: 1; }
-
-        label{font-size: 17px;}
-
-        .field-icon {z-index: 2;position: relative;margin-right: 8px;margin-top: -28px;float: right;}
-        .card{
-            margin-top: 30px;
-        }
-
-        @-webkit-keyframes fill {
-            0% { width: 0%; height: 1px; }
-            50% { width: 100%; height: 1px; }
-            100% { width: 100%; height: 100%; background: #6495ED; }
-        }
-        @media screen and (max-width: 730px) {
-            .pozadi {background-image: url({{ asset('images/pozadiMobily.png') }});height: 110vh;width: auto;
-                background-size: cover;background-position: center center;}
-        }
-        @media screen and (min-width: 730px) {
-            .pozadi {background-image: url({{ asset('images/pozadi.png') }});height: 95vh;width: auto;
-                background-size: cover;background-position: center center;}
-        }
-
     </style>
+    <title>Tozondo - Reset</title>
 </head>
-<body data-spy="scroll" data-target="#myScrollspy" data-offset="20" style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
-
-<!-- Menu-->
-<nav class="fill navbar sticky-top navbar-light navbar-expand-sm " style="background-color: #F5F5F5" id="myScrollspy">
+<!-- Pozadi webove stranky pochazi z https://www.toptal.com/designers/subtlepatterns/cloudy-day/, vytvorili Toptal Subtle Patterns -->
+<body style="background-image: url('{{ asset('/images/cloudy-day.png')}}');">
+<!-- Definice menu -->
+<nav class="navbar navbar-light navbar-expand-sm efektMenu" style="background-color: #F5F5F5;box-shadow: 0px 5px 1px #DCDCDC;">
     <!-- Sekce logo -->
-    <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 22px;margin-left: 20px;"> <img src="{{ URL::asset('images/logo.png') }}" height="25" width="30" /> | Tozondo</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#dropdownMenu">
+    <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 22px;margin-left: 20px;margin-top: -5px;"> <img src="{{ URL::asset('images/logo.png') }}" height="25" width="30"/> | Tozondo</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#rozbalovaciNabidka">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="dropdownMenu">
+    <div class="collapse navbar-collapse" id="rozbalovaciNabidka">
         <ul class="navbar-nav navbar-collapse justify-content-end">
-            <li class="nav-item"><a href="{{ route('company') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 15px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Přihlásit se</a> </li>
-            <li class="nav-item"><a href="{{ route('register') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 15px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >Registrovat se</a> </li>
+            <li class="nav-item"><a href="{{ route('renderCompanyLogin') }}" class="nav-link" style="font-family: 'Roboto', sans-serif;font-weight:bold;font-size: 15px;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >PŘIHLÁSIT SE</a> </li>
+            <li class="nav-item"><a href="{{ route('register') }}" class="nav-link" style="font-family: 'Roboto', sans-serif; font-size: 15px;font-weight:bold;padding-left:15px;padding-right:15px;padding-bottom:15px;padding-top:15px;" >REGISTROVAT SE</a> </li>
         </ul>
     </div>
 </nav>
+<!-- Definice obsahu -->
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card">
-                <div class="card-header text-center" style="font-size: 18px;background-color: #d9534f;color:white;">Resetování hesla</div>
-                <div class="card-body">
+            <div class="card" style="margin-top: 30px;">
+                <div class="card-header text-center" style="background-color: #d9534f;color:white;font-size: 23px;font-family: 'Pacifico', cursive;border-radius: 35px !important;">Resetování hesla</div>
+                <div class="card-body" style="padding-bottom: 30px;">
                     <center>
                     @if (session('status'))
                         <div class="alert alert-success" role="alert">
+                            <button type="button" class="close" data-dismiss="alert">x</button>
                             Ná váš email byl odeslán resetovací odkaz!
                         </div>
                     @endif
-
-                    <form method="POST" action="{{ route('password.email') }}">
+                    <!-- Definice formulare -->
+                    <form method="POST" style="padding-top: 7px;" action="{{ route('password.email') }}">
                         @csrf
                         <div class="form-group" style="margin-top: -20px;">
-                            <label for="email" class="col-md-4 col-form-label text-md-right"></label>
+                            <label for="email" class="col-md-4"></label>
                             <div class="col-md-8">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-envelope " aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-envelope"></i></div>
                                     </div>
-                                <input id="email" type="email" placeholder="Zadejte Váš email ..." class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ old('company_email') }}"  autocomplete="email" autofocus>
-
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        {{$message}}
-                                    </span>
-                                @enderror
+                                    <input id="email" type="email" placeholder="Zadejte Vaši emailovou adresu ..." class="form-control form-control-lg @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}"  autocomplete="on" autofocus>
+                                    @error('email')
+                                        <span class="invalid-feedback" role="alert">
+                                            {{$message}}
+                                        </span>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-3">
                                 <button type="submit" class="btn btn-danger">

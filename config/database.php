@@ -4,7 +4,7 @@ use Illuminate\Support\Str;
 
 return [
 
-    /*
+    /* Tento soubor je soucasti frameworku Laravel
     |--------------------------------------------------------------------------
     | Default Database Connection Name
     |--------------------------------------------------------------------------

@@ -7,6 +7,8 @@ use Illuminate\Support\ServiceProvider;
 
 class BroadcastServiceProvider extends ServiceProvider
 {
+    /* Tato trida je soucasti frameworku Laravel */
+
     /**
      * Bootstrap any application services.
      *

@@ -1,39 +1,45 @@
 @extends('layouts.employee_dashboard')
 @section('title') - Aktuální směny @endsection
 @section('content')
+    <!-- Nazev souboru: current_shifts_list.blade.php -->
+    <!-- Autor: Pavel Sklenář (xsklen12) -->
+    <!-- Tento soubor reprezentuje moznost "Aktuální směny" v ramci uctu s roli zamestnance -->
+    <!-- K inspiraci prace s datovymi tabulky slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020
+         Modalni okna viz dokumentace Bootstrap: https://getbootstrap.com/docs/4.0/components/modal/-->
     <center>
-        <br><br>
+        <br>
+        <!-- Usek kodu pro definici chybovych hlasek za pomoci Session -->
         <div class="col-lg-11 col-md-10 col-sm-10">
-            @if($message = Session::get('success'))
+            @if($zprava = Session::get('success'))
                 <div class="alert alert-success alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
-            @if($message = Session::get('fail'))
+            @if($zprava = Session::get('fail'))
                 <div class="alert alert-danger alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
+            <!-- Usek kodu pro zobrazeni chybovych hlasek pri spatnem zapisu prichodu ci odchodu -->
             <div class="attendancesuccess text-center">
             </div>
             <div class="attendancesfail text-center">
             </div>
-            <div class="flash-message text-center">
-            </div>
-            <table class="table-responsive employee_current_shift_list">
+            <!-- Usek kodu pro definici tabulky, do ktere budou pridany jednotlive zaznamy -->
+            <table class="employee_current_shifts_table">
                 <thead>
-                <tr>
-                    <th width="5%">Začátek</th>
-                    <th width="5%">Konec</th>
-                    <th width="5%">Lokace</th>
-                    <th width="4%">Důležitost</th>
-                    <th width="5%">Příchod</th>
-                    <th width="5%">Odchod</th>
-                    <th width="5%">Status</th>
-                    <th width="5%">Akce</th>
-                </tr>
+                    <tr>
+                        <th width="12.5%">Začátek</th>
+                        <th width="12.5%">Konec</th>
+                        <th width="12.5%">Lokace</th>
+                        <th width="12.5%">Důležitost</th>
+                        <th width="12.5%">Příchod</th>
+                        <th width="12.5%">Odchod</th>
+                        <th width="12.5%">Status</th>
+                        <th width="12.5%">Akce</th>
+                    </tr>
                 </thead>
                 <tbody>
                 </tbody>
@@ -41,61 +47,60 @@
         </div>
     </center>
 
-    <!-- Editace smeny -->
-    <div class="modal fade" id="CurrentShiftDetailModal">
+    <!-- Modalni okno slouzici pro nahled detailu smeny -->
+    <div class="modal fade" id="CurrentShiftDetailForm">
         <div class="modal-dialog" style="max-width: 750px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h4 class="modal-title" style="color:white;">Detail směny</h4>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color:#4aa0e6;">Detail směny</h4>
+                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body" style="color:white;">
                     <div class="chyby alert alert-danger" style="text-decoration: none;">
                     </div>
-                    <div id="CurrentShiftDetailBody">
+                    <div id="CurrentShiftDetailContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalClose modelClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna modelClose" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Potvrzení checkin smeny -->
-    <div id="confirmCheckinModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro potvrzení prichodu na smenu -->
+    <div id="confirmCheckinForm" class="modal fade" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení příchodu</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení příchodu</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete zapsat příchod?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu si přejete zapsat příchod?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="ok_button" style="color:white;" id="SubmitconfirmCheckin" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" style="color:white;" id="SubmitconfirmCheckin" class="btn tlacitkoPotvrzeniOkna">Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- Potvrzení checkout smeny -->
-    <div id="confirmCheckoutModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro potvrzení odchodu ze smeny -->
+    <div id="confirmCheckoutForm" class="modal fade" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení odchodu</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení odchodu</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete zapsat odchod?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu si přejete zapsat odchod?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="ok_button" style="color:white;" id="SubmitconfirmCheckout" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" style="color:white;" id="SubmitconfirmCheckout" class="btn tlacitkoPotvrzeniOkna"  >Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
@@ -103,191 +108,138 @@
 
     <script type="text/javascript">
         $(document).ready(function(){
-            $('.chyby_add').hide();
+            /* K inspiraci prace s datovymi tabulkami slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020 */
+
+            /* Implicitni schovani chyb uzivateli pri nacteni stranky */
             $('.chyby').hide();
-            /* Zobrazení datatable */
-            var datatable = $('.employee_current_shift_list').DataTable({
-                processing: true,
+
+            /* Nastaveni zobrazeni datove tabulky a odeslani do controlleru za pomoci AJAX pozadavku
+               Odkaz na yajra datove tabulky: https://yajrabox.com/docs/laravel-datatables/master/installation
+               Odkaz na datove tabulky jQuery: https://datatables.net/ a manual k nim https://datatables.net/manual/ a jednotlive moznosti k nim https://datatables.net/reference/option/.
+               K prepsani pravidel pro datovou tabulku slouzila tato dokumentace https://legacy.datatables.net/usage/i18n.
+           */
+            $('.employee_current_shifts_table').DataTable({
                 serverSide: true,
-                responsive: true,
-                scrollX: true,
-                scrollY: false,
+                paging: true,
                 autoWidth: true,
-                jQueryUI: true,
-                scrollCollapse: true,
-                oLanguage: {
-                    "sSearch": "",
-                },
+                pageLength: 15,
+                scrollX: true,
+                oLanguage: {"sSearch": "", sZeroRecords: "Nebyla nalezena žádná směna."},
                 language: {
-                    searchPlaceholder: "Vyhledávání ... ",
-                    emptyTable: "Nemáte zaevidované žádné aktuální směny.",
-                    paginate: {
-                        previous: "Předchozí",
-                        next: "Další",
-                    }
+                    searchPlaceholder: "Vyhledávání ...",
+                    emptyTable: "Nemáte žádné aktuální směny.",
+                    paginate: { previous: "Předchozí", next: "Další"}
                 },
-                bLengthChange: false,
-                paging: false,
                 bInfo: false,
-                order: [[ 0, "asc" ]],
-                dom: '<"pull-left"f><"pull-right"l>tip',
-                ajax: "{{ route('shifts.getCurrentEmployeeShiftsList') }}",
-                columns: [
-                    { data: 'shift_start', name: 'shift_start', render: function(data, type, full, meta){
-                            return moment(data).format('DD.MM.YYYY HH:mm');
-                        },sClass:'text-center',},
-                    { data: 'shift_end', name: 'shift_end',render: function(data, type, full, meta){
-                            return moment(data).format('DD.MM.YYYY HH:mm');
+                bLengthChange: false,
+                order: [[0, "asc"]],
+                ajax: "{{ route('shifts.getCurrentEmployeeShiftsList') }}", // smerovani ajax pozadavku viz. https://datatables.net/reference/option/ajax
+                columns: [ // definice dat (viz https://datatables.net/manual/data/)
+                    {data: 'shift_start', name: 'shift_start', render: function(odpoved){ // viz https://datatables.net/reference/option/columns.render
+                            return moment(odpoved).format('DD.MM.YYYY HH:mm'); // zmena formatu datumu pomoci knihovny moment, protoze yajra datove tabulky nepodporuji format DD.MM.YYYY HH:mm  tak bylo zapotrebi vyrenderovat tento format az na klientske strane
+                        },sClass:'text-center',}, // knihovna moment viz https://momentjs.com/
+                    {data: 'shift_end', name: 'shift_end',render: function(odpoved){
+                            return moment(odpoved).format('DD.MM.YYYY HH:mm');
                         },sClass:'text-center'},
-                    { data: 'shift_place', name: 'shift_place',sClass:'text-center'},
-                    { data: 'shift_importance_id', name: 'shift_importance_id',sClass:'text-center'},
-                    { data: 'attendance_check_in', name: 'attendance_check_in', render: function(data, type, full, meta){
-                            var date = moment(data).format('DD.MM.YYYY HH:mm');
-                            if(date === "Invalid date"){
+                    {data: 'shift_place', name: 'shift_place',sClass:'text-center'},
+                    {data: 'shift_importance_id', name: 'shift_importance_id',sClass:'text-center'}, // atribut sClass viz. https://legacy.datatables.net/usage/columns
+                    {data: 'attendance_check_in', name: 'attendance_check_in', render: function(data){
+                            var date = moment(data).format('DD.MM.YYYY HH:mm'); // zmena formatu datumu pomoci knihovny moment
+                            if(date === "Invalid date"){ // pokud neni prichod zapsan
                                 return "Nezapsáno";
-                            }else{
-                                return date;
-                            }
+                            }else{ return date; }
                         },sClass:'text-center',},
-                    { data: 'attendance_check_out', name: 'attendance_check_out', render: function(data, type, full, meta){
-                            var date = moment(data).format('DD.MM.YYYY HH:mm');
-                            if(date === "Invalid date"){
+                    {data: 'attendance_check_out', name: 'attendance_check_out', render: function(data){
+                            var date = moment(data).format('DD.MM.YYYY HH:mm'); // zmena formatu datumu pomoci knihovny moment
+                            if(date === "Invalid date"){ // pokud neni odchod zapsan
                                 return "Nezapsáno";
-                            }else{
-                                return date;
-                            }
+                            }else{ return date; }
                         },sClass:'text-center',},
-                    { data: 'reason_description', name: 'reason_description',sClass:'text-center'},
-                    { data: 'action', name: 'action', orderable: false,searchable: false,sClass:'text-center'},
+                    {data: 'reason_description', name: 'reason_description',sClass:'text-center'},
+                    {data: 'action', name: 'action', orderable: false,searchable: false,sClass:'text-center'},
                 ]
             });
 
-            /* Nahled do detailu smeny */
-            $('.modelClose').on('click', function(){
-                $('#EditShiftCurrentModal').hide();
-            });
-            var id;
-            $('body').on('click', '#getDetailsCurrentShift', function(e) {
-                $('.chyby').html('');
-                $('.chyby').hide();
-                id = $(this).data('id');
-                $.ajax({
-                    url: "/employee/currentshiftActions/"+id,
+
+            /* Zobrazeni detailu smeny po stisknuti tlacitka "Detail" */
+            var id_smeny;
+            $('body').on('click', '#obtainDetailsCurrentShift', function() {
+                id_smeny = $(this).data('id');
+                $.ajax({ // nastaveni a odeslani AJAX pozadavku viz. https://datatables.net/reference/option/ajax
+                    url: "/employee/currentshiftActions/"+id_smeny,
                     method: 'GET',
-                    success: function(result) {
-                        console.log(result);
-                        $('#CurrentShiftDetailBody').html(result.html);
-                        $('#CurrentShiftDetailModal').show();
+                    success: function(odpoved) { // zobrazeni dat do modalniho okna po provedeni ajax pozadavku
+                        $('#CurrentShiftDetailContent').html(odpoved.out);
+                        $('#CurrentShiftDetailForm').show();
                     }
                 });
             });
 
-            /* ziskani ID smeny */
+            /* ziskani ID smeny pri zmacknuti tlacitka "Příchod" */
             var smena_id;
-            $('body').on('click', '#updateCheckinEmployee', function(e) {
-                $('.chyby').html('');
+            $('body').on('click', '#updateCheckinEmployee', function() {
+                $('.chyby').html(''); // vymazani chyb a jejich nasledovne schovani
                 $('.chyby').hide();
-                smena_id = $(this).data('id');
+                smena_id = $(this).data('id'); // ziskani id smeny
             });
 
-            /* Ulozeni check-in*/
-            $('#SubmitconfirmCheckin').click(function(e) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni prichodu zamestnance do databaze */
+            $('#SubmitconfirmCheckin').click( function() {
                 $.ajax({
                     url: "/employee/checkin/update/"+smena_id,
                     method: 'PUT',
-                    data: {
-                        shift_id: smena_id,
-                    },
-                    beforeSend:function(){
-                        $('#SubmitconfirmCheckin').text('Zapisování...');
-                    },
-                    success: function(data) {
-                        if(data.errors) {
-                            $('#SubmitconfirmCheckin').text('Zapsat');
-                        } else {
-                            $('.employee_current_shift_list').DataTable().ajax.reload();
-                            if(data.success !== undefined){
-                                var successHtml = '<div class="alert alert-success">'+
-                                    '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                    '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                    '</div>';
-                                $('.attendancesuccess').html(successHtml);
-                            }
-                            if(data.fail !== undefined){
-                                var failHtml = '<div class="alert alert-danger">'+
-                                    '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                    '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                                    '</div>';
-                                $('.attendancesfail').html(failHtml);
-                            }
-
-
-
-                            $('#SubmitconfirmCheckin').text('Zapsat');
-                            $("#confirmCheckinModal").modal('hide');
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
+                    data: { shift_id: smena_id },
+                    beforeSend:function(){ $('#SubmitconfirmCheckin').text('Zapisování...'); }, // zmena textu pred odeslanim
+                    success: function(odpoved) { // zpracovani odpovedi
+                        if (!(odpoved.fail)) {
+                            var successHtml = '<div class="alert alert-success">'+
+                                '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.success + '</strong></div>';
+                            $('.attendancesuccess').html(successHtml);
+                        }else{
+                            var failHtml = '<div class="alert alert-danger">'+
+                                '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong> '+ odpoved.fail + '</strong></div>';
+                            $('.attendancesfail').html(failHtml);
                         }
+                        $('.employee_current_shifts_table').DataTable().ajax.reload();
+                        $('#SubmitconfirmCheckin').text('Zapsat');
+                        $("#confirmCheckinForm").modal('hide');
                     }
                 });
             });
 
-            /* ziskani ID smeny */
-            $('body').on('click', '#updateCheckoutEmployee', function(e) {
+            /* ziskani ID smeny pri zmacknuti tlacitka "Odchod" */
+            $('body').on('click', '#updateCheckoutEmployee', function() {
                 $('.chyby').html('');
-                $('.chyby').hide();
-                smena_id = $(this).data('id');
+                $('.chyby').hide(); // vymazani chyb a jejich nasledovne schovani
+                smena_id = $(this).data('id'); // ziskani id smeny
             });
 
-            /* Ulozeni check-out */
-            $('#SubmitconfirmCheckout').click(function(e) {
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
+            /* Ulozeni odchodu zamestnance do databaze */
+            $('#SubmitconfirmCheckout').click(function() {
                 $.ajax({
                     url: "/employee/checkout/update/"+smena_id,
                     method: 'PUT',
-                    data: {
-                        shift_id: smena_id,
-                    },
-                    beforeSend:function(){
-                        $('#SubmitconfirmCheckout').text('Zapisování...');
-                    },
-                    success: function(data) {
-                        if(data.errors) {
-                            $('#SubmitconfirmCheckout').text('Zapsat');
-                        } else {
-                            $('.employee_current_shift_list').DataTable().ajax.reload();
-                            if(data.success !== undefined){
-                                var successHtml = '<div class="alert alert-success">'+
-                                    '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                    '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                    '</div>';
-                                $('.attendancesuccess').html(successHtml);
-                            }
-                            if(data.fail !== undefined){
-                                var failHtml = '<div class="alert alert-danger">'+
-                                    '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                    '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                                    '</div>';
-                                $('.attendancesfail').html(failHtml);
-                            }
-
-
-
-                            $('#SubmitconfirmCheckout').text('Zapsat');
-                            $("#confirmCheckoutModal").modal('hide');
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
+                    data: { shift_id: smena_id },
+                    beforeSend:function(){ $('#SubmitconfirmCheckout').text('Zapisování...'); }, // zmena textu pred odeslanim
+                    success: function(odpoved) { // zpracovani odpovedi
+                        if (!(odpoved.fail)) {
+                            var successHtml = '<div class="alert alert-success">'+
+                                '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.success + '</strong></div>';
+                            $('.attendancesuccess').html(successHtml);
+                        }else{
+                            var failHtml = '<div class="alert alert-danger">'+
+                                '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong> '+ odpoved.fail + '</strong></div>';
+                            $('.attendancesfail').html(failHtml);
                         }
+                        $('.employee_current_shifts_table').DataTable().ajax.reload();
+                        $('#SubmitconfirmCheckout').text('Zapsat');
+                        $("#confirmCheckoutForm").modal('hide');
                     }
                 });
             });
 
-
-            });
-        </script>
+        });
+    </script>
 @endsection

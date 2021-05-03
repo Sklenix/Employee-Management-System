@@ -10,10 +10,10 @@ use Illuminate\Support\Facades\Route;
 
 class RouteServiceProvider extends ServiceProvider
 {
+    /* Tato trida je soucasti frameworku Laravel */
+
     /**
      * The path to the "home" route for your application.
-     *
-     * This is used by Laravel authentication to redirect users after login.
      *
      * @var string
      */

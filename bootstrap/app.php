@@ -16,6 +16,7 @@ $app = new Illuminate\Foundation\Application(
 );
 
 /*
+ * Tento soubor je soucasti frameworku Laravel
 |--------------------------------------------------------------------------
 | Bind Important Interfaces
 |--------------------------------------------------------------------------

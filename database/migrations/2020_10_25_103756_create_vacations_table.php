@@ -4,15 +4,15 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVacationsTable extends Migration
-{
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
+class CreateVacationsTable extends Migration {
+    /* Nazev souboru: CreateVacationsTable.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato migrace slouzi pro vytvoreni tabulky pro evidenci dovolenych danych zamestnancu firem
+       Migrace detailneji: https://laravel.com/docs/8.x/migrations.
+    */
+
+    /* Definice tabulky (pro vytvoreni) */
+    public function up(){
         Schema::create('table_vacations', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id('vacation_id');
@@ -29,13 +29,8 @@ class CreateVacationsTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
+    /* Odstraneni tabulky */
+    public function down(){
         Schema::dropIfExists('table_vacations');
     }
 }

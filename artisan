@@ -3,7 +3,7 @@
 
 define('LARAVEL_START', microtime(true));
 
-/*
+/* Soucasti frameworku Laravel
 |--------------------------------------------------------------------------
 | Register The Auto Loader
 |--------------------------------------------------------------------------

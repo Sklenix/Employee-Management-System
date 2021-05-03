@@ -1,33 +1,41 @@
 @extends('layouts.employee_dashboard')
 @section('title') - Dovolené @endsection
 @section('content')
+    <!-- Nazev souboru: vacations_list.blade.php -->
+    <!-- Autor: Pavel Sklenář (xsklen12) -->
+    <!-- Tento soubor reprezentuje moznost "Centrum dovolených" v ramci uctu s roli zamestnance -->
+    <!-- K inspiraci prace s datovymi tabulky slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020
+         Modalni okna viz dokumentace Bootstrap: https://getbootstrap.com/docs/4.0/components/modal/ -->
     <center>
-        <br><br>
+        <br>
         <div class="col-lg-11 col-md-10 col-sm-10">
-            @if($message = Session::get('success'))
+            <!-- Usek kodu pro definici hlasek za pomoci Session -->
+            @if($zprava = Session::get('success'))
                 <div class="alert alert-success alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
-            @if($message = Session::get('fail'))
+            @if($zprava = Session::get('fail'))
                 <div class="alert alert-danger alert-block">
                     <button type="button" class="close" data-dismiss="alert">x</button>
-                    <strong>{{$message}}</strong>
+                    <strong>{{$zprava}}</strong>
                 </div>
             @endif
+            <!-- Tento div slouzi k zobrazeni chyb v ramci AJAXovych pozadavku -->
             <div class="flash-message text-center">
             </div>
-            <table class="table-responsive vacation-list">
+            <!-- Usek kodu pro definici tabulky -->
+            <table class="employee_vacations_table">
                 <thead>
-                <tr>
-                    <th width="8%">Od</th>
-                    <th width="8%">Do</th>
-                    <th width="20%">Poznámka</th>
-                    <th width="7%">Aktuálnost</th>
-                    <th width="7%">Stav</th>
-                    <th width="13%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button"  data-toggle="modal" data-target="#CreateVacationModal"><i class="fa fa-plus-square-o" aria-hidden="true"></i> Vytvořit</button></th>
-                </tr>
+                    <tr>
+                        <th width="14%">Od</th>
+                        <th width="14%">Do</th>
+                        <th width="31%">Poznámka</th>
+                        <th width="13%">Aktuálnost</th>
+                        <th width="13%">Stav</th>
+                        <th width="15%">Akce <button style="float:right;font-weight: 200;" class="btn btn-primary btn-md" type="button"  data-toggle="modal" data-target="#VacationCreateForm"><i class="fa fa-plus-square-o"></i> Vytvořit</button></th>
+                    </tr>
                 </thead>
                 <tbody>
                 </tbody>
@@ -35,14 +43,13 @@
         </div>
     </center>
 
-    <!-- Pridani dovolene !-->
-    <div class="modal fade" id="CreateVacationModal" style="color:white;">
+    <!-- Modalni okno slouzici pro vytvareni dovolene -->
+    <div class="modal fade" id="VacationCreateForm" style="color:white;">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                         <span class="col-md-12 text-center">
-                              <h4 class="modal-title" id="modal_title" style="color:#4aa0e6;">Přidat novou dovolenou</h4>
-                         </span>
+                      <h4 class="modal-title" id="modal_title" style="color:#4aa0e6;">Vytvořit novou dovolenou</h4>
+                      <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger chyby_add" role="alert">
@@ -52,63 +59,62 @@
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left">Datum od (<span class="text-danger">*</span>)</label>
+                            <label for="zacatek_dovolene" class="col-md-2 text-left">Datum od (<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
-                                    <input type="datetime-local" class="form-control" name="zacatek_dovolene" id="zacatek_dovolene" value="{{ old('zacatek_dovolene') }}" autocomplete="zacatek_dovolene" autofocus>
+                                    <input type="datetime-local" class="form-control" placeholder="Zadejte datum ve formátu YYYY-mm-dd H:i" name="zacatek_dovolene" id="zacatek_dovolene" autocomplete="on" autofocus>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left">Datum do (<span class="text-danger">*</span>)</label>
+                            <label for="konec_dovolene" class="col-md-2 text-left">Datum do (<span class="text-danger">*</span>)</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-calendar" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
-                                    <input type="datetime-local" class="form-control" name="konec_dovolene" id="konec_dovolene" value="{{ old('konec_dovolene') }}" autocomplete="konec_dovolene" autofocus>
+                                    <input type="datetime-local" class="form-control" placeholder="Zadejte datum ve formátu YYYY-mm-dd H:i" name="konec_dovolene" id="konec_dovolene" autocomplete="on">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <label class="col-md-2 text-left">Poznámka</label>
+                            <label for="poznamka" class="col-md-2 text-left">Poznámka</label>
                             <div class="col-md-10">
                                 <div class="input-group">
                                     <div class="input-group-prepend">
-                                        <div class="input-group-text"><i class="fa fa-sticky-note-o" aria-hidden="true"></i></div>
+                                        <div class="input-group-text"><i class="fa fa-sticky-note-o"></i></div>
                                     </div>
-                                    <textarea placeholder="Zadejte poznámku k dovolené..." name="poznamka" id="poznamka" class="form-control" autocomplete="poznamka"></textarea>
+                                    <textarea placeholder="Zadejte poznámku k dovolené [maximálně 180 znaků]..." name="poznamka" id="poznamka" class="form-control" autocomplete="on"></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
-
                     @csrf
                 </div>
                 <div class="modal-footer">
                     <div class="col-md-12 text-center">
-                        <input type="submit" name="button_action" id="SubmitCreateVacation" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalSuccess" value="Přidat dovolenou" />
-                        <button type="button" style="color:rgba(255, 255, 255, 0.90);" class="btn btn-modalClose" data-dismiss="modal">Zavřít</button>
+                        <input type="submit" id="SubmitCreateVacation" style="color:rgba(255, 255, 255, 0.90);" class="btn tlacitkoPotvrzeniOkna" value="Vytvořit dovolenou"/>
+                        <button type="button" style="color:rgba(255, 255, 255, 0.90);" class="btn tlacitkoZavreniOkna" data-dismiss="modal">Zavřít</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Editace dovolene -->
-    <div class="modal fade" id="EditVacationModal">
+    <!-- Modalni okno slouzici pro editaci dovolene -->
+    <div class="modal fade" id="EditVacationForm">
         <div class="modal-dialog" style="max-width: 750px;">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h4 class="modal-title" style="color:white;">Detail dovolené</h4>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title" style="color:#4aa0e6;">Detail dovolené</h4>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body" style="color:white;">
                     <div class="alert alert-danger" role="alert" style="font-size: 16px;">
@@ -116,73 +122,73 @@
                     </div>
                     <div class="chyby alert alert-danger" style="text-decoration: none;">
                     </div>
-                    <div id="EditVacationModalBody">
+                    <div id="VacationEditContent">
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn btn-modalSuccess" style="color:white;" id="SubmitEditVacationForm">Aktualizovat</button>
-                    <button type="button" class="btn btn-modalClose modelClose" style="color:white;" data-dismiss="modal">Zavřít</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="SubmitEditVacationForm">Aktualizovat</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Smazani dovolene -->
-    <div id="DeleteVacationModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro odstranovani dovolene -->
+    <div id="DeleteVacationForm" class="modal fade" style="color:white;">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení smazání dovolené</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení smazání dovolené</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete smazat tuto dovolenou?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu si přejete smazat tuto dovolenou?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="SubmitDeleteVacation" style="color:white;" id="SubmitDeleteVacation" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" name="SubmitDeleteVacation" style="color:white;" id="SubmitDeleteVacation" class="btn tlacitkoPotvrzeniOkna"  >Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Zazadat dovolenou -->
-    <div id="ApplyVacationModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro zazadani o dovolenou -->
+    <div id="ApplyVacationForm" class="modal fade" style="color:white;" role="dialog">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení žádosti o dovolenou</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení žádosti o dovolenou</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
                     <div class="chyby_apply" style="text-decoration: none;">
                     </div>
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu chcete zažádat o tuto dovolenou?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu chcete zažádat o tuto dovolenou?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="SubmitApply" style="color:white;" id="SubmitApply" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" name="SubmitApply" style="color:white;" id="SubmitApply" class="btn tlacitkoPotvrzeniOkna"  >Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Zrusit zadost dovolene -->
-    <div id="DeleteApplyVacationModal" class="modal fade" style="color:white;" role="dialog">
+    <!-- Modalni okno slouzici pro zruseni zadosti o dovolenou -->
+    <div id="DeleteApplyVacationForm" class="modal fade" style="color:white;" role="dialog">
         <div class="modal-dialog">
-            <div class="modal-content">
+            <div class="modal-content oknoBarvaPozadi">
                 <div class="modal-header">
-                    <h5 class="modal-title">Potvrzení zrušení žádosti o dovolenou</h5>
-                    <button type="button" class="close modelClose" style="color:white;" data-dismiss="modal">&times;</button>
+                    <h5 class="modal-title" style="color:#4aa0e6;">Potvrzení zrušení žádosti o dovolenou</h5>
+                    <button type="button" class="close" style="color:white;" data-dismiss="modal">x</button>
                 </div>
                 <div class="modal-body">
                     <div class="chyby_delete_apply" style="text-decoration: none;">
                     </div>
-                    <p align="center" style="margin:0;font-size: 16px;">Opravdu si přejete zrušit žádost o tuto dovolenou?</p>
+                    <p align="center" style="margin:0;font-size: 16px;color:#4aa0e6;">Opravdu si přejete zrušit žádost o tuto dovolenou?</p>
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" name="SubmitDeleteApply" style="color:white;" id="SubmitDeleteApply" class="btn btn-modalSuccess"  >Ano</button>
-                    <button type="button" class="btn btn-modalClose" style="color:white;" data-dismiss="modal">Ne</button>
+                    <button type="button" name="SubmitDeleteApply" style="color:white;" id="SubmitDeleteApply" class="btn tlacitkoPotvrzeniOkna"  >Ano</button>
+                    <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Ne</button>
                 </div>
             </div>
         </div>
@@ -190,302 +196,243 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        $('#CreateVacationModal').on('hidden.bs.modal', function () {
+        /* K inspiraci prace s datovymi tabulkami slouzil clanek https://www.laravelcode.com/post/laravel-8-ajax-crud-with-yajra-datatable-and-bootstrap-model-validation-example, ktery napsal Harsukh Makwana v roce 2020,
+              pro inspiraci prace  s modalnimi okny (udalosti) slouzil clanek https://www.tutorialspoint.com/hidden-bs-modal-Bootstrap-Event, ktery napsal David Meador v roce 2018 */
+
+        /* Usek kodu starajici se o schovani chybovych hlaseni pri zavreni modalniho okna, inspirace z: https://www.tutorialspoint.com/hidden-bs-modal-Bootstrap-Event */
+        $('#VacationCreateForm').on('hidden.bs.modal', function () {
             $('.chyby_add').hide();
-            $('#zacatek_dovolene').val('');
-            $('#konec_dovolene').val('');
-            $('#poznamka').val('');
         })
 
-        $('#EditVacationModal').on('hidden.bs.modal', function () {
+        $('#EditVacationForm').on('hidden.bs.modal', function () {
             $('.chyby').hide();
         })
 
-        $('#ApplyVacationModal').on('hidden.bs.modal', function () {
+        $('#ApplyVacationForm').on('hidden.bs.modal', function () {
             $('.chyby_apply').hide();
         })
 
-        $('#DeleteApplyVacationModal').on('hidden.bs.modal', function () {
+        $('#DeleteApplyVacationForm').on('hidden.bs.modal', function () {
             $('.chyby_delete_apply').hide();
         })
 
+        /* Usek kodu pro schovani chybovych hlaseni pri nacteni webove stranky */
         $('.chyby_add').hide();
         $('.chyby').hide();
         $('.chyby_apply').hide();
         $('.chyby_delete_apply').hide();
 
-        /* Zobrazení datatable */
-        var dataTable = $('.vacation-list').DataTable({
-            processing: true,
+        /* Nastaveni zobrazeni datove tabulky a odeslani do controlleru za pomoci AJAX pozadavku
+             Odkaz na yajra datove tabulky: https://yajrabox.com/docs/laravel-datatables/master/installation
+             Odkaz na datove tabulky jQuery: https://datatables.net/ a manual k nim https://datatables.net/manual/ a jednotlive moznosti k nim https://datatables.net/reference/option/.
+             K prepsani pravidel pro datovou tabulku slouzila tato dokumentace https://legacy.datatables.net/usage/i18n.*/
+        $('.employee_vacations_table').DataTable({
             serverSide: true,
-            responsive: true,
-            scrollX: true,
+            paging: true,
             autoWidth: true,
-            jQueryUI: true,
-            scrollCollapse: true,
-            oLanguage: {
-                "sSearch": "",
-            },
+            pageLength: 15,
+            scrollX: true,
+            oLanguage: {"sSearch": "", sZeroRecords: "Nebyla nalezena žádná dovolená."},
             language: {
                 searchPlaceholder: "Vyhledávání ... ",
-                emptyTable: "Nemáte zaevidované žádné dovolené.",
-                paginate: {
-                    previous: "Předchozí",
-                    next: "Další",
-                }
+                emptyTable: "Nemáte zaevidovanou žádnou dovolenou.",
+                paginate: { previous: "Předchozí", next: "Další"}
             },
-            bLengthChange: false,
-            paging: false,
             bInfo: false,
+            bLengthChange: false,
             order: [[0, "asc"]],
-            dom: '<"pull-left"f><"pull-right"l>tip',
-            ajax: "{{ route('employee_vacations.list') }}",
-            columns: [
-                { data: 'vacation_start', name: 'vacation_start', render: function(data, type, full, meta){
-                        return moment(data).format('DD.MM.YYYY HH:mm');
-                    },sClass:'text-center',},
-                { data: 'vacation_end', name: 'vacation_end', render: function(data, type, full, meta){
-                        return moment(data).format('DD.MM.YYYY HH:mm');
-                    },sClass:'text-center',},
+            ajax: "{{ route('employee_vacations.list') }}", // smerovani ajax pozadavku viz. https://datatables.net/reference/option/ajax
+            columns: [ // definice dat (viz https://datatables.net/manual/data/)
+                {data: 'vacation_start', name: 'vacation_start', render: function(odpoved){ return moment(odpoved).format('DD.MM.YYYY HH:mm');}, sClass:'text-center'}, // viz https://datatables.net/reference/option/columns.render
+                {data: 'vacation_end', name: 'vacation_end', render: function(odpoved){ return moment(odpoved).format('DD.MM.YYYY HH:mm');}, sClass:'text-center'}, // zmena formatu datumu pomoci knihovny moment (https://momentjs.com/)
                 {data: 'vacation_note', name: 'vacation_note', sClass: 'text-center', orderable: false, searchable: false},
                 {data: 'vacation_actuality', name: 'vacation_actuality', sClass: 'text-center'},
-                {data: 'vacation_state', name: 'vacation_state', sClass: 'text-center'},
+                {data: 'vacation_state', name: 'vacation_state', sClass: 'text-center'}, // atribut sClass viz. https://legacy.datatables.net/usage/columns
                 {data: 'action', name: 'action', orderable: false, searchable: false, sClass: 'text-center'},
             ]
         });
 
-
-        /* Vytvoreni dovolene */
-        $('#SubmitCreateVacation').click(function(e) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+        /* Po stisknuti tlacitka "Vytvořit dovolenou" dojde k pridani nemocenske do databaze */
+        $('#SubmitCreateVacation').click( function() {
             $.ajax({
                 url: "{{ route('VacationActionsEmployee.store') }}",
                 method: 'POST',
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani
                 data: {
                     zacatek_dovolene: $('#zacatek_dovolene').val(),
                     konec_dovolene: $('#konec_dovolene').val(),
                     poznamka: $('#poznamka').val(),
                 },
-                success: function(result) {
-                    if(result.errors) {
-                        $('.chyby_add').html('');
-                        $.each(result.errors, function(key, value) {
-                            $('.chyby_add').show();
-                            $('.chyby_add').append('<strong><li>'+value+'</li></strong>');
-                        });
-                    } else {
+                beforeSend:function(){$('#SubmitCreateVacation').text('Vytváření...');},
+                success: function(odpoved) {
+                    if(odpoved.success) {
+                        /* Smazani hodnot do puvodniho stavu */
                         $('.chyby_add').hide();
                         $('#zacatek_dovolene').val('');
                         $('#konec_dovolene').val('');
                         $('#poznamka').val('');
-                        $('.vacation-list').DataTable().ajax.reload();
-                        var succadd = '<div class="alert alert-success">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ result.success +
-                            '</div>';
-                        $('.flash-message').html(succadd);
-                        $('#CreateVacationModal').modal('hide');
-                    }
-                }
-            });
-        });
-
-
-        /* Nahled do detailu dovolene */
-        $('.modelClose').on('click', function(){
-            $('#EditVacationModal').hide();
-        });
-        var id;
-        $('body').on('click', '#getEditVacationData', function(e) {
-            id = $(this).data('id');
-            $.ajax({
-                url: "/employee/VacationActionsEmployee/"+id+"/edit",
-                method: 'GET',
-                success: function(result) {
-                    console.log(result);
-                    $('#EditVacationModalBody').html(result.html);
-                    $('#EditVacationModal').show();
-                }
-            });
-        });
-
-        /* Ulozeni hodnot detailu dovolene */
-        $('#SubmitEditVacationForm').click(function(e) {
-            e.preventDefault();
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-            $.ajax({
-                url: "/employee/VacationActionsEmployee/"+id,
-                method: 'PUT',
-                data: {
-                    vacation_start_edit: $('#vacation_start_edit').val(),
-                    vacation_end_edit: $('#vacation_end_edit').val(),
-                    vacation_note_edit: $('#vacation_note_edit').val(),
-                },
-                beforeSend:function(){
-                    $('#SubmitEditVacationForm').text('Aktualizace...');
-                },
-                success: function(data) {
-                    if(data.fail) {
-                        $('.chyby').hide();
-                        $('.chyby').html('');
-                        var failHtml = '<div class="alert alert-danger">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                            '</div>';
-                        $('.flash-message').html(failHtml);
-                        $('#SubmitEditVacationForm').text('Aktualizovat');
-                        $("#EditVacationModal").modal('hide');
-                    }else if(data.errors) {
-                        $('.chyby').show();
-                        $('.chyby').html('');
-                        $('#SubmitEditVacationForm').text('Aktualizovat');
-                        $.each(data.errors, function(key, value) {
-                            $('.chyby').append('<strong><li>'+value+'</li></strong>');
-                        });
+                        $('.employee_vacations_table').DataTable().ajax.reload();
+                        /* Definice zpravy o uspechu akce */
+                        var successAdd = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong> </div>';
+                        $('.flash-message').html(successAdd); // vlozeni do flash-message
+                        $('#VacationCreateForm').modal('hide'); // schovani modalniho okna
                     } else {
-                        $('.vacation-list').DataTable().ajax.reload();
-                        var succ;
-                        if(data.success != "0"){
-                            succ = '<div class="alert alert-success">'+
-                                '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                                '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                                '</div>';
+                        $('#SubmitCreateVacation').text('Vytvořit dovolenou'); // zmena textu na puvodni
+                        $('.chyby_add').html(''); // vyresetovani chybovych hlasek
+                        /* Iterace skrze chyby a postupne pridavani jich do elementu chyby_add */
+                        odpoved.fail.forEach(function (polozka){
+                            $('.chyby_add').append('<strong>'+polozka+'</strong><br>');
+                        });
+                        /* Zobrazeni chyb */
+                        $('.chyby_add').show();
+                    }
+                }
+            });
+        });
+
+        /* Zobrazeni profilu dovolene po stisknuti tlacitka "Editovat" */
+        var id_dovolene;
+        $('body').on('click', '#obtainEditVacationData', function() {
+            id_dovolene = $(this).data('id');
+            $.ajax({
+                url: "/employee/VacationActionsEmployee/"+id_dovolene+"/edit",
+                method: 'GET',
+                success: function(odpoved) {
+                    $('#VacationEditContent').html(odpoved.out); // vlozeni obsahu do okna
+                    $('#EditVacationForm').show(); // zobrazeni okna
+                }
+            });
+        });
+
+        /* Ulozeni hodnot v profilu dovolene do databaze */
+        $('#SubmitEditVacationForm').click( function() {
+            $.ajax({
+                url: "/employee/VacationActionsEmployee/"+id_dovolene,
+                method: 'PUT',
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
+                data: {
+                    zacatek_dovolene: $('#vacation_start_edit').val(),
+                    konec_dovolene: $('#vacation_end_edit').val(),
+                    poznamka: $('#vacation_note_edit').val(),
+                },
+                beforeSend:function(){ $('#SubmitEditVacationForm').text('Aktualizace...'); }, // zobrazeni textu po zakliknuti tlacitka
+                success: function(odpoved) { // zpracovani odpovedi
+                    if(odpoved.success) {
+                        $('.employee_vacations_table').DataTable().ajax.reload();
+                        var successUpdate;
+                        if(odpoved.success != "0"){
+                            successUpdate = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.success + '</strong></div>';
                         }
+                        $('#SubmitEditVacationForm').text('Aktualizovat'); // zmena textu
+                        $('.flash-message').html(successUpdate); // vlozeni hlasky do flash message
+                        $('.chyby').hide(); // schovani chyb
+                        $("#EditVacationForm").modal('hide'); // schovani modalniho okna
+                    }else if(odpoved.errors) {
                         $('#SubmitEditVacationForm').text('Aktualizovat');
-                        $('.flash-message').html(succ);
+                        $('.chyby').html('');
+                        /* Iterace skrze chyby a postupne pridavani jich do elementu chyby */
+                        odpoved.errors.forEach(function (polozka){
+                            $('.chyby').append('<strong>'+polozka+'</strong><br>');
+                        });
+                        /* Zobrazeni chyb */
+                        $('.chyby').show();
+                    } else {
                         $('.chyby').hide();
-                        $("#EditVacationModal").modal('hide');
+                        $('.chyby').html('');
+                        var updateFailed = '<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.fail + '</strong></div>'; // definice chybove hlasky
+                        $('.flash-message').html(updateFailed);
+                        $('#SubmitEditVacationForm').text('Aktualizovat');
+                        $("#EditVacationForm").modal('hide'); // schovani modalniho okna
                     }
                 }
             });
         });
 
 
-        /* Smazani dovolene */
-        var deleteID;
-        $('body').on('click', '#getVacationDelete', function(){
-            deleteID = $(this).data('id');
-            $('#DeleteVacationModal').modal('show');
-            $("#DeleteVacationModal").modal({backdrop: false});
-        })
-        $('#SubmitDeleteVacation').click(function(e) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+        /* Modalni okno slouzici pro smazani dovolenych (po stisknuti tlacitka "Smazat") */
+        var dovolena_id_delete;
+        $('body').on('click', '#obtainVacationDelete', function(){
+            /* ziskani id dovolene skrze tlacitko (data-id atribut) */
+            dovolena_id_delete = $(this).data('id');
+        });
+
+        /* Odstraneni dovolene z databaze */
+        $('#SubmitDeleteVacation').click( function() {
             $.ajax({
-                url: "/employee/VacationActionsEmployee/"+deleteID,
+                url: "/employee/VacationActionsEmployee/"+dovolena_id_delete,
                 method: 'DELETE',
-                beforeSend:function(){
-                    $('#SubmitDeleteVacation').text('Mazání...');
-                },
-                success:function(data) {
-                    var successHtml = '<div class="alert alert-success">'+
-                        '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                        '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                        '</div>';
-                    var failHtml = '<div class="alert alert-danger">'+
-                        '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                        '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                        '</div>';
-                    if(data.success === ''){
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
+                beforeSend:function(){ $('#SubmitDeleteVacation').text('Mazání...'); }, // zmena textu pri kliknuti
+                success:function(odpoved) { // zpracovani odpovedi
+                    var successHtml = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.success + '</strong></div>';
+                    var failHtml = '<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>'+ '<strong>' + odpoved.fail + '</strong></div>';
+                    if(odpoved.success === ''){ // zjisteni, zdali doslo k chybe
                         $('.flash-message').html(failHtml);
                     }else{
                         $('.flash-message').html(successHtml);
                     }
-                    $('.vacation-list').DataTable().ajax.reload();
+                    $('.employee_vacations_table').DataTable().ajax.reload();
                     $('#SubmitDeleteVacation').text('Ano');
-                    $("#DeleteVacationModal").modal('hide');
+                    $("#DeleteVacationForm").modal('hide');
                 }
             })
         });
 
-        /* Ziskani ID dovolene */
-        var id;
-        $('body').on('click', '#getVacationApply', function(){
-            id = $(this).data('id');
-        })
-        /* Zmena stavu zadosti pri zazadani o dovolenou */
-        $('#SubmitApply').click(function(e) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+        /* Ziskani ID dovolene pri stisknuti tlacitka "Zažádat" */
+        var dovolena_zazadani_id;
+        $('body').on('click', '#obtainVacationApply', function(){
+            dovolena_zazadani_id = $(this).data('id');
+        });
+
+        /* Zmena stavu zadosti pri zazadani o dovolenou (zapis do databaze) */
+        $('#SubmitApply').click(function() {
             $.ajax({
-                url: "/employee/vacation/apply/"+id,
+                url: "/employee/vacation/apply/"+dovolena_zazadani_id,
                 method: 'PUT',
-                beforeSend:function(){
-                    $('#SubmitApply').text('Žádání...');
-                },
-                success: function(data) {
-                    if(data.fail) {
-                        $('.chyby_apply').show();
-                        $('.chyby_apply').html('<div class="alert alert-danger">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                            '</div>');
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
+                beforeSend:function(){ $('#SubmitApply').text('Žádání...'); }, // zmena textu pri kliknuti
+                success: function(odpoved) { // zpracovani odpovedi
+                    if(odpoved.success) {
+                        $('.employee_vacations_table').DataTable().ajax.reload();
+                        var successApply = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong> '+ odpoved.success + '</strong></div>';
                         $('#SubmitApply').text('Ano');
-                    } else {
-                        $('.vacation-list').DataTable().ajax.reload();
-                        var succ = '<div class="alert alert-success">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                            '</div>';
-                        $('#SubmitApply').text('Ano');
-                        $('.flash-message').html(succ);
+                        $('.flash-message').html(successApply);
                         $('.chyby_apply').hide();
-                        $("#ApplyVacationModal").modal('hide');
+                        $("#ApplyVacationForm").modal('hide');
+                    } else { // pokud doslo k chybe
+                        $('.chyby_apply').show();
+                        $('.chyby_apply').html('<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.fail + '</strong></div>');
+                        $('#SubmitApply').text('Ano');
                     }
                 }
             });
         });
 
-        /* Ziskani ID dovolene */
-        var id;
-        $('body').on('click', '#getVacationDeleteApply', function(){
-            id = $(this).data('id');
-        })
+        /* Ziskani ID dovolene pri zmacknuti tlacitka "Zrušit žádost" */
+        var dovolena_id_zruseni;
+        $('body').on('click', '#obtainVacationDeleteApply', function(){
+            dovolena_id_zruseni = $(this).data('id');
+        });
+
         /* Zruseni zadosti o dovolenou */
-        $('#SubmitDeleteApply').click(function(e) {
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
+        $('#SubmitDeleteApply').click( function() {
             $.ajax({
-                url: "/employee/vacation/deleteApply/"+id,
+                url: "/employee/vacation/deleteApply/"+dovolena_id_zruseni,
                 method: 'PUT',
-                beforeSend:function(){
-                    $('#SubmitDeleteApply').text('Žádání...');
-                },
-                success: function(data) {
-                    if(data.fail) {
-                        $('.chyby_delete_apply').show();
-                        $('.chyby_delete_apply').html('<div class="alert alert-danger">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.fail +
-                            '</div>');
+                headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')}, // nastaveni csrf tokenu pro odeslani viz vyse
+                beforeSend:function(){ $('#SubmitDeleteApply').text('Žádání...'); }, // zobrazeni textu po zakliknuti tlacitka
+                success: function(odpoved) { // zpracovani odpovedi
+                    if(odpoved.success) {
+                        $('.employee_vacations_table').DataTable().ajax.reload();
+                        var successDel = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.success + '</strong></div>';
                         $('#SubmitDeleteApply').text('Ano');
-                    } else {
-                        $('.vacation-list').DataTable().ajax.reload();
-                        var succ = '<div class="alert alert-success">'+
-                            '<button type="button" class="close" data-dismiss="alert">&times;</button>'+
-                            '<strong><i class="glyphicon glyphicon-ok-sign push-5-r"></i></strong> '+ data.success +
-                            '</div>';
-                        $('#SubmitDeleteApply').text('Ano');
-                        $('.flash-message').html(succ);
+                        $('.flash-message').html(successDel);
                         $('.chyby_delete_apply').hide();
-                        $("#DeleteApplyVacationModal").modal('hide');
+                        $("#DeleteApplyVacationForm").modal('hide');
+                    } else { // pri chybe
+                        $('.chyby_delete_apply').show();
+                        $('.chyby_delete_apply').html('<div class="alert alert-danger">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>'+ odpoved.fail + '</strong></div>');
+                        $('#SubmitDeleteApply').text('Ano');
                     }
                 }
             });

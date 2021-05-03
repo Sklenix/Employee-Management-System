@@ -7,35 +7,28 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
-class CompanyFactory extends Factory
-{
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
+class CompanyFactory extends Factory {
+    /* Nazev souboru: CompanyFactory.php */
+    /* Autor: Pavel Sklenář (xsklen12) */
+    /* Tato trida slouzi jako tovarna pro vyrobu zaznamu firmy */
+
+    /* Napojeni na model */
     protected $model = Company::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
-    {
+    /* Definice samotneho zaznamu */
+    public function definition(){
         return [
-            'company_name' => 'Sklenářství',
+            'company_name' => 'Testovací firma',
             'company_user_name' => 'Pavel',
             'company_user_surname' => 'Sklenář',
             'email' => 'Fload158@gmail.com',
             'company_phone' => '123456789',
-            'company_login' => 'sklenix',
+            'company_login' => 'test',
             'email_verified_at' => now(),
-            'company_url' => '1xG3ONvKj_cjOfP0uMQHDyI0AwtYlDQyI',
-            'password' => Hash::make('ahoj1234'),
-            'remember_token' => Str::random(10),
+            'company_url' => '1hvxk-IaOJm8cO0c72osAObPKZAByThAQ',
+            'password' => Hash::make('qwertz1234'),
             'company_ico' => '12345678',
-            'company_city' => 'Velké Meziříčí',
+            'company_city' => 'Brno',
             'company_street' =>'Třebíčská 10'
         ];
     }

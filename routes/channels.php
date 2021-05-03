@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-/*
+/* Tento soubor je soucasti frameworku Laravel
 |--------------------------------------------------------------------------
 | Broadcast Channels
 |--------------------------------------------------------------------------

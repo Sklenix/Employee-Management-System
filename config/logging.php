@@ -6,7 +6,7 @@ use Monolog\Handler\SyslogUdpHandler;
 
 return [
 
-    /*
+    /* Tento soubor je soucasti frameworku Laravel
     |--------------------------------------------------------------------------
     | Default Log Channel
     |--------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 
 return [
 
-    /*
+    /* Tento soubor je soucasti frameworku Laravel
     |--------------------------------------------------------------------------
     | Authentication Defaults
     |--------------------------------------------------------------------------
@@ -41,6 +41,7 @@ return [
             'provider' => 'users',
             'hash' => false,
         ],
+
         'admin' => [
             'driver' => 'session',
             'provider' => 'admins',
