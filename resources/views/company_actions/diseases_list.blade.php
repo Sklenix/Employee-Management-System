@@ -327,7 +327,7 @@
                     { data: 'employee_picture', name: 'employee_picture', // vyrenderovani profiloveho obrazku zamestnance
                         render: function(odpoved){ // viz https://datatables.net/reference/option/columns.render
                             if(odpoved === null){return "<img src={{ URL::to('/') }}/images/ikona_profil.png width='60'/>";} // Ikonku vytvoril icon king1, odkaz: https://freeicons.io/essential-collection-5/user-icon-icon-4#
-                            return "<img src={{URL::to('/') }}/storage/employee_images/" + odpoved + "width='60' height='50' style='max-width:100%;height:auto;'/>";
+                            return "<img src={{URL::to('/') }}/storage/employee_images/" + odpoved + " width='60' height='50' style='max-width:100%;height:auto;'/>";
                         }, orderable: false},
                     { data: 'employee_name', name: 'employee_name',sClass:'text-center'}, // atribut sClass viz. https://legacy.datatables.net/usage/columns
                     { data: 'employee_surname', name: 'employee_surname',sClass:'text-center'},
@@ -361,6 +361,7 @@
                             $('#nemoc_zacatek').val('');
                             $('#nemoc_konec').val('');
                             $('#poznamka').val('');
+                            $('#zamestnanec_vyber').val('');
                             /* Nacteni tabulky po pridani nemocenske, aby sla ihned videt */
                             $('.company_diseases_table').DataTable().ajax.reload();
                             var successAdd = '<div class="alert alert-success">'+ '<button type="button" class="close" data-dismiss="alert">x</button>'+ '<strong>'+ odpoved.success + '</strong></div>';

@@ -27,23 +27,33 @@ Mezi hlavní funkce systému patří:
 - [Modernizr](https://modernizr.com/)
 - [Laravel IDE Helper Generator](https://github.com/barryvdh/laravel-ide-helper)
 
+## Použité fonty
+- [Roboto](https://fonts.google.com/specimen/Roboto)
+- [Pacifico](https://fonts.google.com/specimen/Pacifico)
+- [Nunito](https://fonts.google.com/specimen/Nunito)
+
 ## Instalace
 ### Prerekvizity
-1. Nainstalovaný nástroj [Composer](https://getcomposer.org/)
-2. Nainstalované libovolné vývojové prostředí pro tvorbu webových aplikací, které obsahuje MySQL databázi a PHP,
+1. Nainstalované libovolné vývojové prostředí pro tvorbu webových aplikací, které obsahuje MySQL databázi a jazyk PHP,  
    například [WAMP Server](https://www.wampserver.com/en/)
-3. Nastavit jazyk PHP jako systémovou proměnnou, aby se dal ovládat z příkazové řádky (cmd) 
+2. Nastavit jazyk PHP jako systémovou proměnnou, poté bude možné ovládat jazyk PHP z příkazové řádky,
+   [návod zde.](https://www.forevolve.com/en/articles/2016/10/27/how-to-add-your-php-runtime-directory-to-your-windows-10-path-environment-variable/)
 ### Proces
-1. Vytvořte soubor **.env**, následně do něj zkopírujte obsah souboru **.env.example**. V souboru **.env** vyplňte 
-údaje potřebné k připojení k databázi.
-2. V kořenovém adresáři spustťe příkaz **composer install** (přes cmd).
-3. Vygenerujte klíč aplikace pomocí příkazu **php artisan key:generate**
-4. Zadejte příkaz **php artisan migrate:fresh** pro vytvoření tabulek a následovně **php artisan db:seed** pro 
-naplnění tabulek záznamy.
-5. Nyní stačí spustit databázi MySQL (WAMP Server) a zadat příkaz **php artisan serve** a přejít na stránku **http://127.0.0.1:8000/**.
-
+1. Pro tvorbu nové databáze je potřeba spustit samotný WAMP Server a přejít na adresu **http://127.0.0.1/**.  Na této adrese se vyskytuje webová stránka, která obsahuje, v sekci  **Tools**, nástroj phpMyAdmin. 
+   V nástroji phpMyAdmin je potřeba kliknout na možnost *Databáze*, která se nachází v menu,  a následně vyplnit název a kódování databáze a stisknout tlačítko *Vytvořit*. V rámci kódování vyberte **utf8mb4_unicode_ci**.
+2. V souboru **.env**, který se nachází ve složce tozondo, vyplňte údaje potřebné k připojení k databázi, která byla vytvořena v nástroji phpMyAdmin. Údaje pro mailový server ponechte beze změn.  Údaje potřebné pro připojení 
+   k databázi jsou konkrétně následující:
+-  *DB_DATABASE* - název databáze vytvořené v phpMyAdmin,
+-  *DB_USERNAME* - uživatelské jméno k nástroji phpMyAdmin (defaultně root),
+- *DB_PASSWORD* - heslo k phpMyAdmin (defaultně bez hesla).
+3. Spusťte příkazovou řádku a dostaňte se v ní do složky tozondo, v které se nachází soubor **artisan**.
+4. Zadejte příkaz **php artisan migrate:fresh** pro vytvoření tabulek a následovně **php artisan db:seed** pro   
+   naplnění tabulek připravenými záznamy.
+5. Nyní stačí zadat příkaz **php artisan serve** a přejít na stránku **http://127.0.0.1:8000/** (musí být spuštěný WAMP Server).
 ### Poznámka
-Pro nahrávání objemnějších souborů je zapotřebí v souboru php.ini přenastavit proměnné post_max_size a upload_max_size na příslušnou požadovanou hodnotu, například 100 MB.
+Pro nahrávání objemnějších souborů, v rámci Google Drive, je zapotřebí v souboru **php.ini**, který se nachází ve složce WAMP Serveru, přenastavit proměnné **post_max_size** a **upload_max_size** na příslušnou požadovanou hodnotu, například 100 MB.
+
+Ukázka cesty k **php.ini** souboru: C:\wamp64\bin\php\php7.4.9\php.ini
 
 ## Licence
 - Framework Laravel je open source software, který je distribuován pod licencí [MIT](https://opensource.org/licenses/MIT).

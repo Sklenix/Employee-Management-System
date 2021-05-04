@@ -85,6 +85,18 @@ class Employee_Shift extends Model {
             ->get();
     }
 
+    /* Nazev funkce: getEmployeeParticularShiftByDates
+       Argumenty: employee_id - identifikator zamestnance, shift_start - zacatek smeny, shift_end - konec smeny
+       Ucel: ziskani konkretni prirazene smeny */
+    public static function getEmployeeParticularShiftByDates($employee_id, $shift_start, $shift_end){
+        return DB::table('table_employee_shifts')
+            ->join('table_employees', 'table_employee_shifts.employee_id', '=', 'table_employees.employee_id')
+            ->join('table_shifts', 'table_employee_shifts.shift_id', '=', 'table_shifts.shift_id')
+            ->select('table_employee_shifts.employee_id','table_employee_shifts.shift_id')
+            ->where(['table_employee_shifts.employee_id' => $employee_id, 'table_shifts.shift_start' => $shift_start, 'table_shifts.shift_end' => $shift_end])
+            ->get();
+    }
+
     /* Nazev funkce: deleteEmployeeAssignedShiftsWithAttendance
        Argumenty: employee_id - identifikator zamestnance, shift_ids_collector - pole identifikatoru smen
        Ucel: odstraneni vsech budoucich smen spolecne s dochazkou konkretniho zamestnance */

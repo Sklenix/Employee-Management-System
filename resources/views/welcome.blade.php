@@ -178,7 +178,7 @@
                     <div class="text-center mt-1">
                         <img src="{{asset("images/google_drive.png")}}" alt="Google Drive ikonka" height="100" width="100" title="Google Drive"/>
                         <h4 class="mt-2">Google Drive</h4>
-                        <p class="text-muted text-justify">Můžete spravovat Vaši Google Drive složku, vytvářet v ní složky, nahrávat soubory a mazat soubory či složky.</p>
+                        <p class="text-muted text-justify">Můžete spravovat Vaši Google Drive složku. Například v ní vytvářet složky, nahrávat do ní soubory či z ní ony soubory odstraňovat.</p>
                     </div>
                 </div>
                 <!-- Ikonka směny: https://freeicons.io/stopwatch-and-time-icons/stopwatch-time-clock-icon-3537#, vytvořil icon king1 -->
@@ -186,7 +186,7 @@
                     <div class="text-center mt-1">
                         <img src="{{asset("images/SmenyWelcome.png")}}" alt="Směny ikonka" height="92" width="92" title="Směny"/>
                         <h4 class="mt-3">Správa směn</h4>
-                        <p class="text-muted">Můžete vytvářet směny a poté je přidávat zaměstnancům.</p>
+                        <p class="text-muted">Můžete vytvářet směny a poté je přiřazovat jednotlivým zaměstnancům.</p>
                     </div>
                 </div>
                 <!-- Ikonka docházky: https://freeicons.io/list,-mail-and-map-icons/list-icon-3298#, vytvořil icon king1 -->

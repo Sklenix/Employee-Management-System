@@ -105,7 +105,7 @@
             </div>
         </a>
     </div>
-    @if($company_url != "")  <!-- Pokud si firma neaktivovala Google Drive, tak ji neni zobrazen -->
+    @if($company_url != "")  <!-- Pokud si firma aktivovala Google Drive, tak ji neni zobrazen -->
         <div class="col-lg-2 col-md-2 text-center">
         </div>
         <div class="col-lg-2 col-md-2 text-center ramecek" style="">

@@ -111,7 +111,7 @@
             </ul>
             <a href="{{route('shifts.index')}}" class="odkaz {{ request()->routeIs('shifts.index') ? 'active' : '' }}" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-list"></i> Seznam směn</a>
             <a href="{{route('attendance.index')}}" class="odkaz border-bottom {{ request()->routeIs('attendance.index') ? 'active' : '' }}" style="padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-address-card-o"></i> Docházka</a>
-            @if($company_url != "") <!-- Pokud si firma neaktivovala Google Drive, tak ji nejsou zobrazeni moznosti Google Drive -->
+            @if($company_url != "") <!-- Pokud si firma aktivovala Google Drive, tak ji nejsou zobrazeni moznosti Google Drive -->
                 <!-- Definice rozbalovaci nabidky v ramci Google Drive -->
                 <a href="#googleDriveDropdown" data-toggle="collapse" class="dropdown-toggle odkaz" style="cursor: pointer;padding-left:30px;color:rgba(255, 255, 255, 0.95);text-decoration: none;padding-bottom: 16px;padding-top: 16px;font-size: 16px;"><i class="fa fa-server"></i> Google Drive <i style="margin-left: 15px;" class="fa fa-caret-down"></i></a>
                 <ul class="collapse list-unstyled" id="googleDriveDropdown" style="margin-bottom:0px;">
@@ -773,12 +773,14 @@
                                         <label class="form-check-label" style="font-size: 17px;" for="nazevJazykyEmployee"> {{$moznost->language_name}}</label><br>
                                     @endforeach
                                 </div>
-                                <div class="form-group text-center">
-                                    <div class="custom-control custom-switch">
-                                        <input type="checkbox" class="custom-control-input" name="googleDriveRequest" id="googleDriveRequest">
-                                        <label class="custom-control-label" style="font-size: 15px;" for="googleDriveRequest">Nasdílet zaměstnanci jeho Google Drive složku.</label>
+                                @if($company_url != "")
+                                    <div class="form-group text-center">
+                                        <div class="custom-control custom-switch">
+                                            <input type="checkbox" class="custom-control-input" name="googleDriveRequest" id="googleDriveRequest">
+                                            <label class="custom-control-label" style="font-size: 15px;" for="googleDriveRequest">Nasdílet zaměstnanci jeho Google Drive složku.</label>
+                                        </div>
                                     </div>
-                                </div>
+                                @endif
                             </div>
                             <div class="modal-footer">
                                 <div class="col-md-12 text-center">

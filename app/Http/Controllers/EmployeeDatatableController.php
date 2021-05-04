@@ -191,37 +191,39 @@ class EmployeeDatatableController extends Controller {
                 $employeeLanguage->save();
             }
         }
-
-        /* Usek kodu zabyvajici se nazvem slozky v Google Drive zamestnance (v tomto systému jmeno a prijmeni zamestnance) */
-        $soubor = $request->jmeno.' '.$request->prijmeni;
-        /*Cesta k autorizacnimu klici*/
-        $authKey = storage_path('app/credentials.json');
-        /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
-        $httpClient = new Client(['verify' => false]);
-        /* Inicializace Google Drive klienta */
-        $GoogleClient = new Google_Client();
-        /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
-        $GoogleClient->setHttpClient($httpClient);
-        /* Nastaveni prihlaseni ke Google Drive API */
-        $GoogleClient->setAuthConfig($authKey);
-        /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
-        $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
-        $googleServ = new Google_Service_Drive($GoogleClient);
-        /* Vytvoreni slozky */
-        $nova_slozka = new Google_Service_Drive_DriveFile();
-        $nova_slozka->setName($soubor);
-        $nova_slozka->setMimeType('application/vnd.google-apps.folder');
-        /*Nasměrování do zvolené složky*/
-        $nova_slozka->setParents([$user->company_url]);
-        /* Vytvoreni slozky na Google Drive */
-        $createdFolder = $googleServ->files->create($nova_slozka, ['mimeType' => 'application/vnd.google-apps.folder', 'uploadType' => "multipart"]);
-        $folderId = $createdFolder->id;
-        /* Pokud chce firma nasdilet slozku zamestnanci */
-        if($request->googleDriveRequest == "true"){
-             $userPermission = new Google_Service_Drive_Permission(['type' => 'user', 'emailAddress' => $request->email, 'role' => 'writer']);
-             $googleServ->permissions->create($folderId, $userPermission, ['emailMessage' => "Dobrý den, Vaše firma Vám nasdílela Vaši Google Drive složku."]);
-             $employeeSearch->update(['employee_url' => $folderId]);
+        if($user->company_url != ""){ // pokud si firma aktivovala Google Drive
+            /* Usek kodu zabyvajici se nazvem slozky v Google Drive zamestnance (v tomto systému jmeno a prijmeni zamestnance) */
+            $soubor = $request->jmeno.' '.$request->prijmeni;
+            /*Cesta k autorizacnimu klici*/
+            $authKey = storage_path('app/credentials.json');
+            /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+            $httpClient = new Client(['verify' => false]);
+            /* Inicializace Google Drive klienta */
+            $GoogleClient = new Google_Client();
+            /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+            $GoogleClient->setHttpClient($httpClient);
+            /* Nastaveni prihlaseni ke Google Drive API */
+            $GoogleClient->setAuthConfig($authKey);
+            /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+            $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+            $googleServ = new Google_Service_Drive($GoogleClient);
+            /* Vytvoreni slozky */
+            $nova_slozka = new Google_Service_Drive_DriveFile();
+            $nova_slozka->setName($soubor);
+            $nova_slozka->setMimeType('application/vnd.google-apps.folder');
+            /*Nasměrování do zvolené složky*/
+            $nova_slozka->setParents([$user->company_url]);
+            /* Vytvoreni slozky na Google Drive */
+            $createdFolder = $googleServ->files->create($nova_slozka, ['mimeType' => 'application/vnd.google-apps.folder', 'uploadType' => "multipart"]);
+            $folderId = $createdFolder->id;
+            /* Pokud chce firma nasdilet slozku zamestnanci */
+            if($request->googleDriveRequest == "true"){
+                $userPermission = new Google_Service_Drive_Permission(['type' => 'user', 'emailAddress' => $request->email, 'role' => 'writer']);
+                $googleServ->permissions->create($folderId, $userPermission, ['emailMessage' => "Dobrý den, Vaše firma Vám nasdílela Vaši Google Drive složku."]);
+                $employeeSearch->update(['employee_url' => $folderId]);
+            }
         }
+
         /* Odeslani odpovedi uzivateli */
         return response()->json(['success'=>'Zaměstnanec '.$request->jmeno.' '.$request->prijmeni.' byl úspešně vytvořen.']);
     }
@@ -985,6 +987,7 @@ class EmployeeDatatableController extends Controller {
        Argumenty: id - jednoznacny identifikator zamestnance, request - zadane hodnoty ve formulari profilu zamestnance
        Ucel: Aktualizace udaju zamestnance */
     public function update(Request $request, $id){
+        $user = Auth::user();
         $zamestnanec = Employee::find($id);
         $idZamestnance = $zamestnanec->employee_id;
         /* Definice pravidel pro validaci */
@@ -1051,34 +1054,37 @@ class EmployeeDatatableController extends Controller {
         $validator = Validator::make($request->all(), $pravidla, $vlastniHlasky);
         if ($validator->fails()) { return response()->json(['fail' => $validator->errors()->all()]); }
 
-        /* Zjisteni zdali ma zamestnanec Google Drive slozku */
-        if($zamestnanec->employee_url != ""){
-            if($zamestnanec->employee_name == $request->jmeno && $zamestnanec->employee_surname == $request->prijmeni){ // pokud ma zamestnanec jmeno a prijmeni stejne, neni spustena aktualizace nazvu Google Drive slozky zamestnance
-            }else{
-                $nazev = $request->jmeno . " " . $request->prijmeni;
-                /*Cesta k autorizacnimu klici*/
-                $authKey = storage_path('app/credentials.json');
-                /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
-                $httpClient = new Client(['verify' => false]);
-                /* Inicializace Google Drive klienta */
-                $GoogleClient = new Google_Client();
-                /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
-                $GoogleClient->setHttpClient($httpClient);
-                /* Nastaveni prihlaseni ke Google Drive API */
-                $GoogleClient->setAuthConfig($authKey);
-                /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
-                $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
-                $googleServ = new Google_Service_Drive($GoogleClient);
-                /* Zjisteni, zdali existuje Google Drive slozka zamestnance, pokud ano a novy nazev je jiny nez stavajici, tak dojde k prejmenovani */
-                $existujeSlozka = $googleServ->files->get($zamestnanec->employee_url);
-                if($existujeSlozka->name == $nazev){
-                }else if($existujeSlozka != NULL){
-                    $novyNazevSlozky = new Google_Service_Drive_DriveFile();
-                    $novyNazevSlozky->setName($nazev);
-                    $googleServ->files->update($zamestnanec->employee_url, $novyNazevSlozky, ['uploadType' => 'multipart']);
+        if($user->company_url != "") { // pokud si firma aktivovala Google Drive
+            /* Zjisteni zdali ma zamestnanec Google Drive slozku */
+            if($zamestnanec->employee_url != ""){
+                if($zamestnanec->employee_name == $request->jmeno && $zamestnanec->employee_surname == $request->prijmeni){ // pokud ma zamestnanec jmeno a prijmeni stejne, neni spustena aktualizace nazvu Google Drive slozky zamestnance
+                }else{
+                    $nazev = $request->jmeno . " " . $request->prijmeni;
+                    /*Cesta k autorizacnimu klici*/
+                    $authKey = storage_path('app/credentials.json');
+                    /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+                    $httpClient = new Client(['verify' => false]);
+                    /* Inicializace Google Drive klienta */
+                    $GoogleClient = new Google_Client();
+                    /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+                    $GoogleClient->setHttpClient($httpClient);
+                    /* Nastaveni prihlaseni ke Google Drive API */
+                    $GoogleClient->setAuthConfig($authKey);
+                    /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+                    $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+                    $googleServ = new Google_Service_Drive($GoogleClient);
+                    /* Zjisteni, zdali existuje Google Drive slozka zamestnance, pokud ano a novy nazev je jiny nez stavajici, tak dojde k prejmenovani */
+                    $existujeSlozka = $googleServ->files->get($zamestnanec->employee_url);
+                    if($existujeSlozka->name == $nazev){
+                    }else if($existujeSlozka != NULL){
+                        $novyNazevSlozky = new Google_Service_Drive_DriveFile();
+                        $novyNazevSlozky->setName($nazev);
+                        $googleServ->files->update($zamestnanec->employee_url, $novyNazevSlozky, ['uploadType' => 'multipart']);
+                    }
                 }
             }
         }
+
         $jeZmenaUdaj = 0;
         $jeZmenaHeslo = 0;
         $jeZmenaJazyk = 0;
@@ -1138,7 +1144,7 @@ class EmployeeDatatableController extends Controller {
         if(isset($request->heslo)){
             $zamestnanec->password = Hash::make($request->heslo);
             /* Definice pravidla */
-            $pravidlo = ['password' => ['string', 'min:8','required_with:heslo_overeni','same:heslo_overeni']];
+            $pravidlo = ['heslo' => ['string', 'min:8','required_with:heslo_overeni','same:heslo_overeni']];
             /* Definice vlastnich hlasek */
             $vlastniHlasky = [
                 'string' => 'Heslo musí být řetězcem.',
@@ -1312,7 +1318,7 @@ class EmployeeDatatableController extends Controller {
                     /* Extrakce dat do tabulky faktu */
                     OlapETL::extractDataToShiftFact($shift, $employee, $shift_info_id, $time_id, $employee_id, $company_id);
                     //return response()->json(['success' => 'Firma je: '.$company_id.', ID času je: '.$time_id.', ID zaměstnance je: '.$employee_id.', ID směny je: '.$shift_info_id]);
-                }
+                }else{}
                 $count++;
             }
         }

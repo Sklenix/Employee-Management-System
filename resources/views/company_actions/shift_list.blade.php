@@ -383,6 +383,7 @@
                             $('#shift_end').val('');
                             $('#shift_place_add').val('');
                             $('#shift_note').val('');
+                            $('#shiftImportance').val('6');
                             $('.company_shifts_table').DataTable().ajax.reload();
                             /* Definice zpravy o uspechu akce */
                             var successAdd = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>'+ '<strong>' + odpoved.success + '</strong> </div>';

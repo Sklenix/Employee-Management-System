@@ -7,5 +7,5 @@ return [
     'from'       => ['address' =>'tozondoservice@gmail.com', 'name' => 'tozondo.com '],
     'encryption' => env('MAIL_ENCRYPTION', 'tls'),
     'username'   => env('MAIL_USERNAME','tozondoservice@gmail.com'),
-    'password'   => env('MAIL_PASSWORD','Bilbo369#')
+    'password'   => env('MAIL_PASSWORD','1H2b#rSaH49?A')
 ];

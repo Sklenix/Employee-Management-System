@@ -319,7 +319,7 @@
             });
 
 
-            /* Po stisknuti tlacitka "Vytvořit dovolenou" dojde k pridani nemocenske do databaze */
+            /* Po stisknuti tlacitka "Vytvořit dovolenou" dojde k pridani dovolene do databaze */
             $('#SubmitCreateVacation').click(function() {
                 $.ajax({
                     url: "{{ route('VacationActions.store') }}",
@@ -339,6 +339,7 @@
                             $('#zacatek_dovolene').val('');
                             $('#konec_dovolene').val('');
                             $('#poznamka').val('');
+                            $('#zamestnanec_vyber').val('');
                             $('.company_vacations_table').DataTable().ajax.reload();
                             /* Definice zpravy o uspechu akce */
                             var successAdd = '<div class="alert alert-success">' + '<button type="button" class="close" data-dismiss="alert">x</button>' + '<strong>' + odpoved.success + '</strong> </div>';

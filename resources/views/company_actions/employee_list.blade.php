@@ -369,13 +369,15 @@
                             <label class="form-check-label" style="font-size: 16px;" for="jazyky"> {{$moznost->language_name}}</label><br>
                         @endforeach
                     </div>
-                    <div class="form-check text-center" style="color:white;margin-top:10px;margin-bottom:5px;">
-                        <input type="checkbox" class="form-check-input" id="povoleniGoogleDrive" name="povoleniGoogleDrive[]" value="1">
-                        <label class="form-check-label" style="font-size: 16px;" for="povoleniGoogleDrive"> Nasdílet zaměstnanci jeho Google Drive složku. </label><br>
-                    </div>
+                    @if($company_url != "")
+                        <div class="form-check text-center" style="color:white;margin-top:10px;margin-bottom:5px;">
+                            <input type="checkbox" class="form-check-input" id="povoleniGoogleDrive" name="povoleniGoogleDrive[]" value="1">
+                            <label class="form-check-label" style="font-size: 16px;" for="povoleniGoogleDrive"> Nasdílet zaměstnanci jeho Google Drive složku. </label><br>
+                        </div>
+                    @endif
                 </div>
                 <div class="modal-footer d-flex justify-content-center">
-                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="EmployeeCreationClicked">Vytvořit</button>
+                    <button type="button" class="btn tlacitkoPotvrzeniOkna" style="color:white;" id="EmployeeCreationClicked">Vytvořit zaměstnance</button>
                     <button type="button" class="btn tlacitkoZavreniOkna" style="color:white;" data-dismiss="modal">Zavřít</button>
                 </div>
             </div>
@@ -644,7 +646,7 @@
                             $('#EmployeeCreationClicked').text('Vytvořit');
                             $('#CreateEmployeeForm').modal('hide'); // schovani modalniho okna
                         } else {
-                            $('#EmployeeCreationClicked').text('Přidat firmu');
+                            $('#EmployeeCreationClicked').text('Vytvořit zaměstnance');
                             $('.chyby_add').html('');
                             /* Iterace skrze chyby a postupne pridavani jich do elementu chyby_add */
                             odpoved.fail.forEach(function (polozka){
@@ -662,7 +664,6 @@
             $('body').on('click', '#obtainDeleteEmployee', function(){
                 zamestnanec_id_delete = $(this).data('id');
                 $('#DeleteEmployeeForm').modal('show');
-                $("#DeleteEmployeeForm").modal({backdrop: false});
             });
 
             /* Realizace smazani zamestnance z databaze za pomoci tlacitka "Smazat" */
@@ -732,7 +733,7 @@
                             $('#SubmitEditArticleForm').text('Aktualizovat');
                             $('.chyby').html('');
                             /* Iterace skrze chyby a postupne pridavani jich do elementu chyby_add */
-                            odpoved.fail.forEach(function (polozka){
+                            odpoved.errors.forEach(function (polozka){
                                 $('.chyby').append('<strong>'+polozka+'</strong><br>');
                             });
                             /* Zobrazeni chyb */
