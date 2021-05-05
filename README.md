@@ -14,6 +14,7 @@ Mezi hlavní funkce systému patří:
 - [Laravel](https://laravel.com/)
 
 ## Použité knihovny
+- [jQuery](https://jquery.com/)
 - [Yajra Datatables](https://yajrabox.com/docs/laravel-datatables/master/installation)
 - [Google Drive API](https://developers.google.com/drive/api/v3/quickstart/php)
 - [Chart.js](https://www.chartjs.org/)
@@ -25,9 +26,16 @@ Mezi hlavní funkce systému patří:
 - [Moment.js](https://momentjs.com/)
 - [Datetimepicker](https://github.com/xdan/datetimepicker/blob/master/MIT-LICENSE.txt)
 - [Modernizr](https://modernizr.com/)
-- [Laravel IDE Helper Generator](https://github.com/barryvdh/laravel-ide-helper)
 
-## Použité fonty
+### Použité programovací jazyky
+- [PHP](https://www.php.net/)
+- [Javascript](https://www.javascript.com/)
+
+### Použité jazyky pro definici struktury a vzhledu webových stránek
+- [HTML](https://www.w3schools.com/html/html_intro.asp)
+- [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+
+### Použité fonty
 - [Roboto](https://fonts.google.com/specimen/Roboto)
 - [Pacifico](https://fonts.google.com/specimen/Pacifico)
 - [Nunito](https://fonts.google.com/specimen/Nunito)
@@ -68,9 +76,7 @@ Ukázka cesty k **php.ini** souboru: C:\wamp64\bin\php\php7.4.9\php.ini
 - Moment.js je knihovna, která je distribuovaná pod licencí [MIT](https://github.com/moment/momentjs.com/blob/master/LICENSE)
 - Datetimepicker je plugin, který je distribuován pod licencí [MIT](https://github.com/xdan/datetimepicker/blob/master/MIT-LICENSE.txt)
 - Modernizr je knihovna, která je distribuovaná pod licencí [MIT](https://github.com/Modernizr/Modernizr/blob/master/LICENSE.md)
-- Laravel IDE Helper Generator je knihovna, která je distribuovaná pod licencí [MIT](https://opensource.org/licenses/MIT)
-
-Laravel IDE Helper Generator byl použit pro generování komentářů pro automatické doplňování v rámci IDE. Jedná se například o doplňování atributů tabulek, metod v rámci modelů, ... 
+- jQuery je knihovna, která je distribuovaná pod licencí [MIT](https://jquery.org/license/).
 
 Jednotlivé licence jsou obsaženy v souboru LICENSE.md
 

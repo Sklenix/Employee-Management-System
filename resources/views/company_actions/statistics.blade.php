@@ -3219,13 +3219,13 @@
         var data_average_max_hour = {{$data_max_shift_hour}};
         renderDoughnutMaxShiftHourGraph(data_average_max_hour,"Nejdelší směna","Nejdelší směna");
         var data_assigned_shifts_by_month = {{$data_shifts_assigned_by_months}};
-        renderBarGraphShiftsAssigned(data_assigned_shifts_by_month,"Počet obsazených směn zaměstnanci dle měsíců","Počet obsazených směn zaměstnanci dle měsíců");
+        renderBarGraphShiftsAssigned(data_assigned_shifts_by_month,"Počet zaměstnaneckých směn dle měsíců","Počet zaměstnaneckých směn dle měsíců");
         var data_shifts_total_hours_by_month = {{$data_shifts_total_hours_by_months}};
-        renderBarGraphShiftsTotalHours(data_shifts_total_hours_by_month,"Celkový počet hodin směn dle měsíců","Celkový počet hodin směn dle měsíců");
+        renderBarGraphShiftsTotalHours(data_shifts_total_hours_by_month,"Součet hodin zaměstnaneckých směn dle měsíců","Součet hodin zaměstnaneckých směn dle měsíců");
         var data_shifts_total_hours = {{$data_shifts_total_hours}};
-        renderDoughnutTotalShiftHoursGraph(data_shifts_total_hours, "Počet celkových hodin směn", "Počet celkových hodin směn");
+        renderDoughnutTotalShiftHoursGraph(data_shifts_total_hours, "Součet hodin zaměstnaneckých směn", "Součet hodin zaměstnaneckých směn");
         var data_shifts_total_worked_hours = {{$data_shifts_total_worked_hours}};
-        renderDoughnutTotalWorkedShiftHoursGraph(data_shifts_total_worked_hours, "Počet celkově odpracovaných hodin na směnách", "Počet celkově odpracovaných hodin na směnách");
+        renderDoughnutTotalWorkedShiftHoursGraph(data_shifts_total_worked_hours, "Počet celkově odpracovaných hodin na zaměstnaneckých směnách", "Počet celkově odpracovaných hodin na zaměstnaneckých směnách");
         var data_shifts_total_late_hours = {{$data_shifts_total_late_hours}};
         renderDoughnutTotalLateShiftHoursGraph(data_shifts_total_late_hours,"Počet celkových hodin zpoždění zaměstnanců", "Počet celkových hodin zpoždění zaměstnanců");
         var data_shifts_total_late_count = {{$data_shifts_total_late_count}};
@@ -3233,13 +3233,13 @@
         var data_employees_average_score_by_time = {{$data_employees_average_employee_score_by_time}};
         renderDoughnutAverageEmployeeScoreByTimeCountGraph(data_employees_average_score_by_time, "Průměrné skóre zaměstnanců v čase ze všech směn", "Průměrné skóre zaměstnanců v čase ze všech směn");
         var data_shifts_total_worked_hours_by_month = {{$data_shifts_total_worked_hours_by_months}};
-        renderBarGraphShiftsTotalWorkedHours(data_shifts_total_worked_hours_by_month, "Počet odpracovaných hodin na směnách dle měsíců", "Počet odpracovaných hodin na směnách dle měsíců");
+        renderBarGraphShiftsTotalWorkedHours(data_shifts_total_worked_hours_by_month, "Počet odpracovaných hodin na zaměstnaneckých směnách dle měsíců", "Počet odpracovaných hodin na zaměstnaneckých směnách dle měsíců");
         var data_shifts_total_late_hours_by_month = {{$data_shifts_total_late_hours_by_months}};
-        renderBarGraphShiftsTotalLateHours(data_shifts_total_late_hours_by_month, "Počet celkových hodin zpoždění dle měsíců", "Počet celkových hodin zpoždění dle měsíců");
+        renderBarGraphShiftsTotalLateHours(data_shifts_total_late_hours_by_month, "Počet celkových hodin zpoždění zaměstnanců dle měsíců", "Počet celkových hodin zpoždění zaměstnanců dle měsíců");
         var data_shifts_total_late_flags_count = {{$data_shifts_total_late_flags_count_by_months}};
-        renderBarGraphShiftsTotalLateFlagsCount(data_shifts_total_late_flags_count, "Počet zpoždění dle měsíců", "Počet zpoždění dle měsíců");
+        renderBarGraphShiftsTotalLateFlagsCount(data_shifts_total_late_flags_count, "Počet zpoždění zaměstnanců, v rámci směn, dle měsíců", "Počet zpoždění zaměstnanců, v rámci směn, dle měsíců");
         var data_shift_total_injuries_flags_count = {{$data_injuries_count_by_month}};
-        renderBarGraphShiftsTotalInjuriesFlagsCount(data_shift_total_injuries_flags_count, "Počet zranění na směnách dle měsíců", "Počet zranění na směnách dle měsíců");
+        renderBarGraphShiftsTotalInjuriesFlagsCount(data_shift_total_injuries_flags_count, "Počet zranění zaměstnanců na směnách dle měsíců", "Počet zranění zaměstnanců na směnách dle měsíců");
         var data_vacations_count = {{$data_vacations_total_count}};
         renderDoughnutVacationsCountGraph(data_vacations_count, "Celkový počet dovolených", "Celkový počet dovolených");
         var data_diseases_count = {{$data_diseases_total_count}};
@@ -3250,11 +3250,11 @@
         renderDoughnutReportsCountGraph(data_reports_count, "Celkový počet nahlášení", "Celkový počet nahlášení");
 
         var data_vacations_by_months = {{$data_vacations_count_by_month}};
-        renderBarGraphVacationsByMonths(data_vacations_by_months,"Počet dovolených dle měsíců","Počet dovolených dle měsíců");
+        renderBarGraphVacationsByMonths(data_vacations_by_months,"Počet dovolených zaměstnanců dle měsíců","Počet dovolených zaměstnanců dle měsíců");
         var data_diseases_by_months = {{$data_diseases_count_by_month}};
-        renderBarGraphDiseasesByMonths(data_diseases_by_months,"Počet nemocenských dle měsíců","Počet nemocenských dle měsíců");
+        renderBarGraphDiseasesByMonths(data_diseases_by_months,"Počet nemocenských zaměstnanců dle měsíců","Počet nemocenských zaměstnanců dle měsíců");
         var data_reports_by_months = {{$data_reports_count_by_month}};
-        renderBarGraphReportsByMonths(data_reports_by_months,"Počet nahlášení dle měsíců","Počet nahlášení dle měsíců");
+        renderBarGraphReportsByMonths(data_reports_by_months,"Počet nahlášení zaměstnanců dle měsíců","Počet nahlášení zaměstnanců dle měsíců");
         var data_employee_average_score_by_months = {{$data_average_employees_scores_by_months}};
         renderBarGraphAverageEmployeesScoreByTime(data_employee_average_score_by_months, "Vývoj průměrného skóre zaměstnanců v čase", "Vývoj průměrného skóre zaměstnanců v čase");
     </script>

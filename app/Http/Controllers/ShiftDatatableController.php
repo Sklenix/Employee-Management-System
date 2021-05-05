@@ -7,6 +7,8 @@ use App\Models\Attendance;
 use App\Models\Employee_Shift;
 use App\Models\ImportancesShifts;
 use App\Models\Languages;
+use App\Models\ShiftFacts;
+use App\Models\ShiftInfoDimension;
 use DateTime;
 use Illuminate\Http\Request;
 use App\Models\Shift;
@@ -865,12 +867,18 @@ class ShiftDatatableController extends Controller {
             if($rozhod == 1){ // pokud je statusem zpozdeni ci ok, tak se indikator prichodu nastavi na 1
                 Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'absence_reason_id' => $request->attendance_absence_reason_id, 'attendance_came' => 1]);
             }else{
+                /* Vyresetovani prichodu a odchodu v ramci dimenze shift_info_dimension a aktualizace tabulky faktu (reset hodnot a aktualizace statusu dochazky) */
+                ShiftInfoDimension::where(['shift_info_id' => $shift_info_id])->update(['attendance_check_in_company' => NULL, 'attendance_check_out_company' => NULL]);
+                ShiftFacts::where(['shift_info_id' => $shift_info_id])->update(['total_worked_hours' => 0, 'late_total_hours' => 0, 'employee_late_flag' => 0, 'employee_injury_flag' => 0, 'attendance_came' => 0, 'absence_reason' => $request->attendance_absence_reason_id]);
                 Attendance::create(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id, 'absence_reason_id' => $request->attendance_absence_reason_id, 'attendance_came' => 0]);
             }
         }else{ // pokud dochazka existuje, tak se jednotliva pole pouze aktualizuji
             if($request->attendance_absence_reason_id == 4 || $request->attendance_absence_reason_id == 5){
                 Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['absence_reason_id' => $request->attendance_absence_reason_id, 'attendance_came' => 1]);
             }else{
+                /* Vyresetovani prichodu a odchodu v ramci dimenze shift_info_dimension a aktualizace tabulky faktu (reset hodnot a aktualizace statusu dochazky) */
+                ShiftInfoDimension::where(['shift_info_id' => $shift_info_id])->update(['attendance_check_in_company' => NULL, 'attendance_check_out_company' => NULL]);
+                ShiftFacts::where(['shift_info_id' => $shift_info_id])->update(['total_worked_hours' => 0, 'late_total_hours' => 0, 'employee_late_flag' => 0, 'employee_injury_flag' => 0, 'attendance_came' => 0, 'absence_reason' => $request->attendance_absence_reason_id]);
                 Attendance::where(['employee_id' => $zamestnanec_id, 'shift_id' => $smena_id])->update(['attendance_check_in_company' => NULL, 'attendance_check_out_company' => NULL,'absence_reason_id' => $request->attendance_absence_reason_id,'attendance_came' => 0]);
             }
         }
