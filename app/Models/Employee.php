@@ -8,59 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticate;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\Employee
- * @property int $employee_id
- * @property string $employee_name
- * @property string $employee_surname
- * @property string $employee_phone
- * @property string $email
- * @property string|null $employee_note
- * @property string $employee_position
- * @property string $employee_city
- * @property string|null $employee_street
- * @property string|null $employee_reliability
- * @property string|null $employee_absence
- * @property string|null $employee_workindex
- * @property string|null $employee_overall
- * @property string|null $employee_drive_url
- * @property string|null $employee_picture
- * @property string $employee_login
- * @property string|null $employee_department
- * @property string $password
- * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property int $employee_company
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
- * @property-read int|null $notifications_count
- * @method static \Illuminate\Database\Eloquent\Builder|Employee newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee query()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmail($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeAbsence($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeCity($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeCompany($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeDepartment($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeDriveUrl($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeLogin($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeNote($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeOverall($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeePhone($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeePicture($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeePosition($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeReliability($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeStreet($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeSurname($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereEmployeeWorkindex($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee wherePassword($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereRememberToken($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Employee extends Authenticate {
     /* Nazev souboru: Employee.php */
     /* Autor: Pavel Sklenář (xsklen12) */

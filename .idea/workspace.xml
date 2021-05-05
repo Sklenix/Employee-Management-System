@@ -21,20 +21,46 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/Auth/ConfirmPasswordController.php" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/StatisticsController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Middleware/PreventRequestsDuringMaintenance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Middleware/PreventRequestsDuringMaintenance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/AbsenceReason.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/AbsenceReason.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Admin.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Admin.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Attendance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Attendance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Company.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Company.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/CompanyDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/CompanyDimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Disease.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Disease.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Employee.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/EmployeeDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/EmployeeDimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Employee_Language.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee_Language.php" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/Models/Employee_Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Employee_Shift.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/mail.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/mail.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/diseases_list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/diseases_list.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/employee_list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/employee_list.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/shift_list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/shift_list.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/vacations_list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/vacations_list.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/homes/company_home.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/layouts/company_dashboard.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/layouts/company_dashboard.blade.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/welcome.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/welcome.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/ImportancesShifts.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ImportancesShifts.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Injury.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Injury.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Languages.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Languages.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Report.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Report.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Report_Importance.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Report_Importance.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Shift.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Shift.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/ShiftFacts.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ShiftFacts.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/ShiftInfoDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/ShiftInfoDimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/TimeDimension.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/TimeDimension.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Models/Vacation.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Models/Vacation.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/factories/CompanyFactory.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/factories/CompanyFactory.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_18_095234_create_importances_shifts_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_18_095234_create_importances_shifts_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_19_112013_create_absence_reasons_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_19_112013_create_absence_reasons_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/migrations/2020_10_20_185032_create_reports_importances_table.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/migrations/2020_10_20_185032_create_reports_importances_table.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/AbsenceReasons.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/AbsenceReasons.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/CompanySeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/CompanySeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/DatabaseSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/DiseasesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/DiseasesSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/EmployeeSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/EmployeeSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/ImportancesReportsSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/ImportancesReportsSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/ImportancesShiftsSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/ImportancesShiftsSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/InjuriesSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/InjuriesSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/ReportsSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/ReportsSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/ShiftsSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/ShiftsSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/seeders/VacationsSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/VacationsSeeder.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/injuries_list.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/injuries_list.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -456,7 +482,9 @@
       <workItem from="1620043312190" duration="3759000" />
       <workItem from="1620077907980" duration="1493000" />
       <workItem from="1620124351776" duration="6111000" />
-      <workItem from="1620137629545" duration="9751000" />
+      <workItem from="1620137629545" duration="10421000" />
+      <workItem from="1620208179495" duration="593000" />
+      <workItem from="1620210735863" duration="6722000" />
     </task>
     <servers />
   </component>

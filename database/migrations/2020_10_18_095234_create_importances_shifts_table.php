@@ -16,7 +16,6 @@ class CreateImportancesShiftsTable extends Migration {
         Schema::create('table_importances_shifts', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id('importance_id');
-            $table->integer('importance_value')->nullable();
             $table->string('importance_description')->nullable();
         });
     }

@@ -127,7 +127,7 @@ class StatisticsController extends Controller {
         $pocet_neprichodu_firmy = Attendance::getCompanyAbsenceNotCameCount($user->company_id);
         $pocet_odmitnuti_smen = Attendance::getCompanyAbsenceDeniedCount($user->company_id);
         $pocet_ok_smen = Attendance::getCompanyAbsenceOKCount($user->company_id);
-        $pocet_nezapsanych = $shifts_assigned_count - ($pocet_absenci_firmy + $pocet_absenci_zpozdeni_firmy + $pocet_absenci_nemoc_firmy + $pocet_odmitnuti_smen + $pocet_ok_smen);
+        $pocet_nezapsanych = $shifts_assigned_count - ($pocet_absenci_firmy + $pocet_absenci_zpozdeni_firmy + $pocet_ok_smen);
         $dochazka_absence_neprichod = json_encode(Attendance::getAttendanceAbsenceNotComeByMonths($user->company_id, Carbon::now()->year));
         $dochazka_absence_nemoc = json_encode(Attendance::getAttendanceAbsenceDiseaseByMonths($user->company_id, Carbon::now()->year));
         $dochazka_absence_odmitl = json_encode(Attendance::getAttendanceAbsenceDeniedByMonths($user->company_id, Carbon::now()->year));

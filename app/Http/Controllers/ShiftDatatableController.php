@@ -824,22 +824,22 @@ class ShiftDatatableController extends Controller {
 
         if($dochazka->isEmpty()){
             foreach ($duvody as $duvod){
-                $out .= '<option id="'.$duvod->reason_value.'" value="'.$duvod->reason_value.'">'.$duvod->reason_description.'</option>';
+                $out .= '<option id="'.$duvod->reason_id.'" value="'.$duvod->reason_id.'">'.$duvod->reason_description.'</option>';
             }
         }else{
             if($dochazka[0]->absence_reason_id == NULL){
                 foreach ($duvody as $duvod){
-                    $out .= '<option id="'.$duvod->reason_value.'" value="'.$duvod->reason_value.'">'.$duvod->reason_description.'</option>';
+                    $out .= '<option id="'.$duvod->reason_id.'" value="'.$duvod->reason_id.'">'.$duvod->reason_description.'</option>';
                 }
             }else{
                 foreach ($duvody as $duvod){
-                    if($duvod->reason_value == $dochazka[0]->absence_reason_id){
-                        $out .= '<option id="'.$duvod->reason_value.'" value="'.$duvod->reason_value.'">'.$duvod->reason_description.'</option>';
+                    if($duvod->reason_id == $dochazka[0]->absence_reason_id){
+                        $out .= '<option id="'.$duvod->reason_id.'" value="'.$duvod->reason_id.'">'.$duvod->reason_description.'</option>';
                     }
                 }
                 foreach ($duvody as $duvod){
-                    if($duvod->reason_value != $dochazka[0]->absence_reason_id){
-                        $out .= '<option id="'.$duvod->reason_value.'" value="'.$duvod->reason_value.'">'.$duvod->reason_description.'</option>';
+                    if($duvod->reason_id != $dochazka[0]->absence_reason_id){
+                        $out .= '<option id="'.$duvod->reason_id.'" value="'.$duvod->reason_id.'">'.$duvod->reason_description.'</option>';
                     }
                 }
             }

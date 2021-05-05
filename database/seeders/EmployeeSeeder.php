@@ -27,7 +27,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 2,
             'employee_login' => 'butler',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-02-09 10:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
@@ -46,7 +46,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 4,
             'employee_login' => 'pearl',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-02-18 12:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
@@ -65,7 +65,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 4,
             'employee_login' => 'xander',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-02-25 10:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
@@ -84,7 +84,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 3,
             'employee_login' => 'felix',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-03-05 10:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
@@ -103,7 +103,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 4,
             'employee_login' => 'bush',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-03-15 14:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
@@ -122,7 +122,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 2,
             'employee_login' => 'maxwell',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-03-25 11:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
@@ -141,7 +141,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 3,
             'employee_login' => 'laurent',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-04-18 09:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);
@@ -160,7 +160,7 @@ class EmployeeSeeder extends Seeder {
             'employee_overall' => 2,
             'employee_login' => 'bale',
             'password' => Hash::make('qwertz1234'),
-            'created_at' => now(),
+            'created_at' => '2021-05-02 15:00:00',
             'updated_at' => now(),
             'employee_company' => '1',
         ]);

@@ -18,7 +18,7 @@ class CompanySeeder extends Seeder {
             'company_user_surname' => 'Sklenář',
             'email' => 'test@gmail.com',
             'company_phone' => '123456789',
-            'company_login' => 'test',
+            'company_login' => 'testovaci',
             'company_email_verified_at' => now(),
             'password' => Hash::make('qwertz1234'),
             'company_ico' => '12345678',

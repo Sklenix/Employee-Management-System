@@ -8,33 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\Shift
- * @property int $shift_id
- * @property string|null $shift_start
- * @property string|null $shift_end
- * @property string|null $shift_note
- * @property string|null $shift_place
- * @property int|null $shift_importance_id
- * @property int $company_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
- * @property-read int|null $notifications_count
- * @method static \Illuminate\Database\Eloquent\Builder|Shift newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Shift newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Shift query()
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereCompanyId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereShiftEnd($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereShiftId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereShiftImportanceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereShiftNote($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereShiftPlace($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereShiftStart($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Shift whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Shift extends Model {
     /* Nazev souboru: Shift.php */
     /* Autor: Pavel Sklenář (xsklen12) */

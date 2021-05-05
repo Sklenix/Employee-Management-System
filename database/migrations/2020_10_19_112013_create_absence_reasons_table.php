@@ -16,7 +16,6 @@ class CreateAbsenceReasonsTable extends Migration {
         Schema::create('table_absence_reasons', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->id('reason_id');
-            $table->integer('reason_value');
             $table->string('reason_description')->nullable();
         });
     }

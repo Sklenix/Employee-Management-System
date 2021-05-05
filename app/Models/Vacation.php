@@ -7,29 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\Vacation
- * @property int $vacation_id
- * @property string|null $vacation_start
- * @property string|null $vacation_end
- * @property string|null $vacation_note
- * @property int $vacation_state
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property int $employee_id
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation query()
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereVacationEnd($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereVacationId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereVacationNote($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereVacationStart($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Vacation whereVacationState($value)
- * @mixin \Eloquent
- */
 class Vacation extends Model {
     /* Nazev souboru: Vacation.php */
     /* Autor: Pavel Sklenář (xsklen12) */

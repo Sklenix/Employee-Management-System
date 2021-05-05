@@ -6,23 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\Employee_Language
- * @property int $language_employee_id
- * @property int $language_id
- * @property int $employee_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language query()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language whereLanguageEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language whereLanguageId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Language whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Employee_Language extends Model {
     /* Nazev souboru: Employee_Language.php */
     /* Autor: Pavel Sklenář (xsklen12) */

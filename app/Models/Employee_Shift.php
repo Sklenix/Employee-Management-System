@@ -6,23 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\Employee_Shift
- * @property int $employee_shift_id
- * @property int $employee_id
- * @property int $shift_id
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift query()
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift whereEmployeeShiftId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift whereShiftId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Employee_Shift whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Employee_Shift extends Model {
     /* Nazev souboru: Employee_Shift.php */
     /* Autor: Pavel Sklenář (xsklen12) */

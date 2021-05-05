@@ -15,7 +15,7 @@ class InjuriesSeeder extends Seeder {
             'injury_id' => '1',
             'injury_description' => 'Vyvrtnutý kotník',
             'injury_date' => '2021-03-09 11:20:00',
-            'created_at' => now(),
+            'created_at' => '2021-03-09 11:20:00',
             'updated_at' => now(),
             'employee_id' => 1,
             'shift_id' => 1
@@ -24,7 +24,7 @@ class InjuriesSeeder extends Seeder {
             'injury_id' => '2',
             'injury_description' => 'Řezná rána na ruce',
             'injury_date' => '2021-02-12 15:05:00',
-            'created_at' => now(),
+            'created_at' => '2021-02-12 15:05:00',
             'updated_at' => now(),
             'employee_id' => 2,
             'shift_id' => 4
@@ -33,7 +33,7 @@ class InjuriesSeeder extends Seeder {
             'injury_id' => '3',
             'injury_description' => 'Vykloubené rameno',
             'injury_date' => '2021-03-20 13:10:00',
-            'created_at' => now(),
+            'created_at' => '2021-03-20 13:10:00',
             'updated_at' => now(),
             'employee_id' => 3,
             'shift_id' => 9
@@ -42,10 +42,19 @@ class InjuriesSeeder extends Seeder {
             'injury_id' => '4',
             'injury_description' => 'Upadnutí',
             'injury_date' => '2021-03-14 17:32:00',
-            'created_at' => now(),
+            'created_at' => '2021-03-14 17:32:00',
             'updated_at' => now(),
             'employee_id' => 5,
             'shift_id' => 12
+        ]);
+        DB::table('table_injuries')->insert([
+            'injury_id' => '5',
+            'injury_description' => 'Řezná rána',
+            'injury_date' => '2021-04-14 16:32:00',
+            'created_at' => '2021-04-14 16:32:00',
+            'updated_at' => now(),
+            'employee_id' => 4,
+            'shift_id' => 25
         ]);
     }
 }

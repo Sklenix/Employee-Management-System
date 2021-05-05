@@ -8,34 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use function PHPUnit\Framework\isEmpty;
 
-/**
- * App\Models\Attendance
- * Tato trida je modelem k tabulce table_attendances
- * @property int $attendance_id
- * @property int $attendance_came
- * @property string|null $attendance_note
- * @property string|null $attendance_check_in
- * @property string|null $attendance_check_out
- * @property string|null $attendance_check_in_company
- * @property string|null $attendance_check_out_company
- * @property int|null $absence_reason_id
- * @property int|null $employee_id
- * @property int|null $shift_id
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance query()
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAbsenceReasonId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAttendanceCame($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAttendanceCheckIn($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAttendanceCheckInCompany($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAttendanceCheckOut($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAttendanceCheckOutCompany($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAttendanceId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereAttendanceNote($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Attendance whereShiftId($value)
- * @mixin \Eloquent
- */
 class Attendance extends Model {
     /* Nazev souboru: Attendance.php */
     /* Autor: Pavel Sklenář (xsklen12) */

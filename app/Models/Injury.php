@@ -7,27 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\Injury
- * @property int $injury_id
- * @property string|null $injury_description
- * @property string|null $injury_date
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property int $employee_id
- * @property int $shift_id
- * @method static \Illuminate\Database\Eloquent\Builder|Injury newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Injury newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Injury query()
- * @method static \Illuminate\Database\Eloquent\Builder|Injury whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Injury whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Injury whereInjuryDate($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Injury whereInjuryDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Injury whereInjuryId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Injury whereShiftId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Injury whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Injury extends Model {
     /* Nazev souboru: Injury.php */
     /* Autor: Pavel Sklenář (xsklen12) */

@@ -6,19 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\AbsenceReason
- * @property int $reason_id
- * @property int $reason_value
- * @property string|null $reason_description
- * @method static \Illuminate\Database\Eloquent\Builder|AbsenceReason newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|AbsenceReason newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|AbsenceReason query()
- * @method static \Illuminate\Database\Eloquent\Builder|AbsenceReason whereReasonDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AbsenceReason whereReasonId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|AbsenceReason whereReasonValue($value)
- * @mixin \Eloquent
- */
 class AbsenceReason extends Model {
     /* Nazev souboru: AbsenceReason.php */
     /* Autor: Pavel Sklenář (xsklen12) */
@@ -30,16 +17,14 @@ class AbsenceReason extends Model {
     protected $table = 'table_absence_reasons';
     public $timestamps = false;
     /* Definice atributu tabulky, s kterymi model pracuje */
-    protected $fillable = [
-        'reason_description','reason_value'
-    ];
+    protected $fillable = ['reason_description'];
 
     /* Nazev funkce: getAllReasons
        Argumenty: zadne
        Ucel: ziskani vsech duvodu absence (pro status dochazky) */
     public static function getAllReasons(){
         return DB::table('table_absence_reasons')
-            ->select('table_absence_reasons.reason_description','table_absence_reasons.reason_value')
+            ->select('table_absence_reasons.reason_id', 'table_absence_reasons.reason_description')
             ->get();
     }
 

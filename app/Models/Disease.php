@@ -7,31 +7,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-/**
- * App\Models\Disease
- * @property int $disease_id
- * @property string|null $disease_name
- * @property string|null $disease_from
- * @property string|null $disease_to
- * @property int $disease_state
- * @property string|null $disease_note
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property int $employee_id
- * @method static \Illuminate\Database\Eloquent\Builder|Disease newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Disease newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Disease query()
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereDiseaseFrom($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereDiseaseId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereDiseaseName($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereDiseaseNote($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereDiseaseState($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereDiseaseTo($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereEmployeeId($value)
- * @method static \Illuminate\Database\Eloquent\Builder|Disease whereUpdatedAt($value)
- * @mixin \Eloquent
- */
 class Disease extends Model {
     /* Nazev souboru: Disease.php */
     /* Autor: Pavel Sklenář (xsklen12) */

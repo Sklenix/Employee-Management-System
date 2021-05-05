@@ -29,7 +29,7 @@
                 <table class="company_injuries_table">
                 <thead>
                     <tr>
-                        <th width="5%">Fotka</th>
+                        <th width="4%">Fotka</th>
                         <th width="9%">Jméno</th>
                         <th width="9%">Příjmení</th>
                         <th width="18%">Popis zranění</th>
@@ -37,7 +37,7 @@
                         <th width="12%">Začátek směny</th>
                         <th width="12%">Konec směny</th>
                         <th width="10%">Lokace</th>
-                        <th width="13%">Akce <button style="float:right;font-weight: 200;" class="btn btn-dark btn-md" type="button"  data-toggle="modal" data-target="#InjuryCreateForm"><i class="fa fa-plus-square-o"></i> Vytvořit</button></th>
+                        <th width="14%">Akce <button style="float:right;font-weight: 200;" class="btn btn-dark btn-md" type="button"  data-toggle="modal" data-target="#InjuryCreateForm"><i class="fa fa-plus-square-o"></i> Vytvořit</button></th>
                     </tr>
                 </thead>
                 <tbody>
