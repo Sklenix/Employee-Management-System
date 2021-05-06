@@ -544,7 +544,10 @@ class UserCompanyController extends Controller {
             $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
             $googleServ = new Google_Service_Drive($GoogleClient);
             /* Postupne odstranovani souboru */
-            foreach ($request->google_drive_delete_listFile as $slozka){ $googleServ->files->delete($slozka); }
+            foreach ($request->google_drive_delete_listFile as $slozka){
+                Employee::where(['employee_url' => $slozka])->update(['employee_url' => ""]); // zruseni identifikatoru slozky u zamestnance v databazi
+                $googleServ->files->delete($slozka);
+            }
             /* Odeslani hlasky o uspechu uzivateli */
             if (count($request->google_drive_delete_listFile) == 1) {
                 session()->flash('success', 'Soubor byl úspešně smazán!');
@@ -840,6 +843,28 @@ class UserCompanyController extends Controller {
         if($request->zamestnanciDeleteDashboard != NULL){
             /* Iterace skrz vybrane zamestnance a jejich postupne odstranovani z databaze a OLAP sekce systemu */
             foreach ($request->zamestnanciDeleteDashboard as $zamestnanec){
+                $zamestnanecSlozka = Employee::find($zamestnanec);
+                /* Odstraneni zamestnanecke Google Drive slozky z Google Drive slozky firmy */
+                if($zamestnanecSlozka->employee_url != ""){ // pokud zamestnanec ma Google Drive slozku
+                    /*Cesta k autorizacnimu klici*/
+                    $authKey = storage_path('app/credentials.json');
+                    /* Inicializace klienta a nastaveni atributu verify na false (pote neni pozadovan certifikat SSL, nebo TLS) */
+                    $httpClient = new Client(['verify' => false]);
+                    /* Inicializace Google Drive klienta */
+                    $GoogleClient = new Google_Client();
+                    /* Diky tomuto nastaveni (setHttpClient) bude mozno pracovat s Google Drive API i bez SSL nebo TLS certifikatu, nebot httpClient ma nastaven atribut verify na false */
+                    $GoogleClient->setHttpClient($httpClient);
+                    /* Nastaveni prihlaseni ke Google Drive API */
+                    $GoogleClient->setAuthConfig($authKey);
+                    /* Pro moznost nahravani, vytvareni souboru, ... je potreba nastavit scope na Google_Service_Drive::DRIVE */
+                    $GoogleClient->addScope([Google_Service_Drive::DRIVE]);
+                    $googleServ = new Google_Service_Drive($GoogleClient);
+                    /* Pokud zamestnanec ma Google Drive slozku, tak je mu smazana */
+                    $existujeSlozka = $googleServ->files->get($zamestnanecSlozka->employee_url);
+                    if ($existujeSlozka != NULL) {
+                        $googleServ->files->delete($zamestnanecSlozka->employee_url);
+                    }
+                }
                 /* Odstraneni zamestnance z OLAP sekce systemu a databaze */
                 OlapETL::deleteRecordFromEmployeeDimension($zamestnanec);
                 DB::table('table_employees')->where(['table_employees.employee_id' => $zamestnanec])->delete();

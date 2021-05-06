@@ -315,6 +315,11 @@ class AdminCompaniesDatatable extends Controller {
                               <p class="d-flex justify-content-center">Účet vytvořen '.$created_at.', naposledy aktualizován '.$updated_at.'.</p>
                          </div>
                          <div class="tab-pane" id="zmenaHesla">
+                           <div class="row" style="margin-bottom:10px;">
+                                <div class="col-md-12">
+                                    <input type="button" class="btn btn-sm btn-warning pull-right" value="Generovat heslo" onClick="generator_edit_password_admin();">
+                                </div>
+                            </div>
                              <div class="form-group">
                                 <div class="row">
                                     <label for="password" class="col-form-label col-md-2 text-center" style="font-size: 15px;">Heslo (<span style="color:red;">*</span>)</label>
@@ -403,6 +408,19 @@ class AdminCompaniesDatatable extends Controller {
                                             OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
                                             DEALINGS IN THE SOFTWARE.
                                             */
+
+                                            /* Funkce pro vygenerovani hesla pro zmenu hesla firmy */
+                                            function generator_edit_password_admin() {
+                                                  var znaky = "PQRSTUVWXYZ123!@#$()4567890abcd+efghijklm-nop456789qABCDEFGHIJKLMNOrst456789uvwxyz";
+                                                  var heslo = "";
+                                                  var i = 0;
+                                                  while(i < 10){
+                                                        heslo += znaky.charAt(Math.floor(Math.random()*znaky.length));
+                                                        i++;
+                                                  }
+                                                  document.getElementById("password_edit").value = heslo;
+                                                  document.getElementById("password_confirmation_edit").value = heslo;
+                                             }
                                         </script>
                                     </div>
                                 </div>
@@ -530,7 +548,7 @@ class AdminCompaniesDatatable extends Controller {
         /* Zjisteni, zdali uzivatel zmenil heslo a pripadna aktualizace hesla v databazi*/
         if(isset($request->heslo)){
             /* Definice pravidel pro validaci udaju a jeji provedeni */
-            $validator = Validator::make($request->all(), ['password' => ['string', 'min:8','required_with:potvrzeni_hesla','same:potvrzeni_hesla']]);
+            $validator = Validator::make($request->all(), ['heslo' => ['string', 'min:8','required_with:potvrzeni_hesla','same:potvrzeni_hesla']]);
             /* Pokud selze validace (inkorektni udaje) */
             if ($validator->fails()) { return response()->json(['errors' => $validator->errors()->all()]);}
 

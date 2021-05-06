@@ -44,7 +44,7 @@
     </a>
     <a class="btn btn-dark" href="{{route('employee_generator.employeeprofile')}}" style="color:black;margin-right: 25px;margin-bottom:5px;">
         <div style="padding-top: 50px;padding-bottom:50px;">
-            <h5 style="color:white;">&nbsp;Údaje zaměstnance&nbsp;</h5>
+            <h5 style="color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Moje údaje&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
         </div>
     </a>
     <div class="col-12" style="margin-top: 10px;">
@@ -58,7 +58,7 @@
     </a>
     <a class="btn btn-dark" href="{{route('employee_generator.shifthistoryList')}}" style="color:black;margin-right: 25px;margin-bottom:5px;">
         <div style="padding-top: 50px;padding-bottom:50px;">
-            <h5 style="color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Historie směn&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
+            <h5 style="color:white;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Všechny směny&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h5>
         </div>
     </a>
     <a class="btn btn-dark" href="{{route('employee_generator.injuriesList')}}" style="color:black;margin-right: 25px;margin-bottom:5px;">

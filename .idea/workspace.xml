@@ -21,13 +21,9 @@
   <component name="ChangeListManager">
     <list default="true" id="5fe1a4c3-9806-4973-9278-1dd08952e493" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LICENSE.md" beforeDir="false" afterPath="$PROJECT_DIR$/LICENSE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/EmployeeDatatableController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/ShiftDatatableController.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeders/DatabaseSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/DatabaseSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/seeders/LanguageSeeder.php" beforeDir="false" afterPath="$PROJECT_DIR$/database/seeders/LanguageSeeder.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/company_actions/statistics.blade.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/AdminCompaniesDatatable.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/AdminCompaniesDatatable.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/UserCompanyController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/views/employee_actions/file_generator.blade.php" beforeDir="false" afterPath="$PROJECT_DIR$/resources/views/employee_actions/file_generator.blade.php" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -451,7 +447,12 @@
       <workItem from="1620124351776" duration="6111000" />
       <workItem from="1620137629545" duration="10421000" />
       <workItem from="1620208179495" duration="593000" />
-      <workItem from="1620210735863" duration="12850000" />
+      <workItem from="1620210735863" duration="12979000" />
+      <workItem from="1620229063713" duration="22000" />
+      <workItem from="1620229639236" duration="3140000" />
+      <workItem from="1620250008184" duration="71000" />
+      <workItem from="1620300910978" duration="2514000" />
+      <workItem from="1620306859795" duration="1036000" />
     </task>
     <servers />
   </component>
